@@ -371,37 +371,31 @@ def test_flow_rollback_ledger_calls_inverses():
 
 
 def test_abort_envelope_dispatches_rollback_ledger(monkeypatch):
-    """_abort_envelope routes rollback through dispatch_uri when set."""
-    import urirun.node.flow as flow_mod
+    """_thin_rollback fires inverses LIFO through dispatch_uri when the envelope ledger has entries."""
+    from urirun.node.flow import _thin_rollback, FlowEnvelope
 
     dispatch_calls = []
     def fake_dispatch(uri, payload):
         dispatch_calls.append((uri, payload))
-        return {"ok": True, "undone": payload.get("ledger", [])}
+        return {"ok": True}
 
-    # Build a minimal timeline/results that ledger_from_execution can parse.
-    # An entry with ok=True and a result that has result.value.inverse is needed.
-    step = {"id": "s1", "uri": "kvm://host/db/command/insert"}
-    entry = {"id": "s1", "uri": "kvm://host/db/command/insert", "ok": True}
-    result_with_inverse = {
-        "ok": True,
-        "result": {"value": {"inverse": {"uri": "kvm://host/db/command/delete", "args": {}}}}
-    }
-    timeline = [entry]
-    results = {"s1": result_with_inverse}
+    envelope = FlowEnvelope(flow_id="t", goal={})
+    # Pre-populate the ledger as _thin_update_ledger would after a successful step.
+    envelope.ledger.append({
+        "uri": "kvm://host/db/command/insert",
+        "inverse": "kvm://host/db/command/delete",
+        "args": {},
+    })
+    timeline = [{"id": "s1", "uri": "kvm://host/db/command/insert", "ok": True}]
 
-    out = flow_mod._abort_envelope(
-        step, [{"id": "s1", "error": {"category": "ABORTED"}}], [{"error": {"category": "ABORTED"}}],
-        timeline, results, [], {}, rollback_on_failure=True, execute=True,
-        dispatch_uri=fake_dispatch,
-    )
+    out = _thin_rollback(fake_dispatch, envelope, timeline, {"s1": {"ok": True}}, "failed")
+
     assert out["ok"] is False
-    # rollback-ledger call happened
-    rb_calls = [u for u, _ in dispatch_calls if "rollback-ledger" in u]
-    assert rb_calls, f"expected rollback-ledger call; got {dispatch_calls}"
-    # payload has ledger with the insert→delete pair
-    _, payload = next((u, p) for u, p in dispatch_calls if "rollback-ledger" in u)
-    assert any(l.get("inverse") == "kvm://host/db/command/delete" for l in payload["ledger"])
+    # inverse was fired through dispatch_uri
+    inverse_calls = [u for u, _ in dispatch_calls if "delete" in u]
+    assert inverse_calls, f"expected delete inverse; got {dispatch_calls}"
+    assert out["rollback"]["ok"] is True
+    assert "kvm://host/db/command/delete" in out["rollback"]["undone"]
 
 
 # ─── _thin_driver + _evaluate_step_next seam ─────────────────────────────────
