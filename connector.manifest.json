@@ -1,0 +1,416 @@
+{
+  "version": "urirun.bindings.v2",
+  "bindings": {
+    "twin://host/browser/query/profile": {
+      "uri": "twin://host/browser/query/profile",
+      "kind": "local-function",
+      "adapter": "local-function",
+      "python": {
+        "type": "python",
+        "module": "urirun_connector_twin.core",
+        "export": "browser_profile"
+      },
+      "policy": {
+        "allowExecute": true
+      },
+      "meta": {
+        "connector": "twin",
+        "label": "Select best Chrome session for domain"
+      },
+      "inputSchema": {
+        "properties": {
+          "domain": {
+            "default": "",
+            "title": "Domain",
+            "type": "string"
+          },
+          "prompt": {
+            "default": "",
+            "title": "Prompt",
+            "type": "string"
+          },
+          "probe_cookies": {
+            "default": true,
+            "title": "Probe Cookies",
+            "type": "boolean"
+          }
+        },
+        "title": "browser_profileInput",
+        "type": "object",
+        "additionalProperties": false
+      }
+    },
+    "twin://host/browser/query/sessions": {
+      "uri": "twin://host/browser/query/sessions",
+      "kind": "local-function",
+      "adapter": "local-function",
+      "python": {
+        "type": "python",
+        "module": "urirun_connector_twin.core",
+        "export": "browser_sessions"
+      },
+      "policy": {
+        "allowExecute": true
+      },
+      "meta": {
+        "connector": "twin",
+        "label": "Enumerate live Chrome sessions"
+      },
+      "inputSchema": {
+        "properties": {
+          "probe_cookies": {
+            "default": false,
+            "title": "Probe Cookies",
+            "type": "boolean"
+          }
+        },
+        "title": "browser_sessionsInput",
+        "type": "object",
+        "additionalProperties": false
+      }
+    },
+    "twin://host/constraints/query/from-profile": {
+      "uri": "twin://host/constraints/query/from-profile",
+      "kind": "local-function",
+      "adapter": "local-function",
+      "python": {
+        "type": "python",
+        "module": "urirun_connector_twin.core",
+        "export": "constraints_from_profile"
+      },
+      "policy": {
+        "allowExecute": true
+      },
+      "meta": {
+        "connector": "twin",
+        "label": "Infeasible constraints from actionMatrix"
+      },
+      "inputSchema": {
+        "properties": {
+          "actionMatrix": {
+            "additionalProperties": true,
+            "title": "Actionmatrix",
+            "type": "object"
+          }
+        },
+        "required": [
+          "actionMatrix"
+        ],
+        "title": "constraints_from_profileInput",
+        "type": "object",
+        "additionalProperties": false
+      }
+    },
+    "twin://host/environment/query/profile": {
+      "uri": "twin://host/environment/query/profile",
+      "kind": "local-function",
+      "adapter": "local-function",
+      "python": {
+        "type": "python",
+        "module": "urirun_connector_twin.core",
+        "export": "environment_profile"
+      },
+      "policy": {
+        "allowExecute": true
+      },
+      "meta": {
+        "connector": "twin",
+        "label": "Twin environment probe"
+      },
+      "inputSchema": {
+        "properties": {
+          "node": {
+            "default": "",
+            "title": "Node",
+            "type": "string"
+          },
+          "prompt": {
+            "default": "",
+            "title": "Prompt",
+            "type": "string"
+          }
+        },
+        "title": "environment_profileInput",
+        "type": "object",
+        "additionalProperties": false
+      }
+    },
+    "twin://host/mock/command/create": {
+      "uri": "twin://host/mock/command/create",
+      "kind": "local-function",
+      "adapter": "local-function",
+      "python": {
+        "type": "python",
+        "module": "urirun_connector_twin.core",
+        "export": "mock_create"
+      },
+      "policy": {
+        "allowExecute": true
+      },
+      "meta": {
+        "connector": "twin",
+        "label": "Generate Docker mock for unavailable target",
+        "external": true
+      },
+      "inputSchema": {
+        "properties": {
+          "prompt": {
+            "default": "",
+            "title": "Prompt",
+            "type": "string"
+          },
+          "flow": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Flow"
+          },
+          "target": {
+            "default": "",
+            "title": "Target",
+            "type": "string"
+          }
+        },
+        "title": "mock_createInput",
+        "type": "object",
+        "additionalProperties": false
+      }
+    },
+    "twin://host/monitor/event": {
+      "uri": "twin://host/monitor/event",
+      "kind": "local-function",
+      "adapter": "local-function",
+      "python": {
+        "type": "python",
+        "module": "urirun_connector_twin.core",
+        "export": "monitor_event"
+      },
+      "policy": {
+        "allowExecute": true
+      },
+      "meta": {
+        "connector": "twin",
+        "label": "Twin monitor SSE event marker"
+      },
+      "inputSchema": {
+        "properties": {
+          "node": {
+            "default": "",
+            "title": "Node",
+            "type": "string"
+          },
+          "stateSig": {
+            "default": "",
+            "title": "Statesig",
+            "type": "string"
+          },
+          "narration": {
+            "default": "",
+            "title": "Narration",
+            "type": "string"
+          }
+        },
+        "title": "monitor_eventInput",
+        "type": "object",
+        "additionalProperties": false
+      }
+    },
+    "twin://host/plan/command/from-prompt": {
+      "uri": "twin://host/plan/command/from-prompt",
+      "kind": "local-function",
+      "adapter": "local-function",
+      "python": {
+        "type": "python",
+        "module": "urirun_connector_twin.core",
+        "export": "plan_from_prompt_route"
+      },
+      "policy": {
+        "allowExecute": true
+      },
+      "meta": {
+        "connector": "twin",
+        "label": "Derive imperative plan from NL prompt",
+        "external": true
+      },
+      "inputSchema": {
+        "properties": {
+          "prompt": {
+            "title": "Prompt",
+            "type": "string"
+          },
+          "node": {
+            "default": "",
+            "title": "Node",
+            "type": "string"
+          },
+          "include_mock": {
+            "default": false,
+            "title": "Include Mock",
+            "type": "boolean"
+          },
+          "probe_browser": {
+            "default": true,
+            "title": "Probe Browser",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "prompt"
+        ],
+        "title": "plan_from_prompt_routeInput",
+        "type": "object",
+        "additionalProperties": false
+      }
+    },
+    "twin://host/plan/command/generate": {
+      "uri": "twin://host/plan/command/generate",
+      "kind": "local-function",
+      "adapter": "local-function",
+      "python": {
+        "type": "python",
+        "module": "urirun_connector_twin.core",
+        "export": "plan_generate"
+      },
+      "policy": {
+        "allowExecute": true
+      },
+      "meta": {
+        "connector": "twin",
+        "label": "Generate imperative plan from flow + environment",
+        "external": true
+      },
+      "inputSchema": {
+        "properties": {
+          "flow": {
+            "additionalProperties": true,
+            "title": "Flow",
+            "type": "object"
+          },
+          "prompt": {
+            "default": "",
+            "title": "Prompt",
+            "type": "string"
+          },
+          "node": {
+            "default": "",
+            "title": "Node",
+            "type": "string"
+          },
+          "include_mock": {
+            "default": false,
+            "title": "Include Mock",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "flow"
+        ],
+        "title": "plan_generateInput",
+        "type": "object",
+        "additionalProperties": false
+      }
+    },
+    "twin://host/sandbox/command/probe": {
+      "uri": "twin://host/sandbox/command/probe",
+      "kind": "local-function",
+      "adapter": "local-function-subprocess",
+      "python": {
+        "type": "python",
+        "module": "urirun_connector_twin.core",
+        "export": "sandbox_probe"
+      },
+      "policy": {
+        "allowExecute": true
+      },
+      "meta": {
+        "connector": "twin",
+        "label": "Prove reversibility in a disposable Docker sandbox"
+      },
+      "inputSchema": {
+        "properties": {
+          "image": {
+            "default": "alpine:3",
+            "title": "Image",
+            "type": "string"
+          },
+          "scan_cmd": {
+            "default": "ls /data 2>/dev/null || echo EMPTY",
+            "title": "Scan Cmd",
+            "type": "string"
+          },
+          "forward_cmd": {
+            "default": "true",
+            "title": "Forward Cmd",
+            "type": "string"
+          },
+          "inverse_cmd": {
+            "default": "true",
+            "title": "Inverse Cmd",
+            "type": "string"
+          },
+          "setup_cmd": {
+            "default": "mkdir -p /data",
+            "title": "Setup Cmd",
+            "type": "string"
+          },
+          "uri": {
+            "default": "",
+            "title": "Uri",
+            "type": "string"
+          }
+        },
+        "title": "sandbox_probeInput",
+        "type": "object",
+        "additionalProperties": false
+      }
+    },
+    "twin://host/step/query/feasibility": {
+      "uri": "twin://host/step/query/feasibility",
+      "kind": "local-function",
+      "adapter": "local-function",
+      "python": {
+        "type": "python",
+        "module": "urirun_connector_twin.core",
+        "export": "step_feasibility"
+      },
+      "policy": {
+        "allowExecute": true
+      },
+      "meta": {
+        "connector": "twin",
+        "label": "Check URI step feasibility"
+      },
+      "inputSchema": {
+        "properties": {
+          "uri": {
+            "title": "Uri",
+            "type": "string"
+          },
+          "node": {
+            "default": "",
+            "title": "Node",
+            "type": "string"
+          },
+          "prompt": {
+            "default": "",
+            "title": "Prompt",
+            "type": "string"
+          }
+        },
+        "required": [
+          "uri"
+        ],
+        "title": "step_feasibilityInput",
+        "type": "object",
+        "additionalProperties": false
+      }
+    }
+  }
+}
