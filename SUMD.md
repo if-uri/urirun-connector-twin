@@ -957,7 +957,7 @@ sumd_interface('cli', '').
 
 ```toon markpact:analysis path=project/calls.toon.yaml
 # code2llm call graph | /home/tom/github/if-uri/urirun-connector-twin
-# generated in 0.05s
+# generated in 0.04s
 # nodes: 84 | edges: 108 | modules: 9
 # CC̄=4.2
 
@@ -978,30 +978,30 @@ HUBS[20]:
     CC=7  in:0  out:16  total:16
   urirun_connector_twin.planner.annotate_steps
     CC=8  in:2  out:13  total:15
-  urirun_connector_twin.browser.select_session
-    CC=15  in:3  out:11  total:14
   urirun_connector_twin.core.flow_preflight
     CC=9  in:0  out:14  total:14
+  urirun_connector_twin.browser.select_session
+    CC=15  in:3  out:11  total:14
   urirun_connector_twin.sandbox._simulated_probe
     CC=1  in:1  out:12  total:13
-  urirun_connector_twin.core.browser_profile
-    CC=7  in:0  out:12  total:12
   urirun_connector_twin.core._prompt_result
     CC=5  in:1  out:11  total:12
-  urirun_connector_twin.proof_cache.proof_record
-    CC=10  in:2  out:10  total:12
   urirun_connector_twin.prompt_plan._raw_steps_for_target
     CC=13  in:1  out:11  total:12
+  urirun_connector_twin.proof_cache.proof_record
+    CC=10  in:2  out:10  total:12
   urirun_connector_twin.core.step_feasibility
     CC=4  in:0  out:12  total:12
-  urirun_connector_twin.dispatch.uri_call
-    CC=10  in:6  out:5  total:11
+  urirun_connector_twin.core.browser_profile
+    CC=7  in:0  out:12  total:12
   urirun_connector_twin.prompt_plan.derive_task_target
     CC=2  in:5  out:6  total:11
-  urirun_connector_twin.mock.generate_mock
-    CC=5  in:4  out:6  total:10
+  urirun_connector_twin.dispatch.uri_call
+    CC=10  in:6  out:5  total:11
   urirun_connector_twin.browser._selection
     CC=6  in:3  out:7  total:10
+  urirun_connector_twin.mock.generate_mock
+    CC=5  in:4  out:6  total:10
 
 MODULES:
   urirun_connector_twin.browser  [11 funcs]
