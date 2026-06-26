@@ -14,13 +14,13 @@ flowchart TD
         urirun_connector_twin__browser__select_best_session["select_best_session"]
         urirun_connector_twin__dispatch__set_transport["set_transport"]
         urirun_connector_twin__prompt_plan___file_write_steps["_file_write_steps"]
-        urirun_connector_twin__environment___probe_browser["_probe_browser"]
-        urirun_connector_twin__environment__probe("probe CC=11")
-        urirun_connector_twin__proof_cache__DictProofStore__get["get"]
         urirun_connector_twin__core__environment_profile["environment_profile"]
         urirun_connector_twin__core__constraints_from_profile["constraints_from_profile"]
         urirun_connector_twin__core__browser_sessions["browser_sessions"]
+        urirun_connector_twin__core__browser_profile["browser_profile"]
+        urirun_connector_twin__core__plan_from_prompt_route["plan_from_prompt_route"]
+        urirun_connector_twin__core__plan_annotate["plan_annotate"]
         ...["+23 more"]
     end
 
-    class urirun_connector_twin__sandbox__Scenario__signature,urirun_connector_twin__browser___extract_chrome_info,urirun_connector_twin__browser__select_best_session,urirun_connector_twin__dispatch__set_transport,urirun_connector_twin__prompt_plan___file_write_steps,urirun_connector_twin__proof_cache__DictProofStore__get,urirun_connector_twin__core__environment_profile,urirun_connector_twin__core__constraints_from_profile,urirun_connector_twin__core__browser_sessions,urirun_connector_twin__core__browser_profile entry
+    class urirun_connector_twin__sandbox__Scenario__signature,urirun_connector_twin__browser___extract_chrome_info,urirun_connector_twin__browser__select_best_session,urirun_connector_twin__dispatch__set_transport,urirun_connector_twin__prompt_plan___file_write_steps,urirun_connector_twin__core__environment_profile,urirun_connector_twin__core__constraints_from_profile,urirun_connector_twin__core__browser_sessions,urirun_connector_twin__core__browser_profile,urirun_connector_twin__core__plan_from_prompt_route entry

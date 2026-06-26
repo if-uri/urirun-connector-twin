@@ -5,76 +5,20 @@ stats:
   total_edges: 108
   modules_count: 9
 nodes:
-  urirun_connector_twin.browser._domain_key:
-    name: _domain_key
+  urirun_connector_twin.browser._extract_chrome_info:
+    name: _extract_chrome_info
     module: urirun_connector_twin.browser
-    line: 302
-    cyclomatic_complexity: 3
-    calls_out: 3
-    calls_in: 1
-  urirun_connector_twin.planner.build_imperative_plan:
-    name: build_imperative_plan
-    module: urirun_connector_twin.planner
-    line: 106
-    cyclomatic_complexity: 8
-    calls_out: 14
-    calls_in: 6
-  urirun_connector_twin.environment._host_os_info:
-    name: _host_os_info
-    module: urirun_connector_twin.environment
-    line: 68
-    cyclomatic_complexity: 1
-    calls_out: 7
-    calls_in: 1
-  urirun_connector_twin.dispatch.uri_call:
-    name: uri_call
-    module: urirun_connector_twin.dispatch
-    line: 33
-    cyclomatic_complexity: 10
-    calls_out: 5
-    calls_in: 6
-  urirun_connector_twin.environment._kvm_query:
-    name: _kvm_query
-    module: urirun_connector_twin.environment
-    line: 38
-    cyclomatic_complexity: 4
-    calls_out: 3
-    calls_in: 2
-  urirun_connector_twin.planner._is_infeasible:
-    name: _is_infeasible
-    module: urirun_connector_twin.planner
-    line: 51
+    line: 253
     cyclomatic_complexity: 5
-    calls_out: 3
-    calls_in: 1
-  urirun_connector_twin.prompt_plan._raw_steps_for_target:
-    name: _raw_steps_for_target
-    module: urirun_connector_twin.prompt_plan
-    line: 203
-    cyclomatic_complexity: 13
-    calls_out: 11
-    calls_in: 1
-  urirun_connector_twin.mock._resolve_service:
-    name: _resolve_service
-    module: urirun_connector_twin.mock
-    line: 68
-    cyclomatic_complexity: 5
-    calls_out: 2
-    calls_in: 1
-  urirun_connector_twin.browser.select_session:
-    name: select_session
-    module: urirun_connector_twin.browser
-    line: 202
-    cyclomatic_complexity: 15
-    calls_out: 11
-    calls_in: 3
-  urirun_connector_twin.core.browser_sessions:
-    name: browser_sessions
-    module: urirun_connector_twin.core
-    line: 119
-    cyclomatic_complexity: 3
-    calls_out: 6
+    calls_out: 4
     calls_in: 0
+  urirun_connector_twin.prompt_plan._extract_domain:
+    name: _extract_domain
+    module: urirun_connector_twin.prompt_plan
+    line: 25
+    cyclomatic_complexity: 5
+    calls_out: 4
+    calls_in: 1
   urirun_connector_twin.prompt_plan._extract_url:
     name: _extract_url
     module: urirun_connector_twin.prompt_plan
@@ -82,27 +26,20 @@ nodes:
     cyclomatic_complexity: 2
     calls_out: 2
     calls_in: 2
-  urirun_connector_twin.prompt_plan._post_on_social_steps:
-    name: _post_on_social_steps
-    module: urirun_connector_twin.prompt_plan
-    line: 82
+  urirun_connector_twin.browser._port_open:
+    name: _port_open
+    module: urirun_connector_twin.browser
+    line: 142
     cyclomatic_complexity: 2
-    calls_out: 0
+    calls_out: 1
     calls_in: 1
-  urirun_connector_twin.core._run_compose:
-    name: _run_compose
-    module: urirun_connector_twin.core
-    line: 292
-    cyclomatic_complexity: 4
+  urirun_connector_twin.mock._detect_service:
+    name: _detect_service
+    module: urirun_connector_twin.mock
+    line: 60
+    cyclomatic_complexity: 3
     calls_out: 2
-    calls_in: 2
-  urirun_connector_twin.dispatch.value_of:
-    name: value_of
-    module: urirun_connector_twin.dispatch
-    line: 67
-    cyclomatic_complexity: 4
-    calls_out: 4
-    calls_in: 2
+    calls_in: 1
   urirun_connector_twin.browser.discover_browser_sessions:
     name: discover_browser_sessions
     module: urirun_connector_twin.browser
@@ -110,82 +47,12 @@ nodes:
     cyclomatic_complexity: 15
     calls_out: 17
     calls_in: 4
-  urirun_connector_twin.browser._cdp_cookies:
-    name: _cdp_cookies
-    module: urirun_connector_twin.browser
-    line: 66
-    cyclomatic_complexity: 13
-    calls_out: 32
-    calls_in: 1
-  urirun_connector_twin.sandbox.scenario_for_uri:
-    name: scenario_for_uri
-    module: urirun_connector_twin.sandbox
-    line: 82
-    cyclomatic_complexity: 6
-    calls_out: 3
-    calls_in: 4
-  urirun_connector_twin.core.proof_record_route:
-    name: proof_record_route
-    module: urirun_connector_twin.core
-    line: 380
-    cyclomatic_complexity: 1
-    calls_out: 6
-    calls_in: 0
-  urirun_connector_twin.prompt_plan.derive_task_target:
-    name: derive_task_target
+  urirun_connector_twin.prompt_plan.steps_from_prompt:
+    name: steps_from_prompt
     module: urirun_connector_twin.prompt_plan
-    line: 187
+    line: 227
     cyclomatic_complexity: 2
-    calls_out: 6
-    calls_in: 5
-  urirun_connector_twin.browser._extract_flag:
-    name: _extract_flag
-    module: urirun_connector_twin.browser
-    line: 46
-    cyclomatic_complexity: 3
     calls_out: 3
-    calls_in: 4
-  urirun_connector_twin.core.mock_create:
-    name: mock_create
-    module: urirun_connector_twin.core
-    line: 231
-    cyclomatic_complexity: 3
-    calls_out: 7
-    calls_in: 0
-  urirun_connector_twin.prompt_plan.plan_from_prompt:
-    name: plan_from_prompt
-    module: urirun_connector_twin.prompt_plan
-    line: 245
-    cyclomatic_complexity: 1
-    calls_out: 3
-    calls_in: 1
-  urirun_connector_twin.core.plan_annotate:
-    name: plan_annotate
-    module: urirun_connector_twin.core
-    line: 203
-    cyclomatic_complexity: 1
-    calls_out: 3
-    calls_in: 0
-  urirun_connector_twin.prompt_plan._bind_node:
-    name: _bind_node
-    module: urirun_connector_twin.prompt_plan
-    line: 239
-    cyclomatic_complexity: 1
-    calls_out: 1
-    calls_in: 1
-  urirun_connector_twin.planner._step_surface:
-    name: _step_surface
-    module: urirun_connector_twin.planner
-    line: 59
-    cyclomatic_complexity: 7
-    calls_out: 3
-    calls_in: 1
-  urirun_connector_twin.sandbox._simulated_probe:
-    name: _simulated_probe
-    module: urirun_connector_twin.sandbox
-    line: 146
-    cyclomatic_complexity: 1
-    calls_out: 12
     calls_in: 1
   urirun_connector_twin.core.browser_profile:
     name: browser_profile
@@ -194,319 +61,25 @@ nodes:
     cyclomatic_complexity: 7
     calls_out: 12
     calls_in: 0
-  urirun_connector_twin.sandbox._run:
-    name: _run
-    module: urirun_connector_twin.sandbox
-    line: 98
-    cyclomatic_complexity: 4
-    calls_out: 2
-    calls_in: 2
-  urirun_connector_twin.browser._is_browser:
-    name: _is_browser
-    module: urirun_connector_twin.browser
-    line: 39
-    cyclomatic_complexity: 3
-    calls_out: 3
-    calls_in: 2
-  urirun_connector_twin.prompt_plan._service_stop_steps:
-    name: _service_stop_steps
-    module: urirun_connector_twin.prompt_plan
-    line: 133
-    cyclomatic_complexity: 1
-    calls_out: 0
-    calls_in: 1
-  urirun_connector_twin.browser._proc_cmdline:
-    name: _proc_cmdline
-    module: urirun_connector_twin.browser
-    line: 31
-    cyclomatic_complexity: 2
-    calls_out: 4
-    calls_in: 1
-  urirun_connector_twin.core.proof_check_route:
-    name: proof_check_route
+  urirun_connector_twin.core.browser_sessions:
+    name: browser_sessions
     module: urirun_connector_twin.core
-    line: 372
-    cyclomatic_complexity: 1
-    calls_out: 5
-    calls_in: 0
-  urirun_connector_twin.mock._detect_service:
-    name: _detect_service
-    module: urirun_connector_twin.mock
-    line: 60
+    line: 119
     cyclomatic_complexity: 3
-    calls_out: 2
-    calls_in: 1
-  urirun_connector_twin.prompt_plan.steps_from_prompt:
-    name: steps_from_prompt
-    module: urirun_connector_twin.prompt_plan
-    line: 227
-    cyclomatic_complexity: 2
-    calls_out: 3
-    calls_in: 1
-  urirun_connector_twin.planner.extract_steps_from_flow:
-    name: extract_steps_from_flow
-    module: urirun_connector_twin.planner
-    line: 100
-    cyclomatic_complexity: 4
-    calls_out: 4
-    calls_in: 1
-  urirun_connector_twin.core.sandbox_probe:
-    name: sandbox_probe
-    module: urirun_connector_twin.core
-    line: 336
-    cyclomatic_complexity: 3
-    calls_out: 4
-    calls_in: 0
-  urirun_connector_twin.core._target_of:
-    name: _target_of
-    module: urirun_connector_twin.core
-    line: 435
-    cyclomatic_complexity: 2
-    calls_out: 2
-    calls_in: 1
-  urirun_connector_twin.environment._constraints_from_profile_local:
-    name: _constraints_from_profile_local
-    module: urirun_connector_twin.environment
-    line: 46
-    cyclomatic_complexity: 3
-    calls_out: 2
-    calls_in: 1
-  urirun_connector_twin.environment._probe_browser:
-    name: _probe_browser
-    module: urirun_connector_twin.environment
-    line: 88
-    cyclomatic_complexity: 5
     calls_out: 6
-    calls_in: 1
-  urirun_connector_twin.prompt_plan._extract_text_to_type:
-    name: _extract_text_to_type
-    module: urirun_connector_twin.prompt_plan
-    line: 37
-    cyclomatic_complexity: 5
-    calls_out: 8
-    calls_in: 1
-  urirun_connector_twin.core.mock_start_probe_stop:
-    name: mock_start_probe_stop
-    module: urirun_connector_twin.core
-    line: 244
-    cyclomatic_complexity: 7
-    calls_out: 16
     calls_in: 0
+  urirun_connector_twin.environment._safe_import:
+    name: _safe_import
+    module: urirun_connector_twin.environment
+    line: 29
+    cyclomatic_complexity: 3
+    calls_out: 2
+    calls_in: 1
   urirun_connector_twin.prompt_plan._location_ok:
     name: _location_ok
     module: urirun_connector_twin.prompt_plan
     line: 171
     cyclomatic_complexity: 4
-    calls_out: 2
-    calls_in: 1
-  urirun_connector_twin.browser._cdp_pages:
-    name: _cdp_pages
-    module: urirun_connector_twin.browser
-    line: 55
-    cyclomatic_complexity: 2
-    calls_out: 4
-    calls_in: 2
-  urirun_connector_twin.proof_cache.proof_record:
-    name: proof_record
-    module: urirun_connector_twin.proof_cache
-    line: 64
-    cyclomatic_complexity: 10
-    calls_out: 10
-    calls_in: 2
-  urirun_connector_twin.sandbox._parse_sections:
-    name: _parse_sections
-    module: urirun_connector_twin.sandbox
-    line: 106
-    cyclomatic_complexity: 2
-    calls_out: 7
-    calls_in: 1
-  urirun_connector_twin.planner._route_suffix:
-    name: _route_suffix
-    module: urirun_connector_twin.planner
-    line: 45
-    cyclomatic_complexity: 2
-    calls_out: 4
-    calls_in: 3
-  urirun_connector_twin.environment._constraints_via_uri:
-    name: _constraints_via_uri
-    module: urirun_connector_twin.environment
-    line: 57
-    cyclomatic_complexity: 3
-    calls_out: 4
-    calls_in: 1
-  urirun_connector_twin.prompt_plan._browser_fill_and_submit_steps:
-    name: _browser_fill_and_submit_steps
-    module: urirun_connector_twin.prompt_plan
-    line: 71
-    cyclomatic_complexity: 1
-    calls_out: 1
-    calls_in: 1
-  urirun_connector_twin.core.step_feasibility:
-    name: step_feasibility
-    module: urirun_connector_twin.core
-    line: 319
-    cyclomatic_complexity: 4
-    calls_out: 12
-    calls_in: 0
-  urirun_connector_twin.sandbox._docker_available:
-    name: _docker_available
-    module: urirun_connector_twin.sandbox
-    line: 94
-    cyclomatic_complexity: 1
-    calls_out: 1
-    calls_in: 1
-  urirun_connector_twin.prompt_plan._fallback_describe_steps:
-    name: _fallback_describe_steps
-    module: urirun_connector_twin.prompt_plan
-    line: 140
-    cyclomatic_complexity: 1
-    calls_out: 0
-    calls_in: 1
-  urirun_connector_twin.browser._extract_chrome_info:
-    name: _extract_chrome_info
-    module: urirun_connector_twin.browser
-    line: 253
-    cyclomatic_complexity: 5
-    calls_out: 4
-    calls_in: 0
-  urirun_connector_twin.proof_cache.proof_key:
-    name: proof_key
-    module: urirun_connector_twin.proof_cache
-    line: 41
-    cyclomatic_complexity: 1
-    calls_out: 2
-    calls_in: 3
-  urirun_connector_twin.environment.probe:
-    name: probe
-    module: urirun_connector_twin.environment
-    line: 107
-    cyclomatic_complexity: 11
-    calls_out: 17
-    calls_in: 7
-  urirun_connector_twin.sandbox.probe_reversibility:
-    name: probe_reversibility
-    module: urirun_connector_twin.sandbox
-    line: 166
-    cyclomatic_complexity: 2
-    calls_out: 4
-    calls_in: 1
-  urirun_connector_twin.core.flow_preflight:
-    name: flow_preflight
-    module: urirun_connector_twin.core
-    line: 402
-    cyclomatic_complexity: 9
-    calls_out: 14
-    calls_in: 0
-  urirun_connector_twin.prompt_plan._extract_query:
-    name: _extract_query
-    module: urirun_connector_twin.prompt_plan
-    line: 50
-    cyclomatic_complexity: 3
-    calls_out: 5
-    calls_in: 1
-  urirun_connector_twin.core.environment_profile:
-    name: environment_profile
-    module: urirun_connector_twin.core
-    line: 95
-    cyclomatic_complexity: 2
-    calls_out: 3
-    calls_in: 0
-  urirun_connector_twin.core.plan_from_prompt_route:
-    name: plan_from_prompt_route
-    module: urirun_connector_twin.core
-    line: 156
-    cyclomatic_complexity: 13
-    calls_out: 18
-    calls_in: 0
-  urirun_connector_twin.proof_cache.preflight_step:
-    name: preflight_step
-    module: urirun_connector_twin.proof_cache
-    line: 90
-    cyclomatic_complexity: 9
-    calls_out: 15
-    calls_in: 1
-  urirun_connector_twin.core._proof_store:
-    name: _proof_store
-    module: urirun_connector_twin.core
-    line: 363
-    cyclomatic_complexity: 1
-    calls_out: 1
-    calls_in: 3
-  urirun_connector_twin.browser._selection:
-    name: _selection
-    module: urirun_connector_twin.browser
-    line: 311
-    cyclomatic_complexity: 6
-    calls_out: 7
-    calls_in: 3
-  urirun_connector_twin.prompt_plan._browser_open_steps:
-    name: _browser_open_steps
-    module: urirun_connector_twin.prompt_plan
-    line: 60
-    cyclomatic_complexity: 1
-    calls_out: 0
-    calls_in: 2
-  urirun_connector_twin.core.constraints_from_profile:
-    name: constraints_from_profile
-    module: urirun_connector_twin.core
-    line: 103
-    cyclomatic_complexity: 4
-    calls_out: 5
-    calls_in: 0
-  urirun_connector_twin.prompt_plan._screenshot_steps:
-    name: _screenshot_steps
-    module: urirun_connector_twin.prompt_plan
-    line: 112
-    cyclomatic_complexity: 1
-    calls_out: 0
-    calls_in: 1
-  urirun_connector_twin.prompt_plan._extract_domain:
-    name: _extract_domain
-    module: urirun_connector_twin.prompt_plan
-    line: 25
-    cyclomatic_complexity: 5
-    calls_out: 4
-    calls_in: 1
-  urirun_connector_twin.prompt_plan._search_steps:
-    name: _search_steps
-    module: urirun_connector_twin.prompt_plan
-    line: 100
-    cyclomatic_complexity: 1
-    calls_out: 1
-    calls_in: 1
-  urirun_connector_twin.prompt_plan._classify_task_type:
-    name: _classify_task_type
-    module: urirun_connector_twin.prompt_plan
-    line: 179
-    cyclomatic_complexity: 6
-    calls_out: 2
-    calls_in: 1
-  urirun_connector_twin.browser._port_open:
-    name: _port_open
-    module: urirun_connector_twin.browser
-    line: 142
-    cyclomatic_complexity: 2
-    calls_out: 1
-    calls_in: 1
-  urirun_connector_twin.core._local_browser_profile:
-    name: _local_browser_profile
-    module: urirun_connector_twin.core
-    line: 55
-    cyclomatic_complexity: 1
-    calls_out: 3
-    calls_in: 1
-  urirun_connector_twin.core.plan_generate:
-    name: plan_generate
-    module: urirun_connector_twin.core
-    line: 214
-    cyclomatic_complexity: 4
-    calls_out: 5
-    calls_in: 0
-  urirun_connector_twin.planner._step_reversible:
-    name: _step_reversible
-    module: urirun_connector_twin.planner
-    line: 68
-    cyclomatic_complexity: 3
     calls_out: 2
     calls_in: 1
   urirun_connector_twin.core._safe_import:
@@ -516,41 +89,146 @@ nodes:
     cyclomatic_complexity: 3
     calls_out: 2
     calls_in: 1
-  urirun_connector_twin.planner.annotate_steps:
-    name: annotate_steps
-    module: urirun_connector_twin.planner
-    line: 76
-    cyclomatic_complexity: 8
-    calls_out: 13
-    calls_in: 2
-  urirun_connector_twin.core.proof_gate_route:
-    name: proof_gate_route
+  urirun_connector_twin.core._prompt_result:
+    name: _prompt_result
     module: urirun_connector_twin.core
-    line: 394
-    cyclomatic_complexity: 1
+    line: 71
+    cyclomatic_complexity: 5
+    calls_out: 11
+    calls_in: 1
+  urirun_connector_twin.core.mock_create:
+    name: mock_create
+    module: urirun_connector_twin.core
+    line: 231
+    cyclomatic_complexity: 3
+    calls_out: 7
+    calls_in: 0
+  urirun_connector_twin.dispatch.value_of:
+    name: value_of
+    module: urirun_connector_twin.dispatch
+    line: 67
+    cyclomatic_complexity: 4
+    calls_out: 4
+    calls_in: 2
+  urirun_connector_twin.browser._is_browser:
+    name: _is_browser
+    module: urirun_connector_twin.browser
+    line: 39
+    cyclomatic_complexity: 3
+    calls_out: 3
+    calls_in: 2
+  urirun_connector_twin.planner._step_reversible:
+    name: _step_reversible
+    module: urirun_connector_twin.planner
+    line: 68
+    cyclomatic_complexity: 3
+    calls_out: 2
+    calls_in: 1
+  urirun_connector_twin.browser.select_session:
+    name: select_session
+    module: urirun_connector_twin.browser
+    line: 202
+    cyclomatic_complexity: 15
+    calls_out: 11
+    calls_in: 3
+  urirun_connector_twin.planner._step_surface:
+    name: _step_surface
+    module: urirun_connector_twin.planner
+    line: 59
+    cyclomatic_complexity: 7
+    calls_out: 3
+    calls_in: 1
+  urirun_connector_twin.core.sandbox_probe:
+    name: sandbox_probe
+    module: urirun_connector_twin.core
+    line: 336
+    cyclomatic_complexity: 3
     calls_out: 4
     calls_in: 0
-  urirun_connector_twin.prompt_plan._service_start_steps:
-    name: _service_start_steps
+  urirun_connector_twin.prompt_plan._screenshot_steps:
+    name: _screenshot_steps
     module: urirun_connector_twin.prompt_plan
-    line: 126
+    line: 112
     cyclomatic_complexity: 1
     calls_out: 0
     calls_in: 1
-  urirun_connector_twin.sandbox._docker_probe:
-    name: _docker_probe
-    module: urirun_connector_twin.sandbox
-    line: 131
-    cyclomatic_complexity: 1
-    calls_out: 5
+  urirun_connector_twin.environment._constraints_via_uri:
+    name: _constraints_via_uri
+    module: urirun_connector_twin.environment
+    line: 57
+    cyclomatic_complexity: 3
+    calls_out: 4
     calls_in: 1
-  urirun_connector_twin.sandbox._verdict:
-    name: _verdict
+  urirun_connector_twin.sandbox.probe_reversibility:
+    name: probe_reversibility
     module: urirun_connector_twin.sandbox
-    line: 118
-    cyclomatic_complexity: 4
-    calls_out: 0
+    line: 166
+    cyclomatic_complexity: 2
+    calls_out: 4
+    calls_in: 1
+  urirun_connector_twin.prompt_plan._browser_fill_and_submit_steps:
+    name: _browser_fill_and_submit_steps
+    module: urirun_connector_twin.prompt_plan
+    line: 71
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 1
+  urirun_connector_twin.proof_cache.proof_record:
+    name: proof_record
+    module: urirun_connector_twin.proof_cache
+    line: 64
+    cyclomatic_complexity: 10
+    calls_out: 10
     calls_in: 2
+  urirun_connector_twin.dispatch.uri_call:
+    name: uri_call
+    module: urirun_connector_twin.dispatch
+    line: 33
+    cyclomatic_complexity: 10
+    calls_out: 5
+    calls_in: 6
+  urirun_connector_twin.prompt_plan._post_on_social_steps:
+    name: _post_on_social_steps
+    module: urirun_connector_twin.prompt_plan
+    line: 82
+    cyclomatic_complexity: 2
+    calls_out: 0
+    calls_in: 1
+  urirun_connector_twin.prompt_plan._service_stop_steps:
+    name: _service_stop_steps
+    module: urirun_connector_twin.prompt_plan
+    line: 133
+    cyclomatic_complexity: 1
+    calls_out: 0
+    calls_in: 1
+  urirun_connector_twin.environment._probe_browser:
+    name: _probe_browser
+    module: urirun_connector_twin.environment
+    line: 88
+    cyclomatic_complexity: 5
+    calls_out: 6
+    calls_in: 1
+  urirun_connector_twin.browser._cdp_pages:
+    name: _cdp_pages
+    module: urirun_connector_twin.browser
+    line: 55
+    cyclomatic_complexity: 2
+    calls_out: 4
+    calls_in: 2
+  urirun_connector_twin.sandbox._parse_sections:
+    name: _parse_sections
+    module: urirun_connector_twin.sandbox
+    line: 106
+    cyclomatic_complexity: 2
+    calls_out: 7
+    calls_in: 1
+  urirun_connector_twin.planner.build_imperative_plan:
+    name: build_imperative_plan
+    module: urirun_connector_twin.planner
+    line: 106
+    cyclomatic_complexity: 8
+    calls_out: 14
+    calls_in: 6
   urirun_connector_twin.prompt_plan._guess_service_name:
     name: _guess_service_name
     module: urirun_connector_twin.prompt_plan
@@ -558,19 +236,131 @@ nodes:
     cyclomatic_complexity: 2
     calls_out: 3
     calls_in: 2
-  urirun_connector_twin.environment._safe_import:
-    name: _safe_import
-    module: urirun_connector_twin.environment
-    line: 29
-    cyclomatic_complexity: 3
+  urirun_connector_twin.mock._resolve_service:
+    name: _resolve_service
+    module: urirun_connector_twin.mock
+    line: 68
+    cyclomatic_complexity: 5
     calls_out: 2
     calls_in: 1
-  urirun_connector_twin.mock._compose_yaml:
-    name: _compose_yaml
-    module: urirun_connector_twin.mock
-    line: 81
+  urirun_connector_twin.browser._extract_flag:
+    name: _extract_flag
+    module: urirun_connector_twin.browser
+    line: 46
     cyclomatic_complexity: 3
     calls_out: 3
+    calls_in: 4
+  urirun_connector_twin.prompt_plan.derive_task_target:
+    name: derive_task_target
+    module: urirun_connector_twin.prompt_plan
+    line: 187
+    cyclomatic_complexity: 2
+    calls_out: 6
+    calls_in: 5
+  urirun_connector_twin.planner._route_suffix:
+    name: _route_suffix
+    module: urirun_connector_twin.planner
+    line: 45
+    cyclomatic_complexity: 2
+    calls_out: 4
+    calls_in: 3
+  urirun_connector_twin.prompt_plan._extract_query:
+    name: _extract_query
+    module: urirun_connector_twin.prompt_plan
+    line: 50
+    cyclomatic_complexity: 3
+    calls_out: 5
+    calls_in: 1
+  urirun_connector_twin.prompt_plan._service_start_steps:
+    name: _service_start_steps
+    module: urirun_connector_twin.prompt_plan
+    line: 126
+    cyclomatic_complexity: 1
+    calls_out: 0
+    calls_in: 1
+  urirun_connector_twin.core.proof_check_route:
+    name: proof_check_route
+    module: urirun_connector_twin.core
+    line: 372
+    cyclomatic_complexity: 1
+    calls_out: 5
+    calls_in: 0
+  urirun_connector_twin.sandbox._run:
+    name: _run
+    module: urirun_connector_twin.sandbox
+    line: 98
+    cyclomatic_complexity: 4
+    calls_out: 2
+    calls_in: 2
+  urirun_connector_twin.core.environment_profile:
+    name: environment_profile
+    module: urirun_connector_twin.core
+    line: 95
+    cyclomatic_complexity: 2
+    calls_out: 3
+    calls_in: 0
+  urirun_connector_twin.environment._host_os_info:
+    name: _host_os_info
+    module: urirun_connector_twin.environment
+    line: 68
+    cyclomatic_complexity: 1
+    calls_out: 7
+    calls_in: 1
+  urirun_connector_twin.core.proof_record_route:
+    name: proof_record_route
+    module: urirun_connector_twin.core
+    line: 380
+    cyclomatic_complexity: 1
+    calls_out: 6
+    calls_in: 0
+  urirun_connector_twin.sandbox._simulated_probe:
+    name: _simulated_probe
+    module: urirun_connector_twin.sandbox
+    line: 146
+    cyclomatic_complexity: 1
+    calls_out: 12
+    calls_in: 1
+  urirun_connector_twin.browser._domain_key:
+    name: _domain_key
+    module: urirun_connector_twin.browser
+    line: 302
+    cyclomatic_complexity: 3
+    calls_out: 3
+    calls_in: 1
+  urirun_connector_twin.prompt_plan.plan_from_prompt:
+    name: plan_from_prompt
+    module: urirun_connector_twin.prompt_plan
+    line: 245
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 1
+  urirun_connector_twin.environment._kvm_query:
+    name: _kvm_query
+    module: urirun_connector_twin.environment
+    line: 38
+    cyclomatic_complexity: 4
+    calls_out: 3
+    calls_in: 2
+  urirun_connector_twin.planner.annotate_steps:
+    name: annotate_steps
+    module: urirun_connector_twin.planner
+    line: 76
+    cyclomatic_complexity: 8
+    calls_out: 13
+    calls_in: 2
+  urirun_connector_twin.core.plan_annotate:
+    name: plan_annotate
+    module: urirun_connector_twin.core
+    line: 203
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 0
+  urirun_connector_twin.proof_cache.preflight_step:
+    name: preflight_step
+    module: urirun_connector_twin.proof_cache
+    line: 90
+    cyclomatic_complexity: 9
+    calls_out: 15
     calls_in: 1
   urirun_connector_twin.mock.generate_mock:
     name: generate_mock
@@ -579,12 +369,96 @@ nodes:
     cyclomatic_complexity: 5
     calls_out: 6
     calls_in: 4
-  urirun_connector_twin.core._prompt_result:
-    name: _prompt_result
+  urirun_connector_twin.core._target_of:
+    name: _target_of
     module: urirun_connector_twin.core
-    line: 71
+    line: 435
+    cyclomatic_complexity: 2
+    calls_out: 2
+    calls_in: 1
+  urirun_connector_twin.core.flow_preflight:
+    name: flow_preflight
+    module: urirun_connector_twin.core
+    line: 402
+    cyclomatic_complexity: 9
+    calls_out: 14
+    calls_in: 0
+  urirun_connector_twin.prompt_plan._search_steps:
+    name: _search_steps
+    module: urirun_connector_twin.prompt_plan
+    line: 100
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 1
+  urirun_connector_twin.browser._selection:
+    name: _selection
+    module: urirun_connector_twin.browser
+    line: 311
+    cyclomatic_complexity: 6
+    calls_out: 7
+    calls_in: 3
+  urirun_connector_twin.core._proof_store:
+    name: _proof_store
+    module: urirun_connector_twin.core
+    line: 363
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 3
+  urirun_connector_twin.sandbox._verdict:
+    name: _verdict
+    module: urirun_connector_twin.sandbox
+    line: 118
+    cyclomatic_complexity: 4
+    calls_out: 0
+    calls_in: 2
+  urirun_connector_twin.core.proof_gate_route:
+    name: proof_gate_route
+    module: urirun_connector_twin.core
+    line: 394
+    cyclomatic_complexity: 1
+    calls_out: 4
+    calls_in: 0
+  urirun_connector_twin.prompt_plan._browser_open_steps:
+    name: _browser_open_steps
+    module: urirun_connector_twin.prompt_plan
+    line: 60
+    cyclomatic_complexity: 1
+    calls_out: 0
+    calls_in: 2
+  urirun_connector_twin.environment.probe:
+    name: probe
+    module: urirun_connector_twin.environment
+    line: 107
+    cyclomatic_complexity: 11
+    calls_out: 17
+    calls_in: 7
+  urirun_connector_twin.core.constraints_from_profile:
+    name: constraints_from_profile
+    module: urirun_connector_twin.core
+    line: 103
+    cyclomatic_complexity: 4
+    calls_out: 5
+    calls_in: 0
+  urirun_connector_twin.prompt_plan._extract_text_to_type:
+    name: _extract_text_to_type
+    module: urirun_connector_twin.prompt_plan
+    line: 37
     cyclomatic_complexity: 5
-    calls_out: 11
+    calls_out: 8
+    calls_in: 1
+  urirun_connector_twin.core.plan_from_prompt_route:
+    name: plan_from_prompt_route
+    module: urirun_connector_twin.core
+    line: 156
+    cyclomatic_complexity: 13
+    calls_out: 18
+    calls_in: 0
+  urirun_connector_twin.browser._proc_cmdline:
+    name: _proc_cmdline
+    module: urirun_connector_twin.browser
+    line: 31
+    cyclomatic_complexity: 2
+    calls_out: 4
     calls_in: 1
   urirun_connector_twin.proof_cache.proof_check:
     name: proof_check
@@ -593,6 +467,132 @@ nodes:
     cyclomatic_complexity: 4
     calls_out: 4
     calls_in: 2
+  urirun_connector_twin.core.mock_start_probe_stop:
+    name: mock_start_probe_stop
+    module: urirun_connector_twin.core
+    line: 244
+    cyclomatic_complexity: 7
+    calls_out: 16
+    calls_in: 0
+  urirun_connector_twin.sandbox._docker_available:
+    name: _docker_available
+    module: urirun_connector_twin.sandbox
+    line: 94
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 1
+  urirun_connector_twin.browser._cdp_cookies:
+    name: _cdp_cookies
+    module: urirun_connector_twin.browser
+    line: 66
+    cyclomatic_complexity: 13
+    calls_out: 32
+    calls_in: 1
+  urirun_connector_twin.mock._compose_yaml:
+    name: _compose_yaml
+    module: urirun_connector_twin.mock
+    line: 81
+    cyclomatic_complexity: 3
+    calls_out: 3
+    calls_in: 1
+  urirun_connector_twin.prompt_plan._classify_task_type:
+    name: _classify_task_type
+    module: urirun_connector_twin.prompt_plan
+    line: 179
+    cyclomatic_complexity: 6
+    calls_out: 2
+    calls_in: 1
+  urirun_connector_twin.planner._is_infeasible:
+    name: _is_infeasible
+    module: urirun_connector_twin.planner
+    line: 51
+    cyclomatic_complexity: 5
+    calls_out: 3
+    calls_in: 1
+  urirun_connector_twin.sandbox.scenario_for_uri:
+    name: scenario_for_uri
+    module: urirun_connector_twin.sandbox
+    line: 82
+    cyclomatic_complexity: 6
+    calls_out: 3
+    calls_in: 4
+  urirun_connector_twin.prompt_plan._fallback_describe_steps:
+    name: _fallback_describe_steps
+    module: urirun_connector_twin.prompt_plan
+    line: 140
+    cyclomatic_complexity: 1
+    calls_out: 0
+    calls_in: 1
+  urirun_connector_twin.planner.extract_steps_from_flow:
+    name: extract_steps_from_flow
+    module: urirun_connector_twin.planner
+    line: 100
+    cyclomatic_complexity: 4
+    calls_out: 4
+    calls_in: 1
+  urirun_connector_twin.core.plan_generate:
+    name: plan_generate
+    module: urirun_connector_twin.core
+    line: 214
+    cyclomatic_complexity: 4
+    calls_out: 5
+    calls_in: 0
+  urirun_connector_twin.core._local_browser_profile:
+    name: _local_browser_profile
+    module: urirun_connector_twin.core
+    line: 55
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 1
+  urirun_connector_twin.prompt_plan._raw_steps_for_target:
+    name: _raw_steps_for_target
+    module: urirun_connector_twin.prompt_plan
+    line: 203
+    cyclomatic_complexity: 13
+    calls_out: 11
+    calls_in: 1
+  urirun_connector_twin.prompt_plan._bind_node:
+    name: _bind_node
+    module: urirun_connector_twin.prompt_plan
+    line: 239
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 1
+  urirun_connector_twin.environment._constraints_from_profile_local:
+    name: _constraints_from_profile_local
+    module: urirun_connector_twin.environment
+    line: 46
+    cyclomatic_complexity: 3
+    calls_out: 2
+    calls_in: 1
+  urirun_connector_twin.sandbox._docker_probe:
+    name: _docker_probe
+    module: urirun_connector_twin.sandbox
+    line: 131
+    cyclomatic_complexity: 1
+    calls_out: 5
+    calls_in: 1
+  urirun_connector_twin.core._run_compose:
+    name: _run_compose
+    module: urirun_connector_twin.core
+    line: 292
+    cyclomatic_complexity: 4
+    calls_out: 2
+    calls_in: 2
+  urirun_connector_twin.core.step_feasibility:
+    name: step_feasibility
+    module: urirun_connector_twin.core
+    line: 319
+    cyclomatic_complexity: 4
+    calls_out: 12
+    calls_in: 0
+  urirun_connector_twin.proof_cache.proof_key:
+    name: proof_key
+    module: urirun_connector_twin.proof_cache
+    line: 41
+    cyclomatic_complexity: 1
+    calls_out: 2
+    calls_in: 3
 edges:
 - caller: urirun_connector_twin.sandbox._docker_probe
   callee: urirun_connector_twin.sandbox._run
@@ -744,54 +744,6 @@ edges:
 - caller: urirun_connector_twin.prompt_plan.plan_from_prompt
   callee: urirun_connector_twin.prompt_plan.steps_from_prompt
   call_type: resolved
-- caller: urirun_connector_twin.environment._kvm_query
-  callee: urirun_connector_twin.dispatch.uri_call
-  call_type: resolved
-- caller: urirun_connector_twin.environment._kvm_query
-  callee: urirun_connector_twin.dispatch.value_of
-  call_type: resolved
-- caller: urirun_connector_twin.environment._constraints_from_profile_local
-  callee: urirun_connector_twin.environment._safe_import
-  call_type: resolved
-- caller: urirun_connector_twin.environment._constraints_via_uri
-  callee: urirun_connector_twin.dispatch.uri_call
-  call_type: resolved
-- caller: urirun_connector_twin.environment._constraints_via_uri
-  callee: urirun_connector_twin.environment._constraints_from_profile_local
-  call_type: resolved
-- caller: urirun_connector_twin.environment._probe_browser
-  callee: urirun_connector_twin.dispatch.uri_call
-  call_type: resolved
-- caller: urirun_connector_twin.environment._probe_browser
-  callee: urirun_connector_twin.browser.select_session
-  call_type: resolved
-- caller: urirun_connector_twin.environment._probe_browser
-  callee: urirun_connector_twin.browser.discover_browser_sessions
-  call_type: resolved
-- caller: urirun_connector_twin.environment.probe
-  callee: urirun_connector_twin.environment._host_os_info
-  call_type: resolved
-- caller: urirun_connector_twin.environment.probe
-  callee: urirun_connector_twin.environment._constraints_via_uri
-  call_type: resolved
-- caller: urirun_connector_twin.environment.probe
-  callee: urirun_connector_twin.environment._probe_browser
-  call_type: resolved
-- caller: urirun_connector_twin.environment.probe
-  callee: urirun_connector_twin.environment._kvm_query
-  call_type: resolved
-- caller: urirun_connector_twin.environment.probe
-  callee: urirun_connector_twin.prompt_plan.derive_task_target
-  call_type: resolved
-- caller: urirun_connector_twin.proof_cache.preflight_step
-  callee: urirun_connector_twin.proof_cache.proof_key
-  call_type: resolved
-- caller: urirun_connector_twin.proof_cache.preflight_step
-  callee: urirun_connector_twin.proof_cache.proof_check
-  call_type: resolved
-- caller: urirun_connector_twin.proof_cache.preflight_step
-  callee: urirun_connector_twin.proof_cache.proof_record
-  call_type: resolved
 - caller: urirun_connector_twin.core._local_browser_profile
   callee: urirun_connector_twin.browser.discover_browser_sessions
   call_type: resolved
@@ -917,6 +869,54 @@ edges:
   call_type: resolved
 - caller: urirun_connector_twin.core.flow_preflight
   callee: urirun_connector_twin.core._target_of
+  call_type: resolved
+- caller: urirun_connector_twin.environment._kvm_query
+  callee: urirun_connector_twin.dispatch.uri_call
+  call_type: resolved
+- caller: urirun_connector_twin.environment._kvm_query
+  callee: urirun_connector_twin.dispatch.value_of
+  call_type: resolved
+- caller: urirun_connector_twin.environment._constraints_from_profile_local
+  callee: urirun_connector_twin.environment._safe_import
+  call_type: resolved
+- caller: urirun_connector_twin.environment._constraints_via_uri
+  callee: urirun_connector_twin.dispatch.uri_call
+  call_type: resolved
+- caller: urirun_connector_twin.environment._constraints_via_uri
+  callee: urirun_connector_twin.environment._constraints_from_profile_local
+  call_type: resolved
+- caller: urirun_connector_twin.environment._probe_browser
+  callee: urirun_connector_twin.dispatch.uri_call
+  call_type: resolved
+- caller: urirun_connector_twin.environment._probe_browser
+  callee: urirun_connector_twin.browser.select_session
+  call_type: resolved
+- caller: urirun_connector_twin.environment._probe_browser
+  callee: urirun_connector_twin.browser.discover_browser_sessions
+  call_type: resolved
+- caller: urirun_connector_twin.environment.probe
+  callee: urirun_connector_twin.environment._host_os_info
+  call_type: resolved
+- caller: urirun_connector_twin.environment.probe
+  callee: urirun_connector_twin.environment._constraints_via_uri
+  call_type: resolved
+- caller: urirun_connector_twin.environment.probe
+  callee: urirun_connector_twin.environment._probe_browser
+  call_type: resolved
+- caller: urirun_connector_twin.environment.probe
+  callee: urirun_connector_twin.environment._kvm_query
+  call_type: resolved
+- caller: urirun_connector_twin.environment.probe
+  callee: urirun_connector_twin.prompt_plan.derive_task_target
+  call_type: resolved
+- caller: urirun_connector_twin.proof_cache.preflight_step
+  callee: urirun_connector_twin.proof_cache.proof_key
+  call_type: resolved
+- caller: urirun_connector_twin.proof_cache.preflight_step
+  callee: urirun_connector_twin.proof_cache.proof_check
+  call_type: resolved
+- caller: urirun_connector_twin.proof_cache.preflight_step
+  callee: urirun_connector_twin.proof_cache.proof_record
   call_type: resolved
 modules:
   urirun_connector_twin.browser:

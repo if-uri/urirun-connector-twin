@@ -1,4 +1,4 @@
-# urirun-connector-twin | 104 func | 9f | 3564L | python | 2026-06-26
+# urirun-connector-twin | 104 func | 9f | 3616L | python | 2026-06-26
 # generated in 0.00s
 
 HEALTH:
@@ -18,8 +18,8 @@ ALERTS[14]:
 
 MODULES[18] (top by size):
   M[urirun_connector_twin/core.py] 733L C:0 F:34 CC↑20 D:0 (python)
+  M[planfile.yaml] 643L C:0 F:0 CC↑0 D:0 (yaml)
   M[connector.manifest.json] 616L C:0 F:0 CC↑0 D:0 (json)
-  M[planfile.yaml] 591L C:0 F:0 CC↑0 D:0 (yaml)
   M[urirun_connector_twin/browser.py] 327L C:0 F:13 CC↑15 D:2 (python)
   M[urirun_connector_twin/prompt_plan.py] 259L C:0 F:21 CC↑13 D:2 (python)
   M[urirun_connector_twin/sandbox.py] 176L C:1 F:9 CC↑6 D:1 (python)
@@ -50,9 +50,9 @@ Calls twin://host/browser/query/profile
 REFACTOR[8]:
   [1] H/H Split god module urirun_connector_twin/core.py (733L, 0 classes)
   [2] H/H Split god module connector.manifest.json (616L, 0 classes)
-  [3] H/H Split god module planfile.yaml (591L, 0 classes)
+  [3] H/H Split god module planfile.yaml (643L, 0 classes)
   [4] M/L Split discover_browser_sessions (CC=15)
   [5] M/L Split select_session (CC=15)
 
 EVOLUTION:
-  2026-06-26 CC̄=4.2 crit=11 3564L // Automated analysis
+  2026-06-26 CC̄=4.2 crit=11 3616L // Automated analysis

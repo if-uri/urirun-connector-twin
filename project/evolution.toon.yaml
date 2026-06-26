@@ -18,19 +18,19 @@ NEXT[6] (ranked by impact):
       WHY: CC=15 exceeds 15
       EFFORT: ~1h  IMPACT: 105
 
-  [5] !! SPLIT           connector.manifest.json
-      WHY: 616L, 0 classes, max CC=0
+  [5] !! SPLIT           planfile.yaml
+      WHY: 643L, 0 classes, max CC=0
       EFFORT: ~4h  IMPACT: 0
 
-  [6] !! SPLIT           planfile.yaml
-      WHY: 591L, 0 classes, max CC=0
+  [6] !! SPLIT           connector.manifest.json
+      WHY: 616L, 0 classes, max CC=0
       EFFORT: ~4h  IMPACT: 0
 
 
 RISKS[3]:
   ⚠ Splitting urirun_connector_twin/core.py may break 34 import paths
-  ⚠ Splitting connector.manifest.json may break 0 import paths
   ⚠ Splitting planfile.yaml may break 0 import paths
+  ⚠ Splitting connector.manifest.json may break 0 import paths
 
 METRICS-TARGET:
   CC̄:          4.2 → ≤2.9

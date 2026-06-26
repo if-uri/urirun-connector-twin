@@ -208,9 +208,6 @@ Exposes execute_flow() as a URI boundary so callers can point to a different
 twin conn
 - **Calls**: conn.handler, execute_flow, _svc.call
 
-### urirun_connector_twin.proof_cache.DictProofStore.get
-- **Calls**: None.get, super
-
 ### urirun_connector_twin.core.monitor_event
 > Receive a twin state-transition event (distributed to /events?scheme=twin SSE).
 - **Calls**: conn.handler, urirun.ok
@@ -220,6 +217,9 @@ twin conn
 
 ### urirun_connector_twin.core.main
 - **Calls**: conn.cli, urirun.load_manifest
+
+### urirun_connector_twin.proof_cache.DictProofStore.get
+- **Calls**: None.get, super
 
 ### urirun_connector_twin.core.bindings
 - **Calls**: conn.bindings
@@ -359,8 +359,8 @@ Functions exposed as public API (no underscore prefix):
 - `urirun_connector_twin.core.step_feasibility` - 12 calls
 - `urirun_connector_twin.browser.select_session` - 11 calls
 - `urirun_connector_twin.core.step_evaluate` - 11 calls
-- `urirun_connector_twin.proof_cache.proof_record` - 10 calls
 - `urirun_connector_twin.core.flow_episode_run` - 10 calls
+- `urirun_connector_twin.proof_cache.proof_record` - 10 calls
 - `urirun_connector_twin.core.mock_create` - 7 calls
 - `urirun_connector_twin.core.flow_goal_verify` - 7 calls
 - `urirun_connector_twin.mock.generate_mock` - 6 calls
@@ -375,10 +375,10 @@ Functions exposed as public API (no underscore prefix):
 - `urirun_connector_twin.sandbox.probe_reversibility` - 4 calls
 - `urirun_connector_twin.dispatch.value_of` - 4 calls
 - `urirun_connector_twin.planner.extract_steps_from_flow` - 4 calls
-- `urirun_connector_twin.proof_cache.proof_check` - 4 calls
 - `urirun_connector_twin.core.sandbox_probe` - 4 calls
 - `urirun_connector_twin.core.proof_gate_route` - 4 calls
 - `urirun_connector_twin.core.flow_diagnose` - 4 calls
+- `urirun_connector_twin.proof_cache.proof_check` - 4 calls
 - `urirun_connector_twin.sandbox.scenario_for_uri` - 3 calls
 - `urirun_connector_twin.prompt_plan.steps_from_prompt` - 3 calls
 - `urirun_connector_twin.prompt_plan.plan_from_prompt` - 3 calls

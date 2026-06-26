@@ -84,13 +84,13 @@ urirun @ git+https://github.com/if-uri/urirun.git#subdirectory=adapters/python
 | `discover_browser_sessions` *(in urirun_connector_twin.browser)* | 15 ⚠ | 4 | 17 | **21** |
 | `build_imperative_plan` *(in urirun_connector_twin.planner)* | 8 | 6 | 14 | **20** |
 | `plan_from_prompt_route` *(in urirun_connector_twin.core)* | 13 ⚠ | 0 | 18 | **18** |
-| `mock_start_probe_stop` *(in urirun_connector_twin.core)* | 7 | 0 | 16 | **16** |
 | `preflight_step` *(in urirun_connector_twin.proof_cache)* | 9 | 1 | 15 | **16** |
+| `mock_start_probe_stop` *(in urirun_connector_twin.core)* | 7 | 0 | 16 | **16** |
 | `annotate_steps` *(in urirun_connector_twin.planner)* | 8 | 2 | 13 | **15** |
 
 ```toon markpact:analysis path=project/calls.toon.yaml
 # code2llm call graph | /home/tom/github/if-uri/urirun-connector-twin
-# generated in 0.04s
+# generated in 0.05s
 # nodes: 84 | edges: 108 | modules: 9
 # CC̄=4.2
 
@@ -105,10 +105,10 @@ HUBS[20]:
     CC=8  in:6  out:14  total:20
   urirun_connector_twin.core.plan_from_prompt_route
     CC=13  in:0  out:18  total:18
-  urirun_connector_twin.core.mock_start_probe_stop
-    CC=7  in:0  out:16  total:16
   urirun_connector_twin.proof_cache.preflight_step
     CC=9  in:1  out:15  total:16
+  urirun_connector_twin.core.mock_start_probe_stop
+    CC=7  in:0  out:16  total:16
   urirun_connector_twin.planner.annotate_steps
     CC=8  in:2  out:13  total:15
   urirun_connector_twin.browser.select_session
@@ -117,24 +117,24 @@ HUBS[20]:
     CC=9  in:0  out:14  total:14
   urirun_connector_twin.sandbox._simulated_probe
     CC=1  in:1  out:12  total:13
-  urirun_connector_twin.prompt_plan._raw_steps_for_target
-    CC=13  in:1  out:11  total:12
   urirun_connector_twin.core.browser_profile
     CC=7  in:0  out:12  total:12
-  urirun_connector_twin.proof_cache.proof_record
-    CC=10  in:2  out:10  total:12
-  urirun_connector_twin.core.step_feasibility
-    CC=4  in:0  out:12  total:12
   urirun_connector_twin.core._prompt_result
     CC=5  in:1  out:11  total:12
+  urirun_connector_twin.proof_cache.proof_record
+    CC=10  in:2  out:10  total:12
+  urirun_connector_twin.prompt_plan._raw_steps_for_target
+    CC=13  in:1  out:11  total:12
+  urirun_connector_twin.core.step_feasibility
+    CC=4  in:0  out:12  total:12
   urirun_connector_twin.dispatch.uri_call
     CC=10  in:6  out:5  total:11
   urirun_connector_twin.prompt_plan.derive_task_target
     CC=2  in:5  out:6  total:11
-  urirun_connector_twin.browser._selection
-    CC=6  in:3  out:7  total:10
   urirun_connector_twin.mock.generate_mock
     CC=5  in:4  out:6  total:10
+  urirun_connector_twin.browser._selection
+    CC=6  in:3  out:7  total:10
 
 MODULES:
   urirun_connector_twin.browser  [11 funcs]
@@ -284,7 +284,7 @@ EDGES:
 
 ```toon markpact:analysis path=project/calls.toon.yaml
 # code2llm call graph | /home/tom/github/if-uri/urirun-connector-twin
-# generated in 0.04s
+# generated in 0.05s
 # nodes: 84 | edges: 108 | modules: 9
 # CC̄=4.2
 
@@ -299,10 +299,10 @@ HUBS[20]:
     CC=8  in:6  out:14  total:20
   urirun_connector_twin.core.plan_from_prompt_route
     CC=13  in:0  out:18  total:18
-  urirun_connector_twin.core.mock_start_probe_stop
-    CC=7  in:0  out:16  total:16
   urirun_connector_twin.proof_cache.preflight_step
     CC=9  in:1  out:15  total:16
+  urirun_connector_twin.core.mock_start_probe_stop
+    CC=7  in:0  out:16  total:16
   urirun_connector_twin.planner.annotate_steps
     CC=8  in:2  out:13  total:15
   urirun_connector_twin.browser.select_session
@@ -311,24 +311,24 @@ HUBS[20]:
     CC=9  in:0  out:14  total:14
   urirun_connector_twin.sandbox._simulated_probe
     CC=1  in:1  out:12  total:13
-  urirun_connector_twin.prompt_plan._raw_steps_for_target
-    CC=13  in:1  out:11  total:12
   urirun_connector_twin.core.browser_profile
     CC=7  in:0  out:12  total:12
-  urirun_connector_twin.proof_cache.proof_record
-    CC=10  in:2  out:10  total:12
-  urirun_connector_twin.core.step_feasibility
-    CC=4  in:0  out:12  total:12
   urirun_connector_twin.core._prompt_result
     CC=5  in:1  out:11  total:12
+  urirun_connector_twin.proof_cache.proof_record
+    CC=10  in:2  out:10  total:12
+  urirun_connector_twin.prompt_plan._raw_steps_for_target
+    CC=13  in:1  out:11  total:12
+  urirun_connector_twin.core.step_feasibility
+    CC=4  in:0  out:12  total:12
   urirun_connector_twin.dispatch.uri_call
     CC=10  in:6  out:5  total:11
   urirun_connector_twin.prompt_plan.derive_task_target
     CC=2  in:5  out:6  total:11
-  urirun_connector_twin.browser._selection
-    CC=6  in:3  out:7  total:10
   urirun_connector_twin.mock.generate_mock
     CC=5  in:4  out:6  total:10
+  urirun_connector_twin.browser._selection
+    CC=6  in:3  out:7  total:10
 
 MODULES:
   urirun_connector_twin.browser  [11 funcs]
@@ -459,8 +459,8 @@ EDGES:
 ### Code Analysis (`project/analysis.toon.yaml`)
 
 ```toon markpact:analysis path=project/analysis.toon.yaml
-# code2llm | 18f 3564L | python:10,yaml:4,shell:2,json:1,toml:1 | 2026-06-26
-# generated in 0.00s
+# code2llm | 18f 3616L | python:10,yaml:4,shell:2,json:1,toml:1 | 2026-06-26
+# generated in 0.01s
 # CC̅=4.2 | critical:3/104 | dups:0 | cycles:0
 
 HEALTH[3]:
@@ -478,59 +478,59 @@ PIPELINES[30]:
       PURITY: 100% pure
   [3] Src [select_best_session]: select_best_session
       PURITY: 100% pure
-  [4] Src [get]: get
+  [4] Src [environment_profile]: environment_profile → probe → _host_os_info
       PURITY: 100% pure
-  [5] Src [environment_profile]: environment_profile → probe → _host_os_info
+  [5] Src [constraints_from_profile]: constraints_from_profile → _safe_import
       PURITY: 100% pure
-  [6] Src [constraints_from_profile]: constraints_from_profile → _safe_import
+  [6] Src [browser_sessions]: browser_sessions → discover_browser_sessions → _proc_cmdline
       PURITY: 100% pure
-  [7] Src [browser_sessions]: browser_sessions → discover_browser_sessions → _proc_cmdline
+  [7] Src [browser_profile]: browser_profile → discover_browser_sessions → _proc_cmdline
       PURITY: 100% pure
-  [8] Src [browser_profile]: browser_profile → discover_browser_sessions → _proc_cmdline
+  [8] Src [plan_from_prompt_route]: plan_from_prompt_route → derive_task_target → _extract_domain → _extract_url
       PURITY: 100% pure
-  [9] Src [plan_from_prompt_route]: plan_from_prompt_route → derive_task_target → _extract_domain → _extract_url
+  [9] Src [plan_annotate]: plan_annotate → build_imperative_plan → extract_steps_from_flow
       PURITY: 100% pure
-  [10] Src [plan_annotate]: plan_annotate → build_imperative_plan → extract_steps_from_flow
+  [10] Src [plan_generate]: plan_generate → probe → _host_os_info
       PURITY: 100% pure
-  [11] Src [plan_generate]: plan_generate → probe → _host_os_info
+  [11] Src [mock_create]: mock_create → probe → _host_os_info
       PURITY: 100% pure
-  [12] Src [mock_create]: mock_create → probe → _host_os_info
+  [12] Src [mock_start_probe_stop]: mock_start_probe_stop → probe → _host_os_info
       PURITY: 100% pure
-  [13] Src [mock_start_probe_stop]: mock_start_probe_stop → probe → _host_os_info
+  [13] Src [step_feasibility]: step_feasibility → probe → _host_os_info
       PURITY: 100% pure
-  [14] Src [step_feasibility]: step_feasibility → probe → _host_os_info
+  [14] Src [sandbox_probe]: sandbox_probe → probe_reversibility → _docker_available
       PURITY: 100% pure
-  [15] Src [sandbox_probe]: sandbox_probe → probe_reversibility → _docker_available
+  [15] Src [proof_check_route]: proof_check_route → proof_key
       PURITY: 100% pure
-  [16] Src [proof_check_route]: proof_check_route → proof_key
+  [16] Src [proof_record_route]: proof_record_route → scenario_for_uri
       PURITY: 100% pure
-  [17] Src [proof_record_route]: proof_record_route → scenario_for_uri
+  [17] Src [proof_gate_route]: proof_gate_route → preflight_step → proof_key
       PURITY: 100% pure
-  [18] Src [proof_gate_route]: proof_gate_route → preflight_step → proof_key
+  [18] Src [flow_preflight]: flow_preflight → _target_of
       PURITY: 100% pure
-  [19] Src [flow_preflight]: flow_preflight → _target_of
+  [19] Src [flow_goal_verify]: flow_goal_verify
       PURITY: 100% pure
-  [20] Src [flow_goal_verify]: flow_goal_verify
+  [20] Src [flow_rollback]: flow_rollback
       PURITY: 100% pure
-  [21] Src [flow_rollback]: flow_rollback
+  [21] Src [step_evaluate]: step_evaluate
       PURITY: 100% pure
-  [22] Src [step_evaluate]: step_evaluate
+  [22] Src [flow_execute]: flow_execute
       PURITY: 100% pure
-  [23] Src [flow_execute]: flow_execute
+  [23] Src [flow_recall]: flow_recall
       PURITY: 100% pure
-  [24] Src [flow_recall]: flow_recall
+  [24] Src [flow_episode_run]: flow_episode_run
       PURITY: 100% pure
-  [25] Src [flow_episode_run]: flow_episode_run
+  [25] Src [flow_diagnose]: flow_diagnose
       PURITY: 100% pure
-  [26] Src [flow_diagnose]: flow_diagnose
+  [26] Src [monitor_event]: monitor_event
       PURITY: 100% pure
-  [27] Src [monitor_event]: monitor_event
+  [27] Src [bindings]: bindings
       PURITY: 100% pure
-  [28] Src [bindings]: bindings
+  [28] Src [manifest]: manifest
       PURITY: 100% pure
-  [29] Src [manifest]: manifest
+  [29] Src [main]: main
       PURITY: 100% pure
-  [30] Src [main]: main
+  [30] Src [get]: get
       PURITY: 100% pure
 
 LAYERS:
@@ -547,8 +547,8 @@ LAYERS:
   │ __init__                     4L  0C    0m  CC=0.0    ←0
   │
   ./                              CC̄=0.0    ←in:0  →out:0
+  │ !! planfile.yaml              643L  0C    0m  CC=0.0    ←0
   │ !! connector.manifest.json    616L  0C    0m  CC=0.0    ←0
-  │ !! planfile.yaml              591L  0C    0m  CC=0.0    ←0
   │ prefact.yaml                94L  0C    0m  CC=0.0    ←0
   │ project.sh                  69L  0C    0m  CC=0.0    ←0
   │ pyproject.toml              28L  0C    0m  CC=0.0    ←0
@@ -577,7 +577,7 @@ SUMMARY:
   dup_groups:    0
   dup_fragments: 0
   saved_lines:   0
-  scan_ms:       4
+  scan_ms:       3
 ```
 
 ### Evolution / Churn (`project/evolution.toon.yaml`)
@@ -603,19 +603,19 @@ NEXT[6] (ranked by impact):
       WHY: CC=15 exceeds 15
       EFFORT: ~1h  IMPACT: 105
 
-  [5] !! SPLIT           connector.manifest.json
-      WHY: 616L, 0 classes, max CC=0
+  [5] !! SPLIT           planfile.yaml
+      WHY: 643L, 0 classes, max CC=0
       EFFORT: ~4h  IMPACT: 0
 
-  [6] !! SPLIT           planfile.yaml
-      WHY: 591L, 0 classes, max CC=0
+  [6] !! SPLIT           connector.manifest.json
+      WHY: 616L, 0 classes, max CC=0
       EFFORT: ~4h  IMPACT: 0
 
 
 RISKS[3]:
   ⚠ Splitting urirun_connector_twin/core.py may break 34 import paths
-  ⚠ Splitting connector.manifest.json may break 0 import paths
   ⚠ Splitting planfile.yaml may break 0 import paths
+  ⚠ Splitting connector.manifest.json may break 0 import paths
 
 METRICS-TARGET:
   CC̄:          4.2 → ≤2.9

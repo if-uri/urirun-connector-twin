@@ -14,9 +14,9 @@ flowchart TD
     urirun_connector_twin__core ==>|5| urirun_connector_twin__browser
     urirun_connector_twin__core ==>|5| urirun_connector_twin__sandbox
     urirun_connector_twin__core ==>|5| urirun_connector_twin__proof_cache
-    urirun_connector_twin__environment ==>|4| urirun_connector_twin__dispatch
     urirun_connector_twin__core ==>|4| urirun_connector_twin__mock
     urirun_connector_twin__core ==>|4| urirun_connector_twin__dispatch
+    urirun_connector_twin__environment ==>|4| urirun_connector_twin__dispatch
     urirun_connector_twin__core -->|3| urirun_connector_twin__prompt_plan
     urirun_connector_twin__environment -->|2| urirun_connector_twin__browser
     urirun_connector_twin__environment -->|1| urirun_connector_twin__prompt_plan
