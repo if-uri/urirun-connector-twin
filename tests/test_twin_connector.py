@@ -345,6 +345,65 @@ def test_flow_rollback_handler_in_bindings():
     assert "step" in evaluate_params and "entry" in evaluate_params and "next" not in evaluate_params
 
 
+def test_flow_rollback_ledger_calls_inverses():
+    """flow_rollback calls each inverse URI LIFO; returns undone list."""
+    from urirun_connector_twin.core import flow_rollback
+    called = []
+    import urirun.v2_service as _svc_mod
+
+    _orig = _svc_mod.call
+    def fake_call(uri, payload, registry, mode="execute"):
+        called.append(uri)
+        return {"ok": True}
+    _svc_mod.call = fake_call
+    try:
+        r = flow_rollback(ledger=[
+            {"uri": "kvm://host/db/command/insert", "inverse": "kvm://host/db/command/delete", "args": {}},
+            {"uri": "kvm://host/fs/command/write", "inverse": "kvm://host/fs/command/delete", "args": {}},
+        ])
+    finally:
+        _svc_mod.call = _orig
+    assert r["ok"] is True
+    assert "undone" in r
+    # LIFO: fs delete (last forward) must be undone before db delete
+    assert called[0] == "kvm://host/fs/command/delete"
+    assert called[1] == "kvm://host/db/command/delete"
+
+
+def test_abort_envelope_dispatches_rollback_ledger(monkeypatch):
+    """_abort_envelope routes rollback through dispatch_uri when set."""
+    import urirun.node.flow as flow_mod
+
+    dispatch_calls = []
+    def fake_dispatch(uri, payload):
+        dispatch_calls.append((uri, payload))
+        return {"ok": True, "undone": payload.get("ledger", [])}
+
+    # Build a minimal timeline/results that ledger_from_execution can parse.
+    # An entry with ok=True and a result that has result.value.inverse is needed.
+    step = {"id": "s1", "uri": "kvm://host/db/command/insert"}
+    entry = {"id": "s1", "uri": "kvm://host/db/command/insert", "ok": True}
+    result_with_inverse = {
+        "ok": True,
+        "result": {"value": {"inverse": {"uri": "kvm://host/db/command/delete", "args": {}}}}
+    }
+    timeline = [entry]
+    results = {"s1": result_with_inverse}
+
+    out = flow_mod._abort_envelope(
+        step, [{"id": "s1", "error": {"category": "ABORTED"}}], [{"error": {"category": "ABORTED"}}],
+        timeline, results, [], {}, rollback_on_failure=True, execute=True,
+        dispatch_uri=fake_dispatch,
+    )
+    assert out["ok"] is False
+    # rollback-ledger call happened
+    rb_calls = [u for u, _ in dispatch_calls if "rollback-ledger" in u]
+    assert rb_calls, f"expected rollback-ledger call; got {dispatch_calls}"
+    # payload has ledger with the insert→delete pair
+    _, payload = next((u, p) for u, p in dispatch_calls if "rollback-ledger" in u)
+    assert any(l.get("inverse") == "kvm://host/db/command/delete" for l in payload["ledger"])
+
+
 # ─── _thin_driver + _evaluate_step_next seam ─────────────────────────────────
 
 def test_evaluate_step_next_routes_through_dispatch_uri():
@@ -372,3 +431,84 @@ def test_evaluate_step_next_in_process_fallback(monkeypatch):
     entry = {"error": {"category": "NETWORK"}, "recovery": {}}
     result = flow_mod._evaluate_step_next(step, entry, [], True, 0, 1, False, None)
     assert result == "retry"
+
+
+# ─── flow/command/preflight ───────────────────────────────────────────────────
+
+def test_flow_preflight_no_cdp_steps_returns_empty(monkeypatch):
+    """Preflight with no CDP steps returns ok=True with empty provisioned list."""
+    import urirun.v2_service as _svc_mod
+    monkeypatch.setattr(_svc_mod, "call",
+                        lambda *a, **kw: {"ok": True})
+    from urirun_connector_twin.core import flow_preflight
+    steps = [
+        {"id": "s1", "uri": "fs://host/file/command/write"},
+        {"id": "s2", "uri": "kvm://host/screen/query/capture"},
+    ]
+    r = flow_preflight(steps=steps)
+    assert r["ok"] is True
+    assert r["provisioned"] == []
+    assert r["targets"] == []
+
+
+def test_flow_preflight_extracts_cdp_targets(monkeypatch):
+    """Preflight finds kvm:// hosts in cdp/page/* step URIs and calls ensure on them."""
+    ensure_calls = []
+
+    def fake_call(uri, payload, registry, mode="execute"):
+        ensure_calls.append(uri)
+        return {"ok": True}
+
+    import urirun.v2_service as _svc_mod
+    monkeypatch.setattr(_svc_mod, "call", fake_call)
+    from urirun_connector_twin.core import flow_preflight
+    steps = [
+        {"id": "nav",   "uri": "kvm://laptop/cdp/page/command/navigate"},
+        {"id": "click", "uri": "kvm://laptop/cdp/page/command/click"},
+        {"id": "read",  "uri": "kvm://server/cdp/page/query/text"},
+    ]
+    r = flow_preflight(steps=steps)
+    assert r["ok"] is True
+    assert sorted(r["targets"]) == ["laptop", "server"]
+    assert len(ensure_calls) == 2
+    assert any("laptop" in u and "ensure" in u for u in ensure_calls)
+    assert any("server" in u and "ensure" in u for u in ensure_calls)
+
+
+def test_flow_preflight_dedups_same_host(monkeypatch):
+    """Multiple steps on the same host produce a single ensure call."""
+    ensure_calls = []
+
+    def fake_call(uri, payload, registry, mode="execute"):
+        ensure_calls.append(uri)
+        return {"ok": True}
+
+    import urirun.v2_service as _svc_mod
+    monkeypatch.setattr(_svc_mod, "call", fake_call)
+    from urirun_connector_twin.core import flow_preflight
+    steps = [
+        {"id": "s1", "uri": "kvm://host/cdp/page/command/navigate"},
+        {"id": "s2", "uri": "kvm://host/cdp/page/command/fill"},
+        {"id": "s3", "uri": "kvm://host/cdp/page/command/click"},
+    ]
+    r = flow_preflight(steps=steps)
+    assert r["count"] == 1
+    assert len(ensure_calls) == 1
+
+
+def test_flow_preflight_handles_ensure_failure_gracefully(monkeypatch):
+    """If ensure fails for a target, preflight continues and reports it not provisioned."""
+    def fake_call(uri, payload, registry, mode="execute"):
+        return {"ok": False, "error": "CDP not reachable"}
+
+    import urirun.v2_service as _svc_mod
+    monkeypatch.setattr(_svc_mod, "call", fake_call)
+    from urirun_connector_twin.core import flow_preflight
+    steps = [{"id": "s1", "uri": "kvm://host/cdp/page/command/click"}]
+    r = flow_preflight(steps=steps)
+    assert r["ok"] is True
+    assert r["provisioned"] == []
+    assert r["targets"] == ["host"]
+    tl = r["timeline"]
+    assert len(tl) == 1
+    assert tl[0]["ok"] is False

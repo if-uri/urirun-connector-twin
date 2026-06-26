@@ -297,34 +297,55 @@ def _target_of(uri: str) -> str:
         return ""
 
 
+@conn.handler("flow/goal/query/verify",
+              meta={"label": "Verify flow goal state after execution"})
+def flow_goal_verify(goal: dict | None = None, results: dict | None = None) -> dict:
+    """Check goal end-state after a flow.
+
+    Calls goal.uri via the mesh and asserts the goal condition (contains/equals/present).
+    Returns {ok:True, goalMet:True} on pass, {ok:False, goalMet:False} on fail so
+    _thin_driver can trigger SAGA rollback when the goal state wasn't reached.
+    A missing goal.uri is a no-op pass — query-only flows have no goal assertion."""
+    from urirun.node.flow import _run_goal_check
+    goal = goal or {}
+    if not goal.get("uri"):
+        return urirun.ok(goalMet=True, skipped="no-goal-uri")
+    import urirun.v2_service as _svc
+    dispatch = lambda uri, payload=None: _svc.call(uri, payload or {}, {}, mode="execute")
+    try:
+        passed, detail = _run_goal_check(goal, dispatch)
+    except Exception as exc:
+        return {"ok": False, "error": str(exc), "goalMet": False}
+    return {**urirun.ok(), "ok": passed, "goalMet": passed, **detail}
+
+
 @conn.handler("flow/command/rollback-ledger",
               meta={"label": "Roll back reversible mutations from ledger"})
 def flow_rollback(ledger: list | None = None) -> dict:
-    """Undo reversible mutations recorded in the ledger.
+    """Undo reversible mutations from a pre-built thin-driver ledger (LIFO).
 
-    Named rollback-ledger (not rollback) to avoid shadowing the
-    urirun.node.reversible handler at the same path — that one takes
-    {execution} while this simplified form takes {ledger: [...]}.
-    Returns {ok, undone, skipped}."""
+    Each entry: {uri, inverse, args, before, after}.  Applies inverses in reverse
+    order via v2_service.  Named rollback-ledger to avoid shadowing
+    urirun.node.reversible's handler at twin://…/flow/command/rollback, which takes
+    {execution, mesh} and does full proof-by-re-scan."""
     import urirun.v2_service as _svc
-    from urirun.node.reversible import CallableTransport, rollback_partial_flow
     ledger = ledger or []
-    # Build a minimal timeline/results stub so rollback_partial_flow can find inverses.
-    # Each ledger entry is {uri, inverse, before, after}.
-    timeline = [
-        {"id": f"step:{i}", "uri": e["uri"], "ok": True,
-         "inverse": e.get("inverse"), "before": e.get("before"), "after": e.get("after")}
-        for i, e in enumerate(ledger)
-    ]
-    results: dict = {}
-    try:
-        transport = CallableTransport(
-            lambda uri, payload: _svc.call(uri, payload, {}, mode="execute")
-        )
-        rb = rollback_partial_flow(timeline, results, transport)
-    except Exception as exc:
-        return {"ok": False, "error": str(exc), "undone": [], "skipped": len(ledger)}
-    return rb or {"ok": True, "undone": [], "skipped": len(ledger)}
+    if not ledger:
+        return urirun.ok(undone=[], note="empty ledger")
+    undone: list[str] = []
+    for entry in reversed(ledger):
+        inv_uri = entry.get("inverse")
+        if not inv_uri:
+            continue
+        try:
+            rb = _svc.call(inv_uri, entry.get("args") or {}, {}, mode="execute")
+        except Exception as exc:
+            return {"ok": False, "undone": undone, "stuck": inv_uri, "error": str(exc)}
+        if not rb.get("ok", True):
+            return {"ok": False, "undone": undone, "stuck": inv_uri,
+                    "reason": rb.get("error", "inverse failed")}
+        undone.append(inv_uri)
+    return urirun.ok(undone=undone)
 
 
 @conn.handler("step/command/evaluate",

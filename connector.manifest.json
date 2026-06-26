@@ -214,6 +214,56 @@
         "additionalProperties": false
       }
     },
+    "twin://host/flow/goal/query/verify": {
+      "uri": "twin://host/flow/goal/query/verify",
+      "kind": "local-function",
+      "adapter": "local-function",
+      "python": {
+        "type": "python",
+        "module": "urirun_connector_twin.core",
+        "export": "flow_goal_verify"
+      },
+      "policy": {
+        "allowExecute": true
+      },
+      "meta": {
+        "connector": "twin",
+        "label": "Verify flow goal state after execution"
+      },
+      "inputSchema": {
+        "properties": {
+          "goal": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Goal"
+          },
+          "results": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Results"
+          }
+        },
+        "title": "flow_goal_verifyInput",
+        "type": "object",
+        "additionalProperties": false
+      }
+    },
     "twin://host/mock/command/create": {
       "uri": "twin://host/mock/command/create",
       "kind": "local-function",
