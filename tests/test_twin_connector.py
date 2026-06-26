@@ -512,3 +512,60 @@ def test_flow_preflight_handles_ensure_failure_gracefully(monkeypatch):
     tl = r["timeline"]
     assert len(tl) == 1
     assert tl[0]["ok"] is False
+
+
+# ─── Krok 4: execute_flow auto-creates FlowEnvelope when dispatch_uri is set ──
+
+def test_execute_flow_auto_envelope_uses_thin_driver():
+    """execute_flow auto-creates FlowEnvelope when dispatch_uri is set (Krok 4)."""
+    from urirun.node.flow import execute_flow, FlowEnvelope
+
+    calls = []
+    def fake_dispatch(uri, payload):
+        calls.append(uri)
+        # goal-verify: return goalMet=True to complete the flow
+        if "goal" in uri:
+            return {"ok": True, "goalMet": True}
+        # preflight
+        if "preflight" in uri:
+            return {"ok": True, "provisioned": [], "timeline": []}
+        # actual step — succeed
+        return {"ok": True, "result": {"value": {"data": "done"}}}
+
+    flow = {
+        "task": {"id": "t1", "title": "test"},
+        "steps": [
+            {"id": "s1", "uri": "kvm://host/screen/query/info", "payload": {}},
+        ]
+    }
+    out = execute_flow(flow, {}, {}, execute=True, dispatch_uri=fake_dispatch)
+    assert out["ok"] is True
+    # thin driver called preflight and goal-verify
+    assert any("preflight" in c for c in calls)
+    assert any("goal" in c or "verify" in c for c in calls)
+    # timeline present (thin driver output)
+    assert "timeline" in out
+
+
+def test_execute_flow_without_dispatch_uses_orchestrator():
+    """Without dispatch_uri, execute_flow uses the legacy orchestrator (no auto-envelope)."""
+    from urirun.node.flow import execute_flow, FlowEnvelope
+    import urirun.v2_service as _svc_mod
+
+    orig = _svc_mod.call
+    called = []
+    def fake_call(uri, payload, registry, mode="execute"):
+        called.append(uri)
+        return {"ok": True}
+    _svc_mod.call = fake_call
+    try:
+        flow = {
+            "task": {"id": "t1"},
+            "steps": [{"id": "s1", "uri": "kvm://host/screen/query/info", "payload": {}}],
+        }
+        out = execute_flow(flow, {}, {}, execute=True)
+    finally:
+        _svc_mod.call = orig
+    # orchestrator path: returns ok, no goalMet key
+    assert out["ok"] is True
+    assert "goalMet" not in out
