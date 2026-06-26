@@ -16,6 +16,9 @@ Routes served:
   twin://host/plan/command/generate       — flow + node → probe env then annotate
   twin://host/mock/command/create         — Docker Compose mock for infeasible steps
   twin://host/step/query/feasibility      — per-step feasibility check
+  twin://host/proof/query/check           — proof cache hit? (uri, scenario, env proven reversible)
+  twin://host/proof/command/record        — record a positive reversibility proof
+  twin://host/proof/command/gate          — reversibility gate: skip / probe-then-record / block
   twin://host/monitor/event               — SSE event marker
 """
 from __future__ import annotations
@@ -32,6 +35,7 @@ from .mock import generate_mock
 from .planner import annotate_steps, build_imperative_plan
 from .prompt_plan import derive_task_target, plan_from_prompt
 from .sandbox import Scenario, probe_reversibility, scenario_for_uri
+from .proof_cache import preflight_step, proof_check, proof_key, proof_record
 
 CONNECTOR_ID = "twin"
 conn = urirun.connector(CONNECTOR_ID, scheme="twin")
@@ -354,6 +358,43 @@ def sandbox_probe(
         sc = Scenario(image=image, scan_cmd=scan_cmd, forward_cmd=forward_cmd,
                       inverse_cmd=inverse_cmd, setup_cmd=setup_cmd)
     return probe_reversibility(sc)
+
+
+def _proof_store():
+    """The durable ``_proofs`` ledger (a ``_NamespacedStore`` from twin_store) — the node
+    HOLDS the proof state; this connector is the swappable URI capability over it."""
+    from urirun.node.twin_store import durable_memory  # noqa: PLC0415
+    return durable_memory().proof_store
+
+
+@conn.handler("proof/query/check",
+              meta={"label": "Proof cache hit? — is (uri, scenario, env) already proven reversible"})
+def proof_check_route(uri: str = "", env_fingerprint: str = "") -> dict:
+    """Cache hit ⇒ the sandbox can be skipped for this exact (uri, scenario, env)."""
+    key = proof_key(uri, scenario_for_uri(uri), env_fingerprint)
+    return proof_check({"proof_key": key}, _proof_store())
+
+
+@conn.handler("proof/command/record",
+              meta={"label": "Record a POSITIVE reversibility proof in the durable ledger"})
+def proof_record_route(uri: str = "", env_fingerprint: str = "", verdict: str = "",
+                       scanned_before: str = "", scanned_after: str = "") -> dict:
+    """Persist only ``verdict == "reversible"`` — a negative is not durable proof."""
+    sc = scenario_for_uri(uri)
+    key = proof_key(uri, sc, env_fingerprint)
+    return proof_record({"proof_key": key, "verdict": verdict, "uri": uri,
+                         "env_fingerprint": env_fingerprint,
+                         "scenario_signature": sc.signature(),
+                         "scanned_before": scanned_before,
+                         "scanned_after": scanned_after}, _proof_store())
+
+
+@conn.handler("proof/command/gate",
+              meta={"label": "Reversibility gate: skip on cache hit, else probe-then-record or block"})
+def proof_gate_route(uri: str = "", env_fingerprint: str = "") -> dict:
+    """check → probe → record. Drift is automatic: a changed env fingerprint is a new key,
+    so it misses the cache and re-probes. Returns {decision: skip|proven|block, ...}."""
+    return preflight_step(uri, scenario_for_uri(uri), env_fingerprint, _proof_store())
 
 
 @conn.handler("flow/command/preflight",

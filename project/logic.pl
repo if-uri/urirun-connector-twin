@@ -8,13 +8,14 @@ project_file('tests/test_browser_session.py', 270, 'python').
 project_file('tests/test_contract.py', 40, 'python').
 project_file('tests/test_dispatch.py', 209, 'python').
 project_file('tests/test_proof_cache.py', 216, 'python').
+project_file('tests/test_proof_routes.py', 76, 'python').
 project_file('tests/test_rollback_parity.py', 380, 'python').
 project_file('tests/test_session.py', 233, 'python').
 project_file('tests/test_twin_connector.py', 1407, 'python').
 project_file('tree.sh', 5, 'shell').
 project_file('urirun_connector_twin/__init__.py', 5, 'python').
 project_file('urirun_connector_twin/browser.py', 328, 'python').
-project_file('urirun_connector_twin/core.py', 574, 'python').
+project_file('urirun_connector_twin/core.py', 612, 'python').
 project_file('urirun_connector_twin/dispatch.py', 73, 'python').
 project_file('urirun_connector_twin/environment.py', 162, 'python').
 project_file('urirun_connector_twin/mock.py', 115, 'python').
@@ -243,6 +244,10 @@ python_function('urirun_connector_twin/core.py', '_run_compose', 1, 4, 2).
 python_function('urirun_connector_twin/core.py', '_wait_for_http', 1, 5, 3).
 python_function('urirun_connector_twin/core.py', 'step_feasibility', 3, 4, 5).
 python_function('urirun_connector_twin/core.py', 'sandbox_probe', 6, 3, 4).
+python_function('urirun_connector_twin/core.py', '_proof_store', 0, 1, 1).
+python_function('urirun_connector_twin/core.py', 'proof_check_route', 2, 1, 5).
+python_function('urirun_connector_twin/core.py', 'proof_record_route', 5, 1, 6).
+python_function('urirun_connector_twin/core.py', 'proof_gate_route', 2, 1, 4).
 python_function('urirun_connector_twin/core.py', 'flow_preflight', 2, 9, 10).
 python_function('urirun_connector_twin/core.py', '_target_of', 1, 2, 1).
 python_function('urirun_connector_twin/core.py', 'flow_goal_verify', 2, 5, 6).
@@ -340,6 +345,13 @@ python_method('TestPreflightPaths', 'test_path3_env_drift_different_key_re_probe
 python_method('TestPreflightPaths', 'test_path4_negative_block_not_cached', 0, 1, 6).
 python_class('tests/test_proof_cache.py', 'TestStoreContainsOnlyPositives').
 python_method('TestStoreContainsOnlyPositives', 'test_store_shows_only_positive_entries', 0, 2, 7).
+python_class('tests/test_proof_routes.py', 'TestProofRoutes').
+python_method('TestProofRoutes', 'setUp', 0, 1, 3).
+python_method('TestProofRoutes', 'tearDown', 0, 2, 2).
+python_method('TestProofRoutes', 'test_check_miss_then_gate_probes_records_then_skip', 0, 1, 8).
+python_method('TestProofRoutes', 'test_drift_reprobes', 0, 1, 3).
+python_method('TestProofRoutes', 'test_irreversible_blocks_and_records_nothing', 0, 1, 5).
+python_method('TestProofRoutes', 'test_record_route_rejects_negative', 0, 1, 3).
 python_class('urirun_connector_twin/proof_cache.py', 'DictProofStore').
 python_method('DictProofStore', 'get', 2, 1, 2).
 python_class('urirun_connector_twin/sandbox.py', 'Scenario').

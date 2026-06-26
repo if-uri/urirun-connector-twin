@@ -163,26 +163,27 @@ pip install -e .[dev]
 ### `project/map.toon.yaml`
 
 ```toon markpact:analysis path=project/map.toon.yaml
-# urirun-connector-twin | 20f 4825L | python:17,shell:2,less:1 | 2026-06-26
-# stats: 285 func | 8 cls | 20 mod | CC̄=3.7 | critical:13 | cycles:0
+# urirun-connector-twin | 21f 4939L | python:18,shell:2,less:1 | 2026-06-26
+# stats: 289 func | 9 cls | 21 mod | CC̄=3.7 | critical:13 | cycles:0
 # alerts[5]: CC test_append_twin_widget_emits_events_with_inverse=20; CC discover_browser_sessions=15; CC select_session=15; CC _cdp_cookies=13; CC plan_from_prompt_route=13
 # hotspots[5]: _cdp_cookies fan=19; discover_browser_sessions fan=13; mock_start_probe_stop fan=13; plan_from_prompt_route fan=11; flow_preflight fan=10
 # evolution: baseline
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
-M[20]:
+M[21]:
   app.doql.less,32
   project.sh,69
   tests/test_browser_session.py,270
   tests/test_contract.py,40
   tests/test_dispatch.py,209
   tests/test_proof_cache.py,216
+  tests/test_proof_routes.py,76
   tests/test_rollback_parity.py,380
   tests/test_session.py,233
   tests/test_twin_connector.py,1407
   tree.sh,5
   urirun_connector_twin/__init__.py,5
   urirun_connector_twin/browser.py,328
-  urirun_connector_twin/core.py,574
+  urirun_connector_twin/core.py,612
   urirun_connector_twin/dispatch.py,73
   urirun_connector_twin/environment.py,162
   urirun_connector_twin/mock.py,115
@@ -255,6 +256,9 @@ D:
     TestRouteHandlers: setUp(0),test_proof_check_miss(0),test_proof_check_hit_after_record(0),test_proof_record_stores_positive_verdict(0),test_proof_record_does_not_store_negative_verdict(0),test_proof_check_missing_key_returns_error(0)
     TestPreflightPaths: setUp(0),_reversible_probe(0),_irreversible_probe(0),test_path1_new_env_miss_probe_proven_cached(0),test_path2_same_env_hit_sandbox_skipped(0),test_path3_env_drift_different_key_re_probed(0),test_path4_negative_block_not_cached(0)  # Structural proof of the four decision paths.
     TestStoreContainsOnlyPositives: test_store_shows_only_positive_entries(0)
+  tests/test_proof_routes.py:
+    e: TestProofRoutes
+    TestProofRoutes: setUp(0),tearDown(0),test_check_miss_then_gate_probes_records_then_skip(0),test_drift_reprobes(0),test_irreversible_blocks_and_records_nothing(0),test_record_route_rejects_negative(0)
   tests/test_rollback_parity.py:
     e: _nav_step,_nav_result_with_inverse,test_envelope_ledger_filled_from_inverse,test_ledger_stays_empty_for_query_step,test_thin_driver_rollback_calls_inverse_lifo,test_thin_driver_rollback_returns_undone_list,test_two_reversible_steps_rolled_back_lifo,test_goal_failure_triggers_rollback,test_goal_none_result_is_treated_as_pass,test_flow_goal_verify_no_uri_is_pass,test_flow_goal_verify_no_goal_arg,test_flow_rollback_empty_ledger,test_flow_rollback_none_inverse_skipped,_undone_uris,_stuck_uri,test_three_path_rollback_convergence_success,test_three_path_rollback_convergence_stuck
     _nav_step(sid)
@@ -417,7 +421,7 @@ D:
     _domain_key(domain)
     _selection(mode;session;domain_key;rationale)
   urirun_connector_twin/core.py:
-    e: _safe_import,_local_browser_profile,_apply_browser_sel,_prompt_result,environment_profile,constraints_from_profile,browser_sessions,browser_profile,plan_from_prompt_route,plan_annotate,plan_generate,mock_create,mock_start_probe_stop,_run_compose,_wait_for_http,step_feasibility,sandbox_probe,flow_preflight,_target_of,flow_goal_verify,flow_rollback,step_evaluate,flow_execute,flow_diagnose,monitor_event,bindings,manifest,main
+    e: _safe_import,_local_browser_profile,_apply_browser_sel,_prompt_result,environment_profile,constraints_from_profile,browser_sessions,browser_profile,plan_from_prompt_route,plan_annotate,plan_generate,mock_create,mock_start_probe_stop,_run_compose,_wait_for_http,step_feasibility,sandbox_probe,_proof_store,proof_check_route,proof_record_route,proof_gate_route,flow_preflight,_target_of,flow_goal_verify,flow_rollback,step_evaluate,flow_execute,flow_diagnose,monitor_event,bindings,manifest,main
     _safe_import(module)
     _local_browser_profile(domain;needs_auth)
     _apply_browser_sel(plan;browser_sel)
@@ -435,6 +439,10 @@ D:
     _wait_for_http(url)
     step_feasibility(uri;node;prompt)
     sandbox_probe(image;scan_cmd;forward_cmd;inverse_cmd;setup_cmd;uri)
+    _proof_store()
+    proof_check_route(uri;env_fingerprint)
+    proof_record_route(uri;env_fingerprint;verdict;scanned_before;scanned_after)
+    proof_gate_route(uri;env_fingerprint)
     flow_preflight(steps;node)
     _target_of(uri)
     flow_goal_verify(goal;results)
@@ -532,13 +540,14 @@ project_file('tests/test_browser_session.py', 270, 'python').
 project_file('tests/test_contract.py', 40, 'python').
 project_file('tests/test_dispatch.py', 209, 'python').
 project_file('tests/test_proof_cache.py', 216, 'python').
+project_file('tests/test_proof_routes.py', 76, 'python').
 project_file('tests/test_rollback_parity.py', 380, 'python').
 project_file('tests/test_session.py', 233, 'python').
 project_file('tests/test_twin_connector.py', 1407, 'python').
 project_file('tree.sh', 5, 'shell').
 project_file('urirun_connector_twin/__init__.py', 5, 'python').
 project_file('urirun_connector_twin/browser.py', 328, 'python').
-project_file('urirun_connector_twin/core.py', 574, 'python').
+project_file('urirun_connector_twin/core.py', 612, 'python').
 project_file('urirun_connector_twin/dispatch.py', 73, 'python').
 project_file('urirun_connector_twin/environment.py', 162, 'python').
 project_file('urirun_connector_twin/mock.py', 115, 'python').
@@ -767,6 +776,10 @@ python_function('urirun_connector_twin/core.py', '_run_compose', 1, 4, 2).
 python_function('urirun_connector_twin/core.py', '_wait_for_http', 1, 5, 3).
 python_function('urirun_connector_twin/core.py', 'step_feasibility', 3, 4, 5).
 python_function('urirun_connector_twin/core.py', 'sandbox_probe', 6, 3, 4).
+python_function('urirun_connector_twin/core.py', '_proof_store', 0, 1, 1).
+python_function('urirun_connector_twin/core.py', 'proof_check_route', 2, 1, 5).
+python_function('urirun_connector_twin/core.py', 'proof_record_route', 5, 1, 6).
+python_function('urirun_connector_twin/core.py', 'proof_gate_route', 2, 1, 4).
 python_function('urirun_connector_twin/core.py', 'flow_preflight', 2, 9, 10).
 python_function('urirun_connector_twin/core.py', '_target_of', 1, 2, 1).
 python_function('urirun_connector_twin/core.py', 'flow_goal_verify', 2, 5, 6).
@@ -864,6 +877,13 @@ python_method('TestPreflightPaths', 'test_path3_env_drift_different_key_re_probe
 python_method('TestPreflightPaths', 'test_path4_negative_block_not_cached', 0, 1, 6).
 python_class('tests/test_proof_cache.py', 'TestStoreContainsOnlyPositives').
 python_method('TestStoreContainsOnlyPositives', 'test_store_shows_only_positive_entries', 0, 2, 7).
+python_class('tests/test_proof_routes.py', 'TestProofRoutes').
+python_method('TestProofRoutes', 'setUp', 0, 1, 3).
+python_method('TestProofRoutes', 'tearDown', 0, 2, 2).
+python_method('TestProofRoutes', 'test_check_miss_then_gate_probes_records_then_skip', 0, 1, 8).
+python_method('TestProofRoutes', 'test_drift_reprobes', 0, 1, 3).
+python_method('TestProofRoutes', 'test_irreversible_blocks_and_records_nothing', 0, 1, 5).
+python_method('TestProofRoutes', 'test_record_route_rejects_negative', 0, 1, 3).
 python_class('urirun_connector_twin/proof_cache.py', 'DictProofStore').
 python_method('DictProofStore', 'get', 2, 1, 2).
 python_class('urirun_connector_twin/sandbox.py', 'Scenario').
@@ -894,7 +914,7 @@ sumd_interface('cli', '').
 
 ## Call Graph
 
-*80 nodes · 97 edges · 9 modules · CC̄=4.1*
+*84 nodes · 108 edges · 9 modules · CC̄=4.0*
 
 ### Hubs (by degree)
 
@@ -905,15 +925,15 @@ sumd_interface('cli', '').
 | `discover_browser_sessions` *(in urirun_connector_twin.browser)* | 15 ⚠ | 4 | 17 | **21** |
 | `build_imperative_plan` *(in urirun_connector_twin.planner)* | 8 | 6 | 14 | **20** |
 | `plan_from_prompt_route` *(in urirun_connector_twin.core)* | 13 ⚠ | 0 | 18 | **18** |
+| `preflight_step` *(in urirun_connector_twin.proof_cache)* | 9 | 1 | 15 | **16** |
 | `mock_start_probe_stop` *(in urirun_connector_twin.core)* | 7 | 0 | 16 | **16** |
 | `annotate_steps` *(in urirun_connector_twin.planner)* | 8 | 2 | 13 | **15** |
-| `preflight_step` *(in urirun_connector_twin.proof_cache)* | 9 | 0 | 15 | **15** |
 
 ```toon markpact:analysis path=project/calls.toon.yaml
 # code2llm call graph | /home/tom/github/if-uri/urirun-connector-twin
 # generated in 0.04s
-# nodes: 80 | edges: 97 | modules: 9
-# CC̄=4.1
+# nodes: 84 | edges: 108 | modules: 9
+# CC̄=4.0
 
 HUBS[20]:
   urirun_connector_twin.browser._cdp_cookies
@@ -926,28 +946,28 @@ HUBS[20]:
     CC=8  in:6  out:14  total:20
   urirun_connector_twin.core.plan_from_prompt_route
     CC=13  in:0  out:18  total:18
+  urirun_connector_twin.proof_cache.preflight_step
+    CC=9  in:1  out:15  total:16
   urirun_connector_twin.core.mock_start_probe_stop
     CC=7  in:0  out:16  total:16
   urirun_connector_twin.planner.annotate_steps
     CC=8  in:2  out:13  total:15
-  urirun_connector_twin.proof_cache.preflight_step
-    CC=9  in:0  out:15  total:15
-  urirun_connector_twin.core.flow_preflight
-    CC=9  in:0  out:14  total:14
   urirun_connector_twin.browser.select_session
     CC=15  in:3  out:11  total:14
+  urirun_connector_twin.core.flow_preflight
+    CC=9  in:0  out:14  total:14
   urirun_connector_twin.sandbox._simulated_probe
     CC=1  in:1  out:12  total:13
-  urirun_connector_twin.core._prompt_result
-    CC=5  in:1  out:11  total:12
-  urirun_connector_twin.core.step_feasibility
-    CC=4  in:0  out:12  total:12
   urirun_connector_twin.prompt_plan._raw_steps_for_target
     CC=13  in:1  out:11  total:12
+  urirun_connector_twin.proof_cache.proof_record
+    CC=10  in:2  out:10  total:12
+  urirun_connector_twin.core.step_feasibility
+    CC=4  in:0  out:12  total:12
+  urirun_connector_twin.core._prompt_result
+    CC=5  in:1  out:11  total:12
   urirun_connector_twin.core.browser_profile
     CC=7  in:0  out:12  total:12
-  urirun_connector_twin.proof_cache.proof_record
-    CC=10  in:1  out:10  total:11
   urirun_connector_twin.dispatch.uri_call
     CC=10  in:6  out:5  total:11
   urirun_connector_twin.prompt_plan.derive_task_target
@@ -969,9 +989,10 @@ MODULES:
     _proc_cmdline  CC=2  out:4
     _selection  CC=6  out:7
     discover_browser_sessions  CC=15  out:17
-  urirun_connector_twin.core  [17 funcs]
+  urirun_connector_twin.core  [21 funcs]
     _local_browser_profile  CC=1  out:3
     _prompt_result  CC=5  out:11
+    _proof_store  CC=1  out:1
     _run_compose  CC=4  out:2
     _safe_import  CC=3  out:2
     _target_of  CC=2  out:2
@@ -979,7 +1000,6 @@ MODULES:
     browser_sessions  CC=3  out:6
     constraints_from_profile  CC=4  out:5
     environment_profile  CC=2  out:3
-    flow_preflight  CC=9  out:14
   urirun_connector_twin.dispatch  [2 funcs]
     uri_call  CC=10  out:5
     value_of  CC=4  out:4
