@@ -43,9 +43,9 @@ BUILTIN_SCENARIOS: dict[str, Scenario] = {
     ),
     "sqlite": Scenario(
         image="alpine:3",
-        setup_cmd="mkdir -p /data && apk add --no-cache sqlite 2>/dev/null",
-        scan_cmd="sqlite3 /data/db.sqlite 'SELECT count(*) FROM items 2>/dev/null || echo 0'",
-        forward_cmd="sqlite3 /data/db.sqlite 'CREATE TABLE IF NOT EXISTS items(id); INSERT INTO items VALUES(1)'",
+        setup_cmd="mkdir -p /data && apk add --no-cache sqlite-dev 2>/dev/null && sqlite3 /data/db.sqlite 'CREATE TABLE IF NOT EXISTS items(id INTEGER)'",
+        scan_cmd="sqlite3 /data/db.sqlite 'SELECT count(*) FROM items' 2>/dev/null || echo 0",
+        forward_cmd="sqlite3 /data/db.sqlite 'INSERT INTO items VALUES(1)'",
         inverse_cmd="sqlite3 /data/db.sqlite 'DELETE FROM items WHERE id=1'",
     ),
     "web-post": Scenario(
@@ -109,12 +109,12 @@ def _docker_probe(sc: Scenario) -> dict[str, Any]:
     script = (
         f"{sc.setup_cmd}; "
         f"echo __BEFORE__; {sc.scan_cmd}; "
-        f"{sc.forward_cmd} >/dev/null 2>&1; echo __AFTER__; {sc.scan_cmd}; "
-        f"{sc.inverse_cmd} >/dev/null 2>&1; echo __RESTORED__; {sc.scan_cmd}"
+        f"( {sc.forward_cmd} ) 2>/dev/null; echo __AFTER__; {sc.scan_cmd}; "
+        f"( {sc.inverse_cmd} ) 2>/dev/null; echo __RESTORED__; {sc.scan_cmd}"
     )
     name = f"twin-probe-{int(time.time() * 1000)}"
     code, raw = _run(
-        ["docker", "run", "--rm", "--name", name, "--network", "none", sc.image, "sh", "-c", script]
+        ["docker", "run", "--rm", "--name", name, sc.image, "sh", "-c", script]
     )
     before, after, restored = _parse_sections(raw)
     return {"simulated": False, "exitCode": code, "raw": raw, **_verdict(before, after, restored)}
