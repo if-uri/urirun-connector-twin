@@ -260,3 +260,115 @@ def test_sandbox_probe_handler_wires_up(monkeypatch):
     r = sandbox_probe(forward_cmd="touch /data/x.txt", inverse_cmd="rm -f /data/x.txt")
     assert r["ok"] is True
     assert "reversible" in r
+
+
+# ─── step/command/evaluate ────────────────────────────────────────────────────
+
+def test_step_evaluate_retry_on_transient(monkeypatch):
+    """Transient NETWORK error + attempt=0 → retry."""
+    from urirun_connector_twin.core import step_evaluate
+    step = {"id": "s1", "uri": "kvm://host/cdp/page/query/info"}
+    entry = {
+        "error": {"category": "NETWORK", "message": "timeout"},
+        "recovery": {"diagnosis": {"autoApplicable": False}},
+    }
+    # Stub can_retry_step to return True
+    import urirun.node.recovery as rec
+    monkeypatch.setattr(rec, "can_retry_step", lambda *a, **kw: True)
+    r = step_evaluate(step=step, entry=entry, attempt=0, max_retries=1)
+    assert r["ok"] is True
+    assert r["next"] == "retry"
+
+
+def test_step_evaluate_heal_when_auto_applicable(monkeypatch):
+    """Auto-applicable diagnosis + not healed → heal."""
+    from urirun_connector_twin.core import step_evaluate
+    import urirun.node.recovery as rec
+    monkeypatch.setattr(rec, "can_retry_step", lambda *a, **kw: False)
+    step = {"id": "s1", "uri": "kvm://host/cdp/page/command/click"}
+    entry = {
+        "error": {"category": "CONNECTOR_REQUIRED", "message": "no CDP"},
+        "recovery": {"diagnosis": {"autoApplicable": True, "rule": "ensure-cdp"}},
+    }
+    r = step_evaluate(step=step, entry=entry, execute=True, healed=False)
+    assert r["ok"] is True
+    assert r["next"] == "heal"
+    assert r["diagnosis"]["rule"] == "ensure-cdp"
+
+
+def test_step_evaluate_rollback_when_healed(monkeypatch):
+    """Already healed + no retry budget → rollback."""
+    from urirun_connector_twin.core import step_evaluate
+    import urirun.node.recovery as rec
+    monkeypatch.setattr(rec, "can_retry_step", lambda *a, **kw: False)
+    step = {"id": "s1", "uri": "kvm://host/cdp/page/command/click"}
+    entry = {
+        "error": {"category": "CONNECTOR_REQUIRED", "message": "no CDP"},
+        "recovery": {"diagnosis": {"autoApplicable": True}},
+    }
+    r = step_evaluate(step=step, entry=entry, execute=True, healed=True)
+    assert r["ok"] is True
+    assert r["next"] == "rollback"
+
+
+def test_step_evaluate_rollback_dry_run(monkeypatch):
+    """In dry-run mode with auto-applicable diagnosis → rollback (heal disabled)."""
+    from urirun_connector_twin.core import step_evaluate
+    import urirun.node.recovery as rec
+    monkeypatch.setattr(rec, "can_retry_step", lambda *a, **kw: False)
+    step = {"id": "s1", "uri": "kvm://host/cdp/page/command/click"}
+    entry = {"error": {"category": "CONNECTOR_REQUIRED"}, "recovery": {"diagnosis": {"autoApplicable": True}}}
+    r = step_evaluate(step=step, entry=entry, execute=False, healed=False)
+    assert r["next"] == "rollback"
+
+
+# ─── flow/command/rollback ────────────────────────────────────────────────────
+
+def test_flow_rollback_empty_ledger():
+    """Empty ledger → rollback succeeds with nothing undone."""
+    from urirun_connector_twin.core import flow_rollback
+    r = flow_rollback(ledger=[])
+    assert isinstance(r, dict)
+
+
+def test_flow_rollback_handler_in_bindings():
+    """flow_rollback and step_evaluate are callable handlers (imported from core)."""
+    from urirun_connector_twin.core import flow_rollback, step_evaluate
+    # Verify they are callable functions (not just imported names)
+    assert callable(flow_rollback)
+    assert callable(step_evaluate)
+    # Verify they have the expected parameter names
+    import inspect
+    rollback_params = set(inspect.signature(flow_rollback).parameters)
+    assert "ledger" in rollback_params
+    evaluate_params = set(inspect.signature(step_evaluate).parameters)
+    assert "step" in evaluate_params and "entry" in evaluate_params and "next" not in evaluate_params
+
+
+# ─── _thin_driver + _evaluate_step_next seam ─────────────────────────────────
+
+def test_evaluate_step_next_routes_through_dispatch_uri():
+    """When dispatch_uri is set, _evaluate_step_next calls twin://*/step/command/evaluate."""
+    from urirun.node.flow import _evaluate_step_next
+    calls = []
+
+    def fake_dispatch(uri, payload):
+        calls.append(uri)
+        return {"ok": True, "next": "retry"}
+
+    step = {"id": "s1", "uri": "kvm://laptop/cdp/page/query/info"}
+    entry = {"error": {"category": "NETWORK"}, "recovery": {}}
+    result = _evaluate_step_next(step, entry, [], True, 0, 1, False, fake_dispatch)
+    assert result == "retry"
+    assert any("step/command/evaluate" in c for c in calls)
+    assert any("laptop" in c for c in calls)
+
+
+def test_evaluate_step_next_in_process_fallback(monkeypatch):
+    """When dispatch_uri is None, decision is in-process (identical behaviour)."""
+    import urirun.node.flow as flow_mod
+    monkeypatch.setattr(flow_mod, "can_retry_step", lambda *a, **kw: True)
+    step = {"id": "s1", "uri": "kvm://host/cdp/page/query/info"}
+    entry = {"error": {"category": "NETWORK"}, "recovery": {}}
+    result = flow_mod._evaluate_step_next(step, entry, [], True, 0, 1, False, None)
+    assert result == "retry"

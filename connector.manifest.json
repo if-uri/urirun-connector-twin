@@ -135,6 +135,85 @@
         "additionalProperties": false
       }
     },
+    "twin://host/flow/command/preflight": {
+      "uri": "twin://host/flow/command/preflight",
+      "kind": "local-function",
+      "adapter": "local-function",
+      "python": {
+        "type": "python",
+        "module": "urirun_connector_twin.core",
+        "export": "flow_preflight"
+      },
+      "policy": {
+        "allowExecute": true
+      },
+      "meta": {
+        "connector": "twin",
+        "label": "Provision required surfaces before flow execution"
+      },
+      "inputSchema": {
+        "properties": {
+          "steps": {
+            "anyOf": [
+              {
+                "items": {},
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Steps"
+          },
+          "node": {
+            "default": "",
+            "title": "Node",
+            "type": "string"
+          }
+        },
+        "title": "flow_preflightInput",
+        "type": "object",
+        "additionalProperties": false
+      }
+    },
+    "twin://host/flow/command/rollback-ledger": {
+      "uri": "twin://host/flow/command/rollback-ledger",
+      "kind": "local-function",
+      "adapter": "local-function",
+      "python": {
+        "type": "python",
+        "module": "urirun_connector_twin.core",
+        "export": "flow_rollback"
+      },
+      "policy": {
+        "allowExecute": true
+      },
+      "meta": {
+        "connector": "twin",
+        "label": "Roll back reversible mutations from ledger"
+      },
+      "inputSchema": {
+        "properties": {
+          "ledger": {
+            "anyOf": [
+              {
+                "items": {},
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ledger"
+          }
+        },
+        "title": "flow_rollbackInput",
+        "type": "object",
+        "additionalProperties": false
+      }
+    },
     "twin://host/mock/command/create": {
       "uri": "twin://host/mock/command/create",
       "kind": "local-function",
@@ -367,6 +446,77 @@
           }
         },
         "title": "sandbox_probeInput",
+        "type": "object",
+        "additionalProperties": false
+      }
+    },
+    "twin://host/step/command/evaluate": {
+      "uri": "twin://host/step/command/evaluate",
+      "kind": "local-function",
+      "adapter": "local-function",
+      "python": {
+        "type": "python",
+        "module": "urirun_connector_twin.core",
+        "export": "step_evaluate"
+      },
+      "policy": {
+        "allowExecute": true
+      },
+      "meta": {
+        "connector": "twin",
+        "label": "Decide next action after a failed step: retry | heal | rollback"
+      },
+      "inputSchema": {
+        "properties": {
+          "step": {
+            "additionalProperties": true,
+            "title": "Step",
+            "type": "object"
+          },
+          "entry": {
+            "additionalProperties": true,
+            "title": "Entry",
+            "type": "object"
+          },
+          "routes": {
+            "anyOf": [
+              {
+                "items": {},
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Routes"
+          },
+          "execute": {
+            "default": true,
+            "title": "Execute",
+            "type": "boolean"
+          },
+          "attempt": {
+            "default": 0,
+            "title": "Attempt",
+            "type": "integer"
+          },
+          "max_retries": {
+            "default": 1,
+            "title": "Max Retries",
+            "type": "integer"
+          },
+          "healed": {
+            "default": false,
+            "title": "Healed",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "step",
+          "entry"
+        ],
+        "title": "step_evaluateInput",
         "type": "object",
         "additionalProperties": false
       }

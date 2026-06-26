@@ -253,6 +253,118 @@ def sandbox_probe(
     return probe_reversibility(sc)
 
 
+@conn.handler("flow/command/preflight",
+              meta={"label": "Provision required surfaces before flow execution"})
+def flow_preflight(steps: list | None = None, node: str = "") -> dict:
+    """Identify which surfaces the flow steps need and provision them up-front.
+
+    For CDP-dependent steps: if CDP is feasible but not reachable on the target
+    node, bring it up now so the first `cdp/page/*` step doesn't hit a
+    fail-then-self-heal roundtrip.  Idempotent — `ensure` reuses an existing session.
+
+    Returns {ok, timeline: [{id, uri, ok, action, target}], provisioned: [target…]}."""
+    import urirun.v2_service as _svc
+    steps = steps or []
+    timeline: list[dict] = []
+    provisioned: list[str] = []
+    cdp_targets: list[str] = sorted({
+        _target_of(str(s.get("uri") or ""))
+        for s in steps
+        if "/cdp/page/" in str(s.get("uri") or "")
+    } - {""})
+    for target in cdp_targets:
+        ensure_uri = f"kvm://{target}/cdp/session/command/ensure"
+        try:
+            env = _svc.call(ensure_uri, {}, {}, mode="execute")
+            ok = bool(env.get("ok"))
+        except Exception:
+            ok = False
+        timeline.append({"id": f"preflight:cdp:{target}", "uri": ensure_uri,
+                         "target": target, "ok": ok, "action": "provision-surface",
+                         "type": "preflight"})
+        if ok:
+            provisioned.append(target)
+    return urirun.ok(timeline=timeline, provisioned=provisioned,
+                     targets=cdp_targets, count=len(cdp_targets))
+
+
+def _target_of(uri: str) -> str:
+    """Extract node/host from a URI string (the authority component)."""
+    try:
+        rest = uri.split("://", 1)[1]
+        return rest.split("/")[0]
+    except (IndexError, AttributeError):
+        return ""
+
+
+@conn.handler("flow/command/rollback-ledger",
+              meta={"label": "Roll back reversible mutations from ledger"})
+def flow_rollback(ledger: list | None = None) -> dict:
+    """Undo reversible mutations recorded in the ledger.
+
+    Named rollback-ledger (not rollback) to avoid shadowing the
+    urirun.node.reversible handler at the same path — that one takes
+    {execution} while this simplified form takes {ledger: [...]}.
+    Returns {ok, undone, skipped}."""
+    import urirun.v2_service as _svc
+    from urirun.node.reversible import CallableTransport, rollback_partial_flow
+    ledger = ledger or []
+    # Build a minimal timeline/results stub so rollback_partial_flow can find inverses.
+    # Each ledger entry is {uri, inverse, before, after}.
+    timeline = [
+        {"id": f"step:{i}", "uri": e["uri"], "ok": True,
+         "inverse": e.get("inverse"), "before": e.get("before"), "after": e.get("after")}
+        for i, e in enumerate(ledger)
+    ]
+    results: dict = {}
+    try:
+        transport = CallableTransport(
+            lambda uri, payload: _svc.call(uri, payload, {}, mode="execute")
+        )
+        rb = rollback_partial_flow(timeline, results, transport)
+    except Exception as exc:
+        return {"ok": False, "error": str(exc), "undone": [], "skipped": len(ledger)}
+    return rb or {"ok": True, "undone": [], "skipped": len(ledger)}
+
+
+@conn.handler("step/command/evaluate",
+              meta={"label": "Decide next action after a failed step: retry | heal | rollback"})
+def step_evaluate(
+    step: dict,
+    entry: dict,
+    routes: list | None = None,
+    execute: bool = True,
+    attempt: int = 0,
+    max_retries: int = 1,
+    healed: bool = False,
+) -> dict:
+    """Retry/heal/rollback decision for a single failed flow step.
+
+    Makes the decision observable and switchable: callers replace this URI
+    to inject different retry policies without touching flow.py.
+
+    Priority order:
+      1. retry  — transient error + within budget + query-kind route
+      2. heal   — auto-applicable diagnosis + execute mode + not yet healed
+      3. rollback — give up, let caller undo reversible mutations
+    """
+    from urirun.node.recovery import can_retry_step
+
+    routes = routes or []
+    error = entry.get("error") or {}
+
+    if can_retry_step(error, step=step, routes=routes, execute=execute,
+                      attempt=attempt, max_retries=max_retries):
+        return urirun.ok(next="retry", reason=error.get("category"))
+
+    if execute and not healed:
+        diagnosis = (entry.get("recovery") or {}).get("diagnosis") or {}
+        if diagnosis.get("autoApplicable"):
+            return urirun.ok(next="heal", diagnosis=diagnosis)
+
+    return urirun.ok(next="rollback", reason=error.get("category"))
+
+
 @conn.handler("monitor/event", meta={"label": "Twin monitor SSE event marker"})
 def monitor_event(node: str = "", stateSig: str = "", narration: str = "") -> dict:
     """Receive a twin state-transition event (distributed to /events?scheme=twin SSE)."""
