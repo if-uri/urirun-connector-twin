@@ -574,29 +574,54 @@ def flow_recall(
     env_fp: str = "",
     episode_id: str = "",
     node: str = "host",
+    skip_drift_check: bool = False,
 ) -> dict:
     """URI boundary for the recall gate: check episode_store then flow_store before the LLM.
 
     Priority:
       1. episode_id — direct lookup (content-addressed, always wins if provided)
       2. intent_sig × env_fp — recall_episode (env-conditioned, strongest match)
-      3. intent_sig alone — recall_flow_by_intent (env-agnostic fallback)
+      3. intent_sig alone — recall_flow_by_intent (env-agnostic fallback, no drift guard)
+
+    For tiers 1 and 2 (env-conditioned recall) the drift gate is consulted: if the current
+    environment has drifted from the stored known-good fingerprint the recall is suppressed
+    (returns found=False, driftDetected=True) so the caller falls through to make_flow with
+    a fresh plan.  Tier 3 (flow_store, intent-only) skips the drift check intentionally —
+    it is offered as a hint, not a guarantee, and is always re-validated by preflight.
 
     Returns {found: True, steps, source, episode_id?} or {found: False, steps: []}.
     Callers use steps to build a flow dict and skip make_flow when found=True."""
     from urirun.node.twin_store import durable_memory  # noqa: PLC0415
     mem = durable_memory()
 
-    # 1. Direct episode lookup
+    def _drift_ok() -> bool:
+        """True when env matches known-good (no drift), False on drift or probe failure."""
+        if skip_drift_check:
+            return True
+        try:
+            import urirun.v2_service as _svc  # noqa: PLC0415
+            drift_uri = f"twin://{node}/env/query/drift"
+            env = _svc.call(drift_uri, {}, {}, mode="execute")
+            val = env.get("result", {})
+            if isinstance(val, dict) and "value" in val:
+                val = val["value"]
+            return bool(isinstance(val, dict) and not val.get("drift") and val.get("known"))
+        except Exception:  # noqa: BLE001 — offline node → treat as drifted, fall through to LLM
+            return False
+
+    # 1. Direct episode lookup (content-addressed; drift gate guards replay)
     if episode_id:
         ep = mem.episode_store.get(episode_id)
         if ep and (ep.get("outcome") or {}).get("status") == "ok":
             steps = (ep.get("plan") or {}).get("steps") or []
             if steps:
+                if not _drift_ok():
+                    return urirun.ok(found=False, steps=[], driftDetected=True,
+                                     reason="env drifted from known-good — re-plan required")
                 return urirun.ok(found=True, steps=steps, source="episode",
                                  episode_id=episode_id, goal=ep.get("goal"))
 
-    # 2. Intent × env fingerprint (episode_store)
+    # 2. Intent × env fingerprint (episode_store; strongest env-conditioned match)
     if prompt and env_fp:
         from urirun.node.episode import intent_signature  # noqa: PLC0415
         sig = intent_signature(prompt)
@@ -604,17 +629,21 @@ def flow_recall(
         if ep:
             steps = (ep.get("plan") or {}).get("steps") or []
             if steps:
+                if not _drift_ok():
+                    return urirun.ok(found=False, steps=[], driftDetected=True,
+                                     reason="env drifted from known-good — re-plan required")
                 return urirun.ok(found=True, steps=steps, source="episode",
                                  episode_id=ep.get("episode_id"), goal=ep.get("goal"))
 
-    # 3. Intent-only fallback (flow_store — no env constraint)
+    # 3. Intent-only fallback (flow_store — no env constraint; no drift guard)
     if prompt:
         rec = mem.recall_flow_by_intent(prompt)
         if rec:
             steps = rec.get("steps") or []
             if steps:
                 return urirun.ok(found=True, steps=steps, source="flow_store",
-                                 flow_key=rec.get("flowKey"), goal=rec.get("prompt"))
+                                 flow_key=rec.get("flowKey"), goal=rec.get("prompt"),
+                                 driftUnchecked=True)
 
     return urirun.ok(found=False, steps=[])
 
