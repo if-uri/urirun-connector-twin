@@ -940,3 +940,112 @@ def test_thin_goal_verify_none_dispatch_result_is_pass():
     dispatch = lambda uri, payload=None: None  # or {} after `or {}` coercion
     rb = _thin_goal_verify(dispatch, env, [], {})
     assert rb is None
+
+
+# ─── flow/command/execute handler ────────────────────────────────────────────
+
+def test_flow_execute_handler_dry_run(monkeypatch):
+    """flow_execute(execute=False) runs all steps in dry-run mode — no mutations."""
+    import urirun.v2_service as _svc
+    dispatched = []
+
+    def fake_call(uri, payload, reg, mode="dry-run"):
+        dispatched.append((uri, mode))
+        if "preflight" in uri or "goal/query/verify" in uri:
+            return {"ok": True, "next": {"kind": "done"}}
+        return {"ok": True, "next": {"kind": "continue"}}
+
+    monkeypatch.setattr(_svc, "call", fake_call)
+    from urirun_connector_twin.core import flow_execute
+    flow = {"steps": [{"id": "s1", "uri": "kvm://host/ui/command/click", "payload": {}}],
+            "task": {"id": "t1", "goal": "click"}}
+    r = flow_execute(flow=flow, execute=False)
+    assert r["ok"] is True
+    modes = {m for _, m in dispatched}
+    assert "dry-run" in modes, f"expected dry-run mode in {modes}"
+    assert "execute" not in modes, f"execute mode must not appear in dry-run"
+
+
+def test_flow_execute_handler_execute_mode(monkeypatch):
+    """flow_execute(execute=True) dispatches steps in execute mode."""
+    import urirun.v2_service as _svc
+    dispatched = []
+
+    def fake_call(uri, payload, reg, mode="execute"):
+        dispatched.append((uri, mode))
+        if "preflight" in uri or "goal/query/verify" in uri:
+            return {"ok": True, "next": {"kind": "done"}}
+        return {"ok": True, "next": {"kind": "continue"}}
+
+    monkeypatch.setattr(_svc, "call", fake_call)
+    from urirun_connector_twin.core import flow_execute
+    flow = {"steps": [{"id": "s1", "uri": "kvm://host/cdp/page/command/navigate", "payload": {}}],
+            "task": {"id": "t2", "goal": "navigate"}}
+    r = flow_execute(flow=flow, execute=True)
+    assert r["ok"] is True
+    execute_calls = [(u, m) for u, m in dispatched if m == "execute"]
+    assert len(execute_calls) >= 1, f"no execute-mode calls; got {dispatched}"
+
+
+def test_flow_execute_handler_step_failure_returns_ok_false(monkeypatch):
+    """A failing step causes flow_execute to return ok=False."""
+    import urirun.v2_service as _svc
+
+    def fake_call(uri, payload, reg, mode="execute"):
+        if "preflight" in uri:
+            return {"ok": True, "next": {"kind": "done"}}
+        return {"ok": False, "error": {"message": "click failed"}, "next": {"kind": "rollback"}}
+
+    monkeypatch.setattr(_svc, "call", fake_call)
+    from urirun_connector_twin.core import flow_execute
+    flow = {"steps": [{"id": "s1", "uri": "kvm://host/ui/command/click", "payload": {}}]}
+    r = flow_execute(flow=flow, execute=True)
+    assert r["ok"] is False
+
+
+def test_flow_execute_in_bindings():
+    """flow/command/execute is registered in the connector bindings."""
+    from urirun_connector_twin.core import bindings
+    uris = list(bindings().get("bindings", {}).keys())
+    assert any("flow/command/execute" in u for u in uris), f"missing execute route; got: {uris}"
+
+
+# ─── flow/command/diagnose handler ───────────────────────────────────────────
+
+def test_flow_diagnose_no_match_returns_found_false():
+    """An error that matches no playbook rule → {ok, found: False}."""
+    from urirun_connector_twin.core import flow_diagnose
+    r = flow_diagnose(error={"message": "completely-unknown-xyzzy-error"})
+    assert r["ok"] is True
+    assert r["found"] is False
+
+
+def test_flow_diagnose_service_stopped_matches():
+    """'connection refused' matches the service-stopped playbook rule."""
+    from urirun_connector_twin.core import flow_diagnose
+    r = flow_diagnose(
+        error={"message": "connection refused"},
+        step={"uri": "kvm://host/cdp/page/command/navigate"},
+    )
+    assert r["ok"] is True
+    assert r["found"] is True
+    assert r.get("rule") == "service-stopped", f"expected service-stopped; got {r}"
+
+
+def test_flow_diagnose_returns_remediation_list():
+    """A matched diagnosis includes a remediation list (may be empty list, not None)."""
+    from urirun_connector_twin.core import flow_diagnose
+    r = flow_diagnose(
+        error={"message": "route not found", "category": "connector_required"},
+        step={"uri": "kvm://host/cdp/page/command/navigate"},
+    )
+    if r["found"]:
+        assert "remediation" in r
+        assert isinstance(r["remediation"], list)
+
+
+def test_flow_diagnose_in_bindings():
+    """flow/command/diagnose is registered in the connector bindings."""
+    from urirun_connector_twin.core import bindings
+    uris = list(bindings().get("bindings", {}).keys())
+    assert any("flow/command/diagnose" in u for u in uris), f"missing diagnose route; got: {uris}"

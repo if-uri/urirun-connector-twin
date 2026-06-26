@@ -1,5 +1,5 @@
 source: code2llm
-# generated in 0.02s
+# generated in 0.01s
 schema: code2llm.planfile_tickets.v1
 project_root: /home/tom/github/if-uri/urirun-connector-twin
 tickets:
@@ -22,28 +22,9 @@ tickets:
   - urirun_connector_twin/browser.py
   dedupe_key: 'code2llm:smell:god_function:urirun_connector_twin/browser.py:66:God
     Function: _cdp_cookies'
-- signal: code2llm_smell_god_function
-  title: 'Address code smell: God Function: _cdp_ws_call'
-  description: 'code2llm reports `God Function: _cdp_ws_call` in `urirun_connector_twin/session.py:138`.
-
-
-    Function ''_cdp_ws_call'' is oversized: CC=11, fan-out=17, mutations=29.
-
-
-    Make the smallest refactor that removes the smell and run local tests.'
-  priority: high
-  labels:
-  - llm-ready
-  - code2llm
-  - code-smell
-  - god-function
-  files:
-  - urirun_connector_twin/session.py
-  dedupe_key: 'code2llm:smell:god_function:urirun_connector_twin/session.py:138:God
-    Function: _cdp_ws_call'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: domain'
-  description: 'code2llm reports `Shotgun Surgery: domain` in `urirun_connector_twin/core.py:129`.
+  description: 'code2llm reports `Shotgun Surgery: domain` in `urirun_connector_twin/prompt_plan.py:158`.
 
 
     Mutation of variable ''domain'' spans 5 functions. Changing this logic requires
@@ -58,12 +39,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - urirun_connector_twin/core.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/core.py:129:Shotgun
+  - urirun_connector_twin/prompt_plan.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/prompt_plan.py:158:Shotgun
     Surgery: domain'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: env'
-  description: 'code2llm reports `Shotgun Surgery: env` in `urirun_connector_twin/core.py:152`.
+  description: 'code2llm reports `Shotgun Surgery: env` in `urirun_connector_twin/core.py:210`.
 
 
     Mutation of variable ''env'' spans 7 functions. Changing this logic requires work
@@ -79,14 +60,14 @@ tickets:
   - shotgun-surgery
   files:
   - urirun_connector_twin/core.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/core.py:152:Shotgun
+  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/core.py:210:Shotgun
     Surgery: env'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: m'
-  description: 'code2llm reports `Shotgun Surgery: m` in `urirun_connector_twin/prompt_plan.py:37`.
+  description: 'code2llm reports `Shotgun Surgery: m` in `urirun_connector_twin/prompt_plan.py:25`.
 
 
-    Mutation of variable ''m'' spans 6 functions. Changing this logic requires work
+    Mutation of variable ''m'' spans 5 functions. Changing this logic requires work
     in many places.
 
 
@@ -99,11 +80,11 @@ tickets:
   - shotgun-surgery
   files:
   - urirun_connector_twin/prompt_plan.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/prompt_plan.py:37:Shotgun
+  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/prompt_plan.py:25:Shotgun
     Surgery: m'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: plan'
-  description: 'code2llm reports `Shotgun Surgery: plan` in `urirun_connector_twin/core.py:152`.
+  description: 'code2llm reports `Shotgun Surgery: plan` in `urirun_connector_twin/core.py:210`.
 
 
     Mutation of variable ''plan'' spans 6 functions. Changing this logic requires
@@ -119,11 +100,11 @@ tickets:
   - shotgun-surgery
   files:
   - urirun_connector_twin/core.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/core.py:152:Shotgun
+  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/core.py:210:Shotgun
     Surgery: plan'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: r'
-  description: 'code2llm reports `Shotgun Surgery: r` in `urirun_connector_twin/core.py:152`.
+  description: 'code2llm reports `Shotgun Surgery: r` in `urirun_connector_twin/dispatch.py:33`.
 
 
     Mutation of variable ''r'' spans 6 functions. Changing this logic requires work
@@ -138,55 +119,15 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - urirun_connector_twin/core.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/core.py:152:Shotgun
+  - urirun_connector_twin/dispatch.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/dispatch.py:33:Shotgun
     Surgery: r'
 - signal: code2llm_smell_shotgun_surgery
-  title: 'Address code smell: Shotgun Surgery: raw'
-  description: 'code2llm reports `Shotgun Surgery: raw` in `urirun_connector_twin/session.py:138`.
-
-
-    Mutation of variable ''raw'' spans 6 functions. Changing this logic requires work
-    in many places.
-
-
-    Make the smallest refactor that removes the smell and run local tests.'
-  priority: high
-  labels:
-  - llm-ready
-  - code2llm
-  - code-smell
-  - shotgun-surgery
-  files:
-  - urirun_connector_twin/session.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/session.py:138:Shotgun
-    Surgery: raw'
-- signal: code2llm_smell_shotgun_surgery
-  title: 'Address code smell: Shotgun Surgery: result'
-  description: 'code2llm reports `Shotgun Surgery: result` in `urirun_connector_twin/session.py:138`.
-
-
-    Mutation of variable ''result'' spans 6 functions. Changing this logic requires
-    work in many places.
-
-
-    Make the smallest refactor that removes the smell and run local tests.'
-  priority: high
-  labels:
-  - llm-ready
-  - code2llm
-  - code-smell
-  - shotgun-surgery
-  files:
-  - urirun_connector_twin/session.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/session.py:138:Shotgun
-    Surgery: result'
-- signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: s'
-  description: 'code2llm reports `Shotgun Surgery: s` in `urirun_connector_twin/session.py:138`.
+  description: 'code2llm reports `Shotgun Surgery: s` in `urirun_connector_twin/core.py:315`.
 
 
-    Mutation of variable ''s'' spans 6 functions. Changing this logic requires work
+    Mutation of variable ''s'' spans 5 functions. Changing this logic requires work
     in many places.
 
 
@@ -198,15 +139,15 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - urirun_connector_twin/session.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/session.py:138:Shotgun
+  - urirun_connector_twin/core.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/core.py:315:Shotgun
     Surgery: s'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: sessions'
-  description: 'code2llm reports `Shotgun Surgery: sessions` in `urirun_connector_twin/core.py:115`.
+  description: 'code2llm reports `Shotgun Surgery: sessions` in `urirun_connector_twin/core.py:51`.
 
 
-    Mutation of variable ''sessions'' spans 6 functions. Changing this logic requires
+    Mutation of variable ''sessions'' spans 5 functions. Changing this logic requires
     work in many places.
 
 
@@ -219,11 +160,11 @@ tickets:
   - shotgun-surgery
   files:
   - urirun_connector_twin/core.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/core.py:115:Shotgun
+  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/core.py:51:Shotgun
     Surgery: sessions'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: steps'
-  description: 'code2llm reports `Shotgun Surgery: steps` in `urirun_connector_twin/planner.py:106`.
+  description: 'code2llm reports `Shotgun Surgery: steps` in `urirun_connector_twin/core.py:315`.
 
 
     Mutation of variable ''steps'' spans 5 functions. Changing this logic requires
@@ -238,15 +179,15 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - urirun_connector_twin/planner.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/planner.py:106:Shotgun
+  - urirun_connector_twin/core.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/core.py:315:Shotgun
     Surgery: steps'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: url'
-  description: 'code2llm reports `Shotgun Surgery: url` in `urirun_connector_twin/session.py:138`.
+  description: 'code2llm reports `Shotgun Surgery: url` in `urirun_connector_twin/prompt_plan.py:25`.
 
 
-    Mutation of variable ''url'' spans 7 functions. Changing this logic requires work
+    Mutation of variable ''url'' spans 5 functions. Changing this logic requires work
     in many places.
 
 
@@ -258,8 +199,8 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - urirun_connector_twin/session.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/session.py:138:Shotgun
+  - urirun_connector_twin/prompt_plan.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/prompt_plan.py:25:Shotgun
     Surgery: url'
 - signal: code2llm_cc
   title: 'Reduce cyclomatic complexity: urirun_connector_twin.browser.discover_browser_sessions
@@ -396,25 +337,6 @@ tickets:
   dedupe_key: 'code2llm:smell:god_function:urirun_connector_twin/sandbox.py:117:God
     Function: _docker_probe'
 - signal: code2llm_smell_god_function
-  title: 'Address code smell: God Function: _extract_chrome_info'
-  description: 'code2llm reports `God Function: _extract_chrome_info` in `urirun_connector_twin/session.py:84`.
-
-
-    Function ''_extract_chrome_info'' is oversized: CC=9, fan-out=6, mutations=7.
-
-
-    Make the smallest refactor that removes the smell and run local tests.'
-  priority: normal
-  labels:
-  - llm-ready
-  - code2llm
-  - code-smell
-  - god-function
-  files:
-  - urirun_connector_twin/session.py
-  dedupe_key: 'code2llm:smell:god_function:urirun_connector_twin/session.py:84:God
-    Function: _extract_chrome_info'
-- signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: annotate_steps'
   description: 'code2llm reports `God Function: annotate_steps` in `urirun_connector_twin/planner.py:76`.
 
@@ -509,43 +431,5 @@ tickets:
   - urirun_connector_twin/environment.py
   dedupe_key: 'code2llm:smell:god_function:urirun_connector_twin/environment.py:107:God
     Function: probe'
-- signal: code2llm_smell_god_function
-  title: 'Address code smell: God Function: probe_session'
-  description: 'code2llm reports `God Function: probe_session` in `urirun_connector_twin/session.py:209`.
-
-
-    Function ''probe_session'' is oversized: CC=12, fan-out=5, mutations=14.
-
-
-    Make the smallest refactor that removes the smell and run local tests.'
-  priority: normal
-  labels:
-  - llm-ready
-  - code2llm
-  - code-smell
-  - god-function
-  files:
-  - urirun_connector_twin/session.py
-  dedupe_key: 'code2llm:smell:god_function:urirun_connector_twin/session.py:209:God
-    Function: probe_session'
-- signal: code2llm_smell_god_function
-  title: 'Address code smell: God Function: select_best_session'
-  description: 'code2llm reports `God Function: select_best_session` in `urirun_connector_twin/session.py:238`.
-
-
-    Function ''select_best_session'' is oversized: CC=12, fan-out=2, mutations=8.
-
-
-    Make the smallest refactor that removes the smell and run local tests.'
-  priority: normal
-  labels:
-  - llm-ready
-  - code2llm
-  - code-smell
-  - god-function
-  files:
-  - urirun_connector_twin/session.py
-  dedupe_key: 'code2llm:smell:god_function:urirun_connector_twin/session.py:238:God
-    Function: select_best_session'
 applied: []
 skipped: []

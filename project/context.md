@@ -7,15 +7,15 @@
 - **Primary Language**: python
 - **Languages**: python: 10, yaml: 4, shell: 2, json: 1, toml: 1
 - **Analysis Mode**: static
-- **Total Functions**: 94
+- **Total Functions**: 90
 - **Total Classes**: 1
 - **Modules**: 18
-- **Entry Points**: 24
+- **Entry Points**: 26
 
 ## Architecture by Module
 
 ### urirun_connector_twin.core
-- **Functions**: 26
+- **Functions**: 28
 - **File**: `core.py`
 
 ### urirun_connector_twin.prompt_plan
@@ -23,12 +23,8 @@
 - **File**: `prompt_plan.py`
 
 ### urirun_connector_twin.browser
-- **Functions**: 11
+- **Functions**: 13
 - **File**: `browser.py`
-
-### urirun_connector_twin.session
-- **Functions**: 9
-- **File**: `session.py`
 
 ### urirun_connector_twin.sandbox
 - **Functions**: 8
@@ -51,6 +47,10 @@
 - **Functions**: 3
 - **File**: `dispatch.py`
 
+### urirun_connector_twin.session
+- **Functions**: 1
+- **File**: `session.py`
+
 ## Key Entry Points
 
 Main execution flows into the system:
@@ -60,7 +60,7 @@ Main execution flows into the system:
 
 Calls twin://host/browser/query/profile via the mesh (switchable URI) with
 fallback to local browser.py scan.
-- **Calls**: conn.handler, urirun_connector_twin.session.derive_task_target, urirun_connector_twin.prompt_plan.plan_from_prompt, urirun_connector_twin.dispatch.uri_call, urirun_connector_twin.dispatch.uri_call, urirun_connector_twin.core._prompt_result, urirun_connector_twin.dispatch.value_of, urirun_connector_twin.environment.probe
+- **Calls**: conn.handler, urirun_connector_twin.prompt_plan.derive_task_target, urirun_connector_twin.prompt_plan.plan_from_prompt, urirun_connector_twin.dispatch.uri_call, urirun_connector_twin.dispatch.uri_call, urirun_connector_twin.core._prompt_result, urirun_connector_twin.dispatch.value_of, urirun_connector_twin.environment.probe
 
 ### urirun_connector_twin.core.mock_start_probe_stop
 > Close the mock ↔ sandbox loop: generate → up → health-check → down -v.
@@ -76,22 +76,29 @@ For CDP-dependent steps: if CDP is feasible but not reachable on the target
 
 - **Calls**: conn.handler, sorted, urirun.ok, timeline.append, _svc.call, bool, provisioned.append, len
 
-### urirun_connector_twin.core.browser_profile
-> Select the best live Chrome session for a domain or natural language task.
-
-Priority: auth cookie confirmed > tab on domain > real profile > any reach
-- **Calls**: conn.handler, urirun_connector_twin.browser.discover_browser_sessions, urirun_connector_twin.browser.select_session, urirun.ok, urirun_connector_twin.session.derive_task_target, t.get, bool, t.get
-
-### urirun_connector_twin.core.step_feasibility
-> Check whether a single URI step is feasible on the current node.
-- **Calls**: conn.handler, urirun_connector_twin.environment.probe, urirun_connector_twin.planner.annotate_steps, urirun.ok, env.get, s.get, s.get, s.get
-
 ### urirun_connector_twin.core.flow_rollback
 > Undo reversible mutations from a pre-built thin-driver ledger (LIFO).
 
 Each entry: {uri, inverse, args, before, after}.  Applies inverses in reverse
 o
-- **Calls**: conn.handler, reversed, urirun.ok, urirun.ok, entry.get, undone.append, _svc.call, rb.get
+- **Calls**: conn.handler, registry_from_routes, reversed, urirun.ok, None.get, urirun.ok, entry.get, undone.append
+
+### urirun_connector_twin.browser.select_best_session
+> Compat shim for session.select_best_session(sessions, task_dict).
+
+Maps the task-dict shape (from session.py) onto select_session's explicit params.
+s
+- **Calls**: str, bool, task.get, s.get, task.get, s.get, s.get, s.get
+
+### urirun_connector_twin.core.browser_profile
+> Select the best live Chrome session for a domain or natural language task.
+
+Priority: auth cookie confirmed > tab on domain > real profile > any reach
+- **Calls**: conn.handler, urirun_connector_twin.browser.discover_browser_sessions, urirun_connector_twin.browser.select_session, urirun.ok, urirun_connector_twin.prompt_plan.derive_task_target, t.get, bool, t.get
+
+### urirun_connector_twin.core.step_feasibility
+> Check whether a single URI step is feasible on the current node.
+- **Calls**: conn.handler, urirun_connector_twin.environment.probe, urirun_connector_twin.planner.annotate_steps, urirun.ok, env.get, s.get, s.get, s.get
 
 ### urirun_connector_twin.core.step_evaluate
 > Retry/heal/rollback decision for a single failed flow step.
@@ -99,10 +106,6 @@ o
 Makes the decision observable and switchable: callers replace this URI
 to inject differen
 - **Calls**: conn.handler, can_retry_step, urirun.ok, entry.get, urirun.ok, diagnosis.get, None.get, urirun.ok
-
-### urirun_connector_twin.session.probe_session
-> Enrich a session entry with reachability, tabs, and auth state.
-- **Calls**: urirun_connector_twin.session._cdp_pages, bool, bool, tab.get, p.get, p.get, p.get, urirun_connector_twin.session._check_auth_cookies
 
 ### urirun_connector_twin.core.mock_create
 > Generate a reversible Docker Compose environment for testing infeasible steps.
@@ -122,18 +125,6 @@ probe_cookies=True: reads Network.getAllCookies per session (slower, auth proof)
 pro
 - **Calls**: conn.handler, urirun_connector_twin.browser.discover_browser_sessions, urirun.ok, len, sum, s.get
 
-### urirun_connector_twin.session.discover_browser_sessions
-> Return metadata for every live debug-enabled Chrome process on this host.
-- **Calls**: set, urirun_connector_twin.session._proc_cmdlines, urirun_connector_twin.session._extract_chrome_info, seen_ports.add, sessions.append
-
-### urirun_connector_twin.session.select_best_session
-> Choose the session to use for a given task.
-
-Priority:
-  1. Session with authConfirmed (proven login via auth cookie) on target domain
-  2. Session wi
-- **Calls**: task.get, task.get, s.get, s.get, s.get
-
 ### urirun_connector_twin.core.constraints_from_profile
 > Derive per-action infeasibility constraints from a kvm actionMatrix.
 
@@ -145,6 +136,12 @@ blo
 > Annotate a pre-built urirun flow with feasibility, reversibility and surface.
 - **Calls**: conn.handler, urirun_connector_twin.environment.probe, urirun_connector_twin.planner.build_imperative_plan, plan.get, urirun_connector_twin.mock.generate_mock
 
+### urirun_connector_twin.browser._extract_chrome_info
+> Compat shim: combine _is_browser + _extract_flag into the shape session.py exported.
+
+session.py is now a re-export shim; this function is the canonic
+- **Calls**: urirun_connector_twin.browser._extract_flag, urirun_connector_twin.browser._is_browser, int, urirun_connector_twin.browser._extract_flag
+
 ### urirun_connector_twin.core.sandbox_probe
 > Run scan(before) → forward → scan(after) → inverse → scan(restored).
 
@@ -152,6 +149,13 @@ reversible := before == restored  AND  before != after.
 
 When `uri` is given and
 - **Calls**: conn.handler, urirun_connector_twin.sandbox.probe_reversibility, urirun_connector_twin.sandbox.scenario_for_uri, Scenario
+
+### urirun_connector_twin.core.flow_diagnose
+> URI boundary for the diagnostics playbook (diagnose()).
+
+Replace this route with a smarter connector (e.g. LLM-augmented root-cause
+analysis) without 
+- **Calls**: conn.handler, diagnose, urirun.ok, urirun.ok
 
 ### urirun_connector_twin.core.environment_profile
 > Collect a structured capability snapshot for the given node (or localhost).
@@ -162,6 +166,20 @@ When `uri` is given and
 
 Deploying a different twin connector with a smarter annotator (e.g. LLM-augment
 - **Calls**: conn.handler, urirun_connector_twin.planner.build_imperative_plan, urirun.ok
+
+### urirun_connector_twin.core.flow_execute
+> Run a flow plan through the thin-driver path via URI dispatch.
+
+Exposes execute_flow() as a URI boundary so callers can point to a different
+twin conn
+- **Calls**: conn.handler, execute_flow, _svc.call
+
+### urirun_connector_twin.session.derive_task_target
+> Extract domain and auth requirement from a natural-language prompt.
+
+Simple shape: {domain, needsAuth}.  For the full classification (taskType, url,
+c
+- **Calls**: prompt.lower, re.search
 
 ### urirun_connector_twin.core.monitor_event
 > Receive a twin state-transition event (distributed to /events?scheme=twin SSE).
@@ -192,6 +210,9 @@ Key execution flows identified:
 ```
 plan_from_prompt_route [urirun_connector_twin.core]
   └─ →> derive_task_target
+      └─> _extract_domain
+          └─> _extract_url
+      └─> _extract_url
   └─ →> plan_from_prompt
       └─> derive_task_target
           └─> _extract_domain
@@ -221,7 +242,17 @@ mock_start_probe_stop [urirun_connector_twin.core]
 flow_preflight [urirun_connector_twin.core]
 ```
 
-### Flow 4: browser_profile
+### Flow 4: flow_rollback
+```
+flow_rollback [urirun_connector_twin.core]
+```
+
+### Flow 5: select_best_session
+```
+select_best_session [urirun_connector_twin.browser]
+```
+
+### Flow 6: browser_profile
 ```
 browser_profile [urirun_connector_twin.core]
   └─ →> discover_browser_sessions
@@ -231,9 +262,12 @@ browser_profile [urirun_connector_twin.core]
       └─> _domain_key
       └─> _selection
   └─ →> derive_task_target
+      └─> _extract_domain
+          └─> _extract_url
+      └─> _extract_url
 ```
 
-### Flow 5: step_feasibility
+### Flow 7: step_feasibility
 ```
 step_feasibility [urirun_connector_twin.core]
   └─ →> probe
@@ -245,20 +279,9 @@ step_feasibility [urirun_connector_twin.core]
           └─> _route_suffix
 ```
 
-### Flow 6: flow_rollback
-```
-flow_rollback [urirun_connector_twin.core]
-```
-
-### Flow 7: step_evaluate
+### Flow 8: step_evaluate
 ```
 step_evaluate [urirun_connector_twin.core]
-```
-
-### Flow 8: probe_session
-```
-probe_session [urirun_connector_twin.session]
-  └─> _cdp_pages
 ```
 
 ### Flow 9: mock_create
@@ -303,37 +326,37 @@ Key functions that process and transform data:
 Functions exposed as public API (no underscore prefix):
 
 - `urirun_connector_twin.core.plan_from_prompt_route` - 18 calls
-- `urirun_connector_twin.browser.discover_browser_sessions` - 17 calls
 - `urirun_connector_twin.environment.probe` - 17 calls
+- `urirun_connector_twin.browser.discover_browser_sessions` - 17 calls
 - `urirun_connector_twin.core.mock_start_probe_stop` - 16 calls
 - `urirun_connector_twin.planner.build_imperative_plan` - 14 calls
 - `urirun_connector_twin.prompt_plan.steps_from_prompt` - 14 calls
 - `urirun_connector_twin.core.flow_preflight` - 14 calls
 - `urirun_connector_twin.planner.annotate_steps` - 13 calls
+- `urirun_connector_twin.core.flow_rollback` - 13 calls
 - `urirun_connector_twin.prompt_plan.derive_task_target` - 12 calls
+- `urirun_connector_twin.browser.select_best_session` - 12 calls
 - `urirun_connector_twin.core.browser_profile` - 12 calls
 - `urirun_connector_twin.core.step_feasibility` - 12 calls
 - `urirun_connector_twin.browser.select_session` - 11 calls
-- `urirun_connector_twin.core.flow_rollback` - 11 calls
 - `urirun_connector_twin.core.step_evaluate` - 11 calls
-- `urirun_connector_twin.session.probe_session` - 9 calls
 - `urirun_connector_twin.core.mock_create` - 7 calls
 - `urirun_connector_twin.core.flow_goal_verify` - 7 calls
 - `urirun_connector_twin.mock.generate_mock` - 6 calls
 - `urirun_connector_twin.core.browser_sessions` - 6 calls
 - `urirun_connector_twin.dispatch.uri_call` - 5 calls
-- `urirun_connector_twin.session.discover_browser_sessions` - 5 calls
-- `urirun_connector_twin.session.select_best_session` - 5 calls
 - `urirun_connector_twin.core.constraints_from_profile` - 5 calls
 - `urirun_connector_twin.core.plan_generate` - 5 calls
 - `urirun_connector_twin.sandbox.probe_reversibility` - 4 calls
 - `urirun_connector_twin.dispatch.value_of` - 4 calls
 - `urirun_connector_twin.planner.extract_steps_from_flow` - 4 calls
 - `urirun_connector_twin.core.sandbox_probe` - 4 calls
+- `urirun_connector_twin.core.flow_diagnose` - 4 calls
 - `urirun_connector_twin.sandbox.scenario_for_uri` - 3 calls
 - `urirun_connector_twin.prompt_plan.plan_from_prompt` - 3 calls
 - `urirun_connector_twin.core.environment_profile` - 3 calls
 - `urirun_connector_twin.core.plan_annotate` - 3 calls
+- `urirun_connector_twin.core.flow_execute` - 3 calls
 - `urirun_connector_twin.session.derive_task_target` - 2 calls
 - `urirun_connector_twin.core.monitor_event` - 2 calls
 - `urirun_connector_twin.core.manifest` - 2 calls
@@ -361,6 +384,14 @@ graph TD
     flow_preflight --> ok
     flow_preflight --> append
     flow_preflight --> call
+    flow_rollback --> handler
+    flow_rollback --> registry_from_routes
+    flow_rollback --> reversed
+    flow_rollback --> ok
+    flow_rollback --> get
+    select_best_session --> str
+    select_best_session --> bool
+    select_best_session --> get
     browser_profile --> handler
     browser_profile --> discover_browser_ses
     browser_profile --> select_session
@@ -369,14 +400,6 @@ graph TD
     step_feasibility --> handler
     step_feasibility --> probe
     step_feasibility --> annotate_steps
-    step_feasibility --> ok
-    step_feasibility --> get
-    flow_rollback --> handler
-    flow_rollback --> reversed
-    flow_rollback --> ok
-    flow_rollback --> get
-    step_evaluate --> handler
-    step_evaluate --> can_retry_step
 ```
 
 ## Reverse Engineering Guidelines

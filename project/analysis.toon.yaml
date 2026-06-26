@@ -1,22 +1,22 @@
-# code2llm | 18f 3327L | python:10,yaml:4,shell:2,json:1,toml:1 | 2026-06-26
+# code2llm | 18f 3206L | python:10,yaml:4,shell:2,json:1,toml:1 | 2026-06-26
 # generated in 0.00s
-# CC̅=4.6 | critical:4/94 | dups:0 | cycles:0
+# CC̅=4.4 | critical:4/90 | dups:0 | cycles:0
 
 HEALTH[4]:
-  🟡 CC    discover_browser_sessions CC=15 (limit:15)
-  🟡 CC    select_session CC=15 (limit:15)
   🟡 CC    derive_task_target CC=22 (limit:15)
   🟡 CC    steps_from_prompt CC=16 (limit:15)
+  🟡 CC    discover_browser_sessions CC=15 (limit:15)
+  🟡 CC    select_session CC=15 (limit:15)
 
 REFACTOR[1]:
   1. split 4 high-CC methods  (CC>15)
 
-PIPELINES[22]:
-  [1] Src [discover_browser_sessions]: discover_browser_sessions → _proc_cmdlines
+PIPELINES[24]:
+  [1] Src [_extract_chrome_info]: _extract_chrome_info → _extract_flag
       PURITY: 100% pure
-  [2] Src [probe_session]: probe_session → _cdp_pages
+  [2] Src [select_best_session]: select_best_session
       PURITY: 100% pure
-  [3] Src [select_best_session]: select_best_session
+  [3] Src [derive_task_target]: derive_task_target
       PURITY: 100% pure
   [4] Src [environment_profile]: environment_profile → probe → _host_os_info
       PURITY: 100% pure
@@ -26,7 +26,7 @@ PIPELINES[22]:
       PURITY: 100% pure
   [7] Src [browser_profile]: browser_profile → discover_browser_sessions → _proc_cmdline
       PURITY: 100% pure
-  [8] Src [plan_from_prompt_route]: plan_from_prompt_route → derive_task_target
+  [8] Src [plan_from_prompt_route]: plan_from_prompt_route → derive_task_target → _extract_domain → _extract_url
       PURITY: 100% pure
   [9] Src [plan_annotate]: plan_annotate → build_imperative_plan → extract_steps_from_flow
       PURITY: 100% pure
@@ -48,26 +48,30 @@ PIPELINES[22]:
       PURITY: 100% pure
   [18] Src [step_evaluate]: step_evaluate
       PURITY: 100% pure
-  [19] Src [monitor_event]: monitor_event
+  [19] Src [flow_execute]: flow_execute
       PURITY: 100% pure
-  [20] Src [bindings]: bindings
+  [20] Src [flow_diagnose]: flow_diagnose
       PURITY: 100% pure
-  [21] Src [manifest]: manifest
+  [21] Src [monitor_event]: monitor_event
       PURITY: 100% pure
-  [22] Src [main]: main
+  [22] Src [bindings]: bindings
+      PURITY: 100% pure
+  [23] Src [manifest]: manifest
+      PURITY: 100% pure
+  [24] Src [main]: main
       PURITY: 100% pure
 
 LAYERS:
-  urirun_connector_twin/          CC̄=4.6    ←in:0  →out:0
-  │ !! core                       512L  0C   26m  CC=13     ←0
-  │ session                    282L  0C    9m  CC=12     ←2
-  │ !! browser                    278L  0C   11m  CC=15     ←2
-  │ !! prompt_plan                256L  0C   18m  CC=22     ←1
+  urirun_connector_twin/          CC̄=4.4    ←in:0  →out:0
+  │ !! core                       573L  0C   28m  CC=13     ←0
+  │ !! browser                    327L  0C   13m  CC=15     ←2
+  │ !! prompt_plan                256L  0C   18m  CC=22     ←2
   │ sandbox                    162L  1C    8m  CC=6      ←1
   │ environment                161L  0C    8m  CC=11     ←1
   │ planner                    127L  0C    7m  CC=8      ←1
   │ mock                       114L  0C    4m  CC=5      ←1
   │ dispatch                    72L  0C    3m  CC=10     ←2
+  │ session                     51L  0C    1m  CC=3      ←0
   │ __init__                     4L  0C    0m  CC=0.0    ←0
   │
   ./                              CC̄=0.0    ←in:0  →out:0

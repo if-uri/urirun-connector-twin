@@ -1,7 +1,7 @@
-# urirun-connector-twin | 18f 3990L | python:15,shell:2,less:1 | 2026-06-26
-# stats: 253 func | 1 cls | 18 mod | CC̄=3.7 | critical:12 | cycles:0
+# urirun-connector-twin | 18f 4111L | python:15,shell:2,less:1 | 2026-06-26
+# stats: 259 func | 1 cls | 18 mod | CC̄=3.6 | critical:10 | cycles:0
 # alerts[5]: CC derive_task_target=22; CC steps_from_prompt=16; CC discover_browser_sessions=15; CC select_session=15; CC _cdp_cookies=13
-# hotspots[5]: _cdp_cookies fan=19; _cdp_ws_call fan=14; discover_browser_sessions fan=13; mock_start_probe_stop fan=13; steps_from_prompt fan=13
+# hotspots[5]: _cdp_cookies fan=19; discover_browser_sessions fan=13; mock_start_probe_stop fan=13; steps_from_prompt fan=13; plan_from_prompt_route fan=11
 # evolution: baseline
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
 M[18]:
@@ -9,20 +9,20 @@ M[18]:
   project.sh,69
   tests/test_browser_session.py,271
   tests/test_dispatch.py,209
-  tests/test_rollback_parity.py,250
+  tests/test_rollback_parity.py,383
   tests/test_session.py,233
-  tests/test_twin_connector.py,943
+  tests/test_twin_connector.py,1052
   tree.sh,5
   urirun_connector_twin/__init__.py,5
-  urirun_connector_twin/browser.py,279
-  urirun_connector_twin/core.py,513
+  urirun_connector_twin/browser.py,328
+  urirun_connector_twin/core.py,574
   urirun_connector_twin/dispatch.py,73
   urirun_connector_twin/environment.py,162
   urirun_connector_twin/mock.py,115
   urirun_connector_twin/planner.py,128
   urirun_connector_twin/prompt_plan.py,257
   urirun_connector_twin/sandbox.py,163
-  urirun_connector_twin/session.py,283
+  urirun_connector_twin/session.py,52
 D:
   tests/test_browser_session.py:
     e: test_derive_task_target_linkedin,test_derive_task_target_google,test_derive_task_target_unknown,test_derive_task_target_twitter,test_extract_chrome_info_with_port,test_extract_chrome_info_no_port,test_extract_chrome_info_not_chrome,test_extract_chrome_info_tmp_profile,_make_session,test_select_best_auth_confirmed,test_select_best_holds_target_fallback,test_select_best_needs_login_when_no_auth,test_select_best_no_chrome,test_select_best_no_auth_required,test_extract_url,test_extract_domain_from_url,test_extract_domain_from_keyword,test_extract_text_to_type_quoted,test_extract_text_to_type_after_verb,test_prompt_derive_social_post,test_prompt_derive_search,test_prompt_derive_screenshot,test_prompt_derive_browser_open,test_prompt_derive_unknown,test_steps_from_prompt_social_post,test_steps_from_prompt_screenshot,test_steps_from_prompt_search,test_steps_from_prompt_unknown_fallback,test_plan_from_prompt_structure,test_plan_from_prompt_social_post_metadata,test_browser_sessions_route_no_chrome,test_browser_profile_route_no_chrome,test_plan_from_prompt_route
@@ -79,7 +79,7 @@ D:
     test_plan_annotate_handler_returns_plan()
     test_all_three_from_prompt_steps_use_uri()
   tests/test_rollback_parity.py:
-    e: _nav_step,_nav_result_with_inverse,test_envelope_ledger_filled_from_inverse,test_ledger_stays_empty_for_query_step,test_thin_driver_rollback_calls_inverse_lifo,test_thin_driver_rollback_returns_undone_list,test_two_reversible_steps_rolled_back_lifo,test_goal_failure_triggers_rollback,test_goal_none_result_is_treated_as_pass,test_flow_goal_verify_no_uri_is_pass,test_flow_goal_verify_no_goal_arg,test_flow_rollback_empty_ledger,test_flow_rollback_none_inverse_skipped
+    e: _nav_step,_nav_result_with_inverse,test_envelope_ledger_filled_from_inverse,test_ledger_stays_empty_for_query_step,test_thin_driver_rollback_calls_inverse_lifo,test_thin_driver_rollback_returns_undone_list,test_two_reversible_steps_rolled_back_lifo,test_goal_failure_triggers_rollback,test_goal_none_result_is_treated_as_pass,test_flow_goal_verify_no_uri_is_pass,test_flow_goal_verify_no_goal_arg,test_flow_rollback_empty_ledger,test_flow_rollback_none_inverse_skipped,test_three_path_rollback_convergence_success,test_three_path_rollback_convergence_stuck
     _nav_step(sid)
     _nav_result_with_inverse(sid)
     test_envelope_ledger_filled_from_inverse()
@@ -93,6 +93,8 @@ D:
     test_flow_goal_verify_no_goal_arg()
     test_flow_rollback_empty_ledger()
     test_flow_rollback_none_inverse_skipped()
+    test_three_path_rollback_convergence_success()
+    test_three_path_rollback_convergence_stuck()
   tests/test_session.py:
     e: test_derive_linkedin,test_derive_github,test_derive_google_no_auth,test_derive_unknown_prompt,test_derive_empty_prompt,test_extract_flag_debug_port,test_extract_flag_user_data_dir,test_extract_flag_missing_returns_none,test_is_browser_chrome,test_is_browser_chromium,test_is_browser_not_chrome,test_is_browser_empty,test_domain_key_linkedin,test_domain_key_github,test_domain_key_unknown,test_has_auth_cookie_linkedin_found,test_has_auth_cookie_linkedin_missing,test_has_auth_cookie_unknown_domain_any_match,_make_session,test_select_prefers_tab_on_domain_with_auth,test_select_real_profile_over_tmp,test_select_needs_login_when_no_reachable,test_select_no_needs_auth_picks_first_reachable,test_discover_returns_list,test_uri_call_returns_none_on_no_mesh,test_uri_call_fallback_none_returns_none,test_value_of_extracts_nested,test_value_of_none_input,test_constraints_from_profile_route_empty_matrix,test_constraints_from_profile_route_blocked_surface,test_probe_adds_infeasible_when_needs_login,test_browser_profile_handler_no_chrome
     test_derive_linkedin()
@@ -128,7 +130,7 @@ D:
     test_probe_adds_infeasible_when_needs_login(monkeypatch)
     test_browser_profile_handler_no_chrome(monkeypatch)
   tests/test_twin_connector.py:
-    e: test_probe_returns_host_info_without_node,test_probe_with_unknown_node_adds_warning,test_probe_merges_kvm_profile,test_constraints_from_profile_wayland_type,test_annotate_infeasible_os_type_step,test_annotate_cdp_fill_is_feasible,test_annotate_navigate_is_reversible,test_annotate_fill_is_irreversible,test_build_plan_counts_infeasible_steps,test_build_plan_no_infeasible_when_clean,test_detect_service_linkedin,test_detect_service_fallback,test_generate_mock_returns_reversible,test_generate_mock_compose_yaml,test_generate_mock_addresses_infeasible_uris,test_generate_mock_has_test_uri,test_connector_bindings_has_twin_routes,test_step_feasibility_handler_clean,test_mock_create_handler,test_sandbox_probe_simulated_reversible,test_sandbox_probe_simulated_irreversible,test_sandbox_probe_noop,test_scenario_for_uri_selects_builtin,test_sandbox_probe_handler_wires_up,test_step_evaluate_retry_on_transient,test_step_evaluate_heal_when_auto_applicable,test_step_evaluate_rollback_when_healed,test_step_evaluate_rollback_dry_run,test_flow_rollback_empty_ledger,test_flow_rollback_handler_in_bindings,test_flow_rollback_ledger_calls_inverses,test_abort_envelope_dispatches_rollback_ledger,test_evaluate_step_next_routes_through_dispatch_uri,test_evaluate_step_next_in_process_fallback,test_flow_preflight_no_cdp_steps_returns_empty,test_flow_preflight_extracts_cdp_targets,test_flow_preflight_dedups_same_host,test_flow_preflight_handles_ensure_failure_gracefully,test_execute_flow_auto_envelope_uses_thin_driver,test_execute_flow_without_dispatch_uses_orchestrator,_make_twin_memory,_make_dispatch_for_memory,test_build_thin_plan_injects_drift_and_remember_for_kvm_steps,test_build_thin_plan_kvm_always_gets_drift,test_build_thin_plan_no_kvm_no_drift,test_build_thin_plan_dry_run_no_drift,test_memory_dispatch_drift_sets_baseline_on_first_run,test_memory_dispatch_drift_detects_change,test_memory_dispatch_remember_updates_store,test_execute_flow_with_memory_injects_drift_steps,test_goal_verify_no_uri_is_noop,test_goal_verify_no_goal_at_all_is_noop,test_goal_verify_contains_passes,test_goal_verify_contains_fails,test_goal_verify_equals_passes,test_goal_verify_present_passes,test_goal_verify_transport_exception_returns_ok_false,test_goal_verify_dispatch_ok_false_fails_goal,test_mock_start_probe_stop_no_docker,test_mock_start_probe_stop_structure_has_mock_fields,test_thin_goal_verify_pass_returns_none,test_thin_goal_verify_fail_returns_rollback_dict,test_thin_goal_verify_registry_not_found_is_pass,test_thin_goal_verify_none_dispatch_result_is_pass
+    e: test_probe_returns_host_info_without_node,test_probe_with_unknown_node_adds_warning,test_probe_merges_kvm_profile,test_constraints_from_profile_wayland_type,test_annotate_infeasible_os_type_step,test_annotate_cdp_fill_is_feasible,test_annotate_navigate_is_reversible,test_annotate_fill_is_irreversible,test_build_plan_counts_infeasible_steps,test_build_plan_no_infeasible_when_clean,test_detect_service_linkedin,test_detect_service_fallback,test_generate_mock_returns_reversible,test_generate_mock_compose_yaml,test_generate_mock_addresses_infeasible_uris,test_generate_mock_has_test_uri,test_connector_bindings_has_twin_routes,test_step_feasibility_handler_clean,test_mock_create_handler,test_sandbox_probe_simulated_reversible,test_sandbox_probe_simulated_irreversible,test_sandbox_probe_noop,test_scenario_for_uri_selects_builtin,test_sandbox_probe_handler_wires_up,test_step_evaluate_retry_on_transient,test_step_evaluate_heal_when_auto_applicable,test_step_evaluate_rollback_when_healed,test_step_evaluate_rollback_dry_run,test_flow_rollback_empty_ledger,test_flow_rollback_handler_in_bindings,test_flow_rollback_ledger_calls_inverses,test_abort_envelope_dispatches_rollback_ledger,test_evaluate_step_next_routes_through_dispatch_uri,test_evaluate_step_next_in_process_fallback,test_flow_preflight_no_cdp_steps_returns_empty,test_flow_preflight_extracts_cdp_targets,test_flow_preflight_dedups_same_host,test_flow_preflight_handles_ensure_failure_gracefully,test_execute_flow_auto_envelope_uses_thin_driver,test_execute_flow_without_dispatch_uses_orchestrator,_make_twin_memory,_make_dispatch_for_memory,test_build_thin_plan_injects_drift_and_remember_for_kvm_steps,test_build_thin_plan_kvm_always_gets_drift,test_build_thin_plan_no_kvm_no_drift,test_build_thin_plan_dry_run_no_drift,test_memory_dispatch_drift_sets_baseline_on_first_run,test_memory_dispatch_drift_detects_change,test_memory_dispatch_remember_updates_store,test_execute_flow_with_memory_injects_drift_steps,test_goal_verify_no_uri_is_noop,test_goal_verify_no_goal_at_all_is_noop,test_goal_verify_contains_passes,test_goal_verify_contains_fails,test_goal_verify_equals_passes,test_goal_verify_present_passes,test_goal_verify_transport_exception_returns_ok_false,test_goal_verify_dispatch_ok_false_fails_goal,test_mock_start_probe_stop_no_docker,test_mock_start_probe_stop_structure_has_mock_fields,test_thin_goal_verify_pass_returns_none,test_thin_goal_verify_fail_returns_rollback_dict,test_thin_goal_verify_registry_not_found_is_pass,test_thin_goal_verify_none_dispatch_result_is_pass,test_flow_execute_handler_dry_run,test_flow_execute_handler_execute_mode,test_flow_execute_handler_step_failure_returns_ok_false,test_flow_execute_in_bindings,test_flow_diagnose_no_match_returns_found_false,test_flow_diagnose_service_stopped_matches,test_flow_diagnose_returns_remediation_list,test_flow_diagnose_in_bindings
     test_probe_returns_host_info_without_node(monkeypatch)
     test_probe_with_unknown_node_adds_warning(monkeypatch)
     test_probe_merges_kvm_profile(monkeypatch)
@@ -193,9 +195,17 @@ D:
     test_thin_goal_verify_fail_returns_rollback_dict()
     test_thin_goal_verify_registry_not_found_is_pass()
     test_thin_goal_verify_none_dispatch_result_is_pass()
+    test_flow_execute_handler_dry_run(monkeypatch)
+    test_flow_execute_handler_execute_mode(monkeypatch)
+    test_flow_execute_handler_step_failure_returns_ok_false(monkeypatch)
+    test_flow_execute_in_bindings()
+    test_flow_diagnose_no_match_returns_found_false()
+    test_flow_diagnose_service_stopped_matches()
+    test_flow_diagnose_returns_remediation_list()
+    test_flow_diagnose_in_bindings()
   urirun_connector_twin/__init__.py:
   urirun_connector_twin/browser.py:
-    e: _proc_cmdline,_is_browser,_extract_flag,_cdp_pages,_cdp_cookies,_has_auth_cookie,_port_open,discover_browser_sessions,select_session,_domain_key,_selection
+    e: _proc_cmdline,_is_browser,_extract_flag,_cdp_pages,_cdp_cookies,_has_auth_cookie,_port_open,discover_browser_sessions,select_session,_extract_chrome_info,select_best_session,_domain_key,_selection
     _proc_cmdline(pid)
     _is_browser(args)
     _extract_flag(args;flag)
@@ -205,10 +215,12 @@ D:
     _port_open(port;timeout)
     discover_browser_sessions(probe_cookies)
     select_session(sessions;domain;needs_auth)
+    _extract_chrome_info(argv)
+    select_best_session(sessions;task)
     _domain_key(domain)
     _selection(mode;session;domain_key;rationale)
   urirun_connector_twin/core.py:
-    e: _safe_import,_local_browser_profile,_apply_browser_sel,_prompt_result,environment_profile,constraints_from_profile,browser_sessions,browser_profile,plan_from_prompt_route,plan_annotate,plan_generate,mock_create,mock_start_probe_stop,_run_compose,_wait_for_http,step_feasibility,sandbox_probe,flow_preflight,_target_of,flow_goal_verify,flow_rollback,step_evaluate,monitor_event,bindings,manifest,main
+    e: _safe_import,_local_browser_profile,_apply_browser_sel,_prompt_result,environment_profile,constraints_from_profile,browser_sessions,browser_profile,plan_from_prompt_route,plan_annotate,plan_generate,mock_create,mock_start_probe_stop,_run_compose,_wait_for_http,step_feasibility,sandbox_probe,flow_preflight,_target_of,flow_goal_verify,flow_rollback,step_evaluate,flow_execute,flow_diagnose,monitor_event,bindings,manifest,main
     _safe_import(module)
     _local_browser_profile(domain;needs_auth)
     _apply_browser_sel(plan;browser_sel)
@@ -229,8 +241,10 @@ D:
     flow_preflight(steps;node)
     _target_of(uri)
     flow_goal_verify(goal;results)
-    flow_rollback(ledger)
+    flow_rollback(ledger;mesh)
     step_evaluate(step;entry;routes;execute;attempt;max_retries;healed)
+    flow_execute(flow;execute;max_retries;max_remediations;max_wall_clock)
+    flow_diagnose(error;step;routes;environment;surface)
     monitor_event(node;stateSig;narration)
     bindings()
     manifest()
@@ -297,13 +311,5 @@ D:
     _simulated_probe(sc)
     probe_reversibility(scenario)
   urirun_connector_twin/session.py:
-    e: derive_task_target,_proc_cmdlines,_extract_chrome_info,discover_browser_sessions,_cdp_pages,_cdp_ws_call,_check_auth_cookies,probe_session,select_best_session
+    e: derive_task_target
     derive_task_target(prompt)
-    _proc_cmdlines()
-    _extract_chrome_info(argv)
-    discover_browser_sessions()
-    _cdp_pages(port;timeout)
-    _cdp_ws_call(ws_url;method;params;timeout)
-    _check_auth_cookies(ws_url;domain)
-    probe_session(session;domain)
-    select_best_session(sessions;task)

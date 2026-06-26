@@ -6,20 +6,20 @@ project_file('app.doql.less', 32, 'less').
 project_file('project.sh', 69, 'shell').
 project_file('tests/test_browser_session.py', 271, 'python').
 project_file('tests/test_dispatch.py', 209, 'python').
-project_file('tests/test_rollback_parity.py', 250, 'python').
+project_file('tests/test_rollback_parity.py', 383, 'python').
 project_file('tests/test_session.py', 233, 'python').
-project_file('tests/test_twin_connector.py', 943, 'python').
+project_file('tests/test_twin_connector.py', 1052, 'python').
 project_file('tree.sh', 5, 'shell').
 project_file('urirun_connector_twin/__init__.py', 5, 'python').
-project_file('urirun_connector_twin/browser.py', 279, 'python').
-project_file('urirun_connector_twin/core.py', 513, 'python').
+project_file('urirun_connector_twin/browser.py', 328, 'python').
+project_file('urirun_connector_twin/core.py', 574, 'python').
 project_file('urirun_connector_twin/dispatch.py', 73, 'python').
 project_file('urirun_connector_twin/environment.py', 162, 'python').
 project_file('urirun_connector_twin/mock.py', 115, 'python').
 project_file('urirun_connector_twin/planner.py', 128, 'python').
 project_file('urirun_connector_twin/prompt_plan.py', 257, 'python').
 project_file('urirun_connector_twin/sandbox.py', 163, 'python').
-project_file('urirun_connector_twin/session.py', 283, 'python').
+project_file('urirun_connector_twin/session.py', 52, 'python').
 
 % ── Python Functions ─────────────────────────────────────
 python_function('tests/test_browser_session.py', 'test_derive_task_target_linkedin', 0, 3, 1).
@@ -85,6 +85,8 @@ python_function('tests/test_rollback_parity.py', 'test_flow_goal_verify_no_uri_i
 python_function('tests/test_rollback_parity.py', 'test_flow_goal_verify_no_goal_arg', 0, 2, 1).
 python_function('tests/test_rollback_parity.py', 'test_flow_rollback_empty_ledger', 0, 3, 2).
 python_function('tests/test_rollback_parity.py', 'test_flow_rollback_none_inverse_skipped', 0, 2, 1).
+python_function('tests/test_rollback_parity.py', 'test_three_path_rollback_convergence_success', 0, 9, 9).
+python_function('tests/test_rollback_parity.py', 'test_three_path_rollback_convergence_stuck', 0, 9, 7).
 python_function('tests/test_session.py', 'test_derive_linkedin', 0, 3, 1).
 python_function('tests/test_session.py', 'test_derive_github', 0, 3, 1).
 python_function('tests/test_session.py', 'test_derive_google_no_auth', 0, 3, 1).
@@ -181,6 +183,14 @@ python_function('tests/test_twin_connector.py', 'test_thin_goal_verify_pass_retu
 python_function('tests/test_twin_connector.py', 'test_thin_goal_verify_fail_returns_rollback_dict', 0, 4, 2).
 python_function('tests/test_twin_connector.py', 'test_thin_goal_verify_registry_not_found_is_pass', 0, 2, 2).
 python_function('tests/test_twin_connector.py', 'test_thin_goal_verify_none_dispatch_result_is_pass', 0, 2, 2).
+python_function('tests/test_twin_connector.py', 'test_flow_execute_handler_dry_run', 1, 5, 3).
+python_function('tests/test_twin_connector.py', 'test_flow_execute_handler_execute_mode', 1, 5, 4).
+python_function('tests/test_twin_connector.py', 'test_flow_execute_handler_step_failure_returns_ok_false', 1, 2, 2).
+python_function('tests/test_twin_connector.py', 'test_flow_execute_in_bindings', 0, 2, 5).
+python_function('tests/test_twin_connector.py', 'test_flow_diagnose_no_match_returns_found_false', 0, 3, 1).
+python_function('tests/test_twin_connector.py', 'test_flow_diagnose_service_stopped_matches', 0, 4, 2).
+python_function('tests/test_twin_connector.py', 'test_flow_diagnose_returns_remediation_list', 0, 4, 2).
+python_function('tests/test_twin_connector.py', 'test_flow_diagnose_in_bindings', 0, 2, 5).
 python_function('urirun_connector_twin/browser.py', '_proc_cmdline', 1, 2, 4).
 python_function('urirun_connector_twin/browser.py', '_is_browser', 1, 3, 3).
 python_function('urirun_connector_twin/browser.py', '_extract_flag', 2, 3, 3).
@@ -214,8 +224,10 @@ python_function('urirun_connector_twin/core.py', 'sandbox_probe', 6, 3, 4).
 python_function('urirun_connector_twin/core.py', 'flow_preflight', 2, 9, 10).
 python_function('urirun_connector_twin/core.py', '_target_of', 1, 2, 1).
 python_function('urirun_connector_twin/core.py', 'flow_goal_verify', 2, 5, 6).
-python_function('urirun_connector_twin/core.py', 'flow_rollback', 1, 8, 7).
+python_function('urirun_connector_twin/core.py', 'flow_rollback', 2, 10, 8).
 python_function('urirun_connector_twin/core.py', 'step_evaluate', 7, 9, 4).
+python_function('urirun_connector_twin/core.py', 'flow_execute', 5, 3, 3).
+python_function('urirun_connector_twin/core.py', 'flow_diagnose', 5, 4, 3).
 python_function('urirun_connector_twin/core.py', 'monitor_event', 3, 1, 2).
 python_function('urirun_connector_twin/core.py', 'bindings', 0, 1, 1).
 python_function('urirun_connector_twin/core.py', 'manifest', 0, 1, 2).
@@ -269,14 +281,6 @@ python_function('urirun_connector_twin/sandbox.py', '_docker_probe', 1, 1, 5).
 python_function('urirun_connector_twin/sandbox.py', '_simulated_probe', 1, 1, 7).
 python_function('urirun_connector_twin/sandbox.py', 'probe_reversibility', 1, 2, 4).
 python_function('urirun_connector_twin/session.py', 'derive_task_target', 1, 3, 2).
-python_function('urirun_connector_twin/session.py', '_proc_cmdlines', 0, 7, 5).
-python_function('urirun_connector_twin/session.py', '_extract_chrome_info', 1, 9, 5).
-python_function('urirun_connector_twin/session.py', 'discover_browser_sessions', 0, 4, 5).
-python_function('urirun_connector_twin/session.py', '_cdp_pages', 2, 2, 3).
-python_function('urirun_connector_twin/session.py', '_cdp_ws_call', 4, 11, 14).
-python_function('urirun_connector_twin/session.py', '_check_auth_cookies', 2, 10, 3).
-python_function('urirun_connector_twin/session.py', 'probe_session', 2, 12, 4).
-python_function('urirun_connector_twin/session.py', 'select_best_session', 2, 12, 1).
 
 % ── Python Classes ───────────────────────────────────────
 python_class('urirun_connector_twin/sandbox.py', 'Scenario').

@@ -73,7 +73,7 @@ urirun @ git+https://github.com/if-uri/urirun.git#subdirectory=adapters/python
 
 ## Call Graph
 
-*77 nodes · 91 edges · 9 modules · CC̄=4.6*
+*70 nodes · 88 edges · 8 modules · CC̄=4.4*
 
 ### Hubs (by degree)
 
@@ -81,73 +81,73 @@ urirun @ git+https://github.com/if-uri/urirun.git#subdirectory=adapters/python
 |----------|----|----|-----|-------|
 | `_cdp_cookies` *(in urirun_connector_twin.browser)* | 13 ⚠ | 1 | 32 | **33** |
 | `probe` *(in urirun_connector_twin.environment)* | 11 ⚠ | 7 | 17 | **24** |
-| `_cdp_ws_call` *(in urirun_connector_twin.session)* | 11 ⚠ | 1 | 23 | **24** |
 | `discover_browser_sessions` *(in urirun_connector_twin.browser)* | 15 ⚠ | 4 | 17 | **21** |
 | `build_imperative_plan` *(in urirun_connector_twin.planner)* | 8 | 6 | 14 | **20** |
 | `plan_from_prompt_route` *(in urirun_connector_twin.core)* | 13 ⚠ | 0 | 18 | **18** |
+| `derive_task_target` *(in urirun_connector_twin.prompt_plan)* | 22 ⚠ | 5 | 12 | **17** |
 | `mock_start_probe_stop` *(in urirun_connector_twin.core)* | 7 | 0 | 16 | **16** |
 | `steps_from_prompt` *(in urirun_connector_twin.prompt_plan)* | 16 ⚠ | 1 | 14 | **15** |
 
 ```toon markpact:analysis path=project/calls.toon.yaml
 # code2llm call graph | /home/tom/github/if-uri/urirun-connector-twin
 # generated in 0.03s
-# nodes: 77 | edges: 91 | modules: 9
-# CC̄=4.6
+# nodes: 70 | edges: 88 | modules: 8
+# CC̄=4.4
 
 HUBS[20]:
   urirun_connector_twin.browser._cdp_cookies
     CC=13  in:1  out:32  total:33
   urirun_connector_twin.environment.probe
     CC=11  in:7  out:17  total:24
-  urirun_connector_twin.session._cdp_ws_call
-    CC=11  in:1  out:23  total:24
   urirun_connector_twin.browser.discover_browser_sessions
     CC=15  in:4  out:17  total:21
   urirun_connector_twin.planner.build_imperative_plan
     CC=8  in:6  out:14  total:20
   urirun_connector_twin.core.plan_from_prompt_route
     CC=13  in:0  out:18  total:18
+  urirun_connector_twin.prompt_plan.derive_task_target
+    CC=22  in:5  out:12  total:17
   urirun_connector_twin.core.mock_start_probe_stop
     CC=7  in:0  out:16  total:16
   urirun_connector_twin.prompt_plan.steps_from_prompt
     CC=16  in:1  out:14  total:15
   urirun_connector_twin.planner.annotate_steps
     CC=8  in:2  out:13  total:15
-  urirun_connector_twin.core.flow_preflight
-    CC=9  in:0  out:14  total:14
-  urirun_connector_twin.prompt_plan.derive_task_target
-    CC=22  in:2  out:12  total:14
   urirun_connector_twin.browser.select_session
     CC=15  in:3  out:11  total:14
+  urirun_connector_twin.core.flow_preflight
+    CC=9  in:0  out:14  total:14
   urirun_connector_twin.sandbox._simulated_probe
     CC=1  in:1  out:12  total:13
-  urirun_connector_twin.core._prompt_result
-    CC=5  in:1  out:11  total:12
-  urirun_connector_twin.core.browser_profile
-    CC=7  in:0  out:12  total:12
   urirun_connector_twin.core.step_feasibility
     CC=4  in:0  out:12  total:12
+  urirun_connector_twin.core.browser_profile
+    CC=7  in:0  out:12  total:12
+  urirun_connector_twin.core._prompt_result
+    CC=5  in:1  out:11  total:12
   urirun_connector_twin.dispatch.uri_call
     CC=10  in:6  out:5  total:11
   urirun_connector_twin.browser._selection
     CC=6  in:3  out:7  total:10
   urirun_connector_twin.mock.generate_mock
     CC=5  in:4  out:6  total:10
-  urirun_connector_twin.session.probe_session
-    CC=12  in:0  out:9  total:9
+  urirun_connector_twin.prompt_plan._extract_text_to_type
+    CC=5  in:1  out:8  total:9
+  urirun_connector_twin.environment._host_os_info
+    CC=1  in:1  out:7  total:8
 
 MODULES:
-  urirun_connector_twin.browser  [10 funcs]
+  urirun_connector_twin.browser  [11 funcs]
     _cdp_cookies  CC=13  out:32
     _cdp_pages  CC=2  out:4
     _domain_key  CC=3  out:3
+    _extract_chrome_info  CC=5  out:4
     _extract_flag  CC=3  out:3
     _is_browser  CC=3  out:3
     _port_open  CC=2  out:1
     _proc_cmdline  CC=2  out:4
     _selection  CC=6  out:7
     discover_browser_sessions  CC=15  out:17
-    select_session  CC=15  out:11
   urirun_connector_twin.core  [17 funcs]
     _local_browser_profile  CC=1  out:3
     _prompt_result  CC=5  out:11
@@ -203,15 +203,6 @@ MODULES:
     _verdict  CC=4  out:0
     probe_reversibility  CC=2  out:4
     scenario_for_uri  CC=6  out:3
-  urirun_connector_twin.session  [8 funcs]
-    _cdp_pages  CC=2  out:3
-    _cdp_ws_call  CC=11  out:23
-    _check_auth_cookies  CC=10  out:7
-    _extract_chrome_info  CC=9  out:8
-    _proc_cmdlines  CC=7  out:5
-    derive_task_target  CC=3  out:2
-    discover_browser_sessions  CC=4  out:5
-    probe_session  CC=12  out:9
 
 EDGES:
   urirun_connector_twin.sandbox._docker_probe → urirun_connector_twin.sandbox._run
@@ -224,14 +215,6 @@ EDGES:
   urirun_connector_twin.mock._resolve_service → urirun_connector_twin.mock._detect_service
   urirun_connector_twin.mock.generate_mock → urirun_connector_twin.mock._resolve_service
   urirun_connector_twin.mock.generate_mock → urirun_connector_twin.mock._compose_yaml
-  urirun_connector_twin.browser._cdp_cookies → urirun_connector_twin.browser._cdp_pages
-  urirun_connector_twin.browser.discover_browser_sessions → urirun_connector_twin.browser._proc_cmdline
-  urirun_connector_twin.browser.discover_browser_sessions → urirun_connector_twin.browser._extract_flag
-  urirun_connector_twin.browser.discover_browser_sessions → urirun_connector_twin.browser._port_open
-  urirun_connector_twin.browser.discover_browser_sessions → urirun_connector_twin.browser._is_browser
-  urirun_connector_twin.browser.discover_browser_sessions → urirun_connector_twin.browser._cdp_pages
-  urirun_connector_twin.browser.select_session → urirun_connector_twin.browser._domain_key
-  urirun_connector_twin.browser.select_session → urirun_connector_twin.browser._selection
   urirun_connector_twin.planner._is_infeasible → urirun_connector_twin.planner._route_suffix
   urirun_connector_twin.planner._step_surface → urirun_connector_twin.planner._route_suffix
   urirun_connector_twin.planner._step_reversible → urirun_connector_twin.planner._route_suffix
@@ -240,11 +223,6 @@ EDGES:
   urirun_connector_twin.planner.annotate_steps → urirun_connector_twin.planner._step_surface
   urirun_connector_twin.planner.build_imperative_plan → urirun_connector_twin.planner.extract_steps_from_flow
   urirun_connector_twin.planner.build_imperative_plan → urirun_connector_twin.planner.annotate_steps
-  urirun_connector_twin.session.discover_browser_sessions → urirun_connector_twin.session._proc_cmdlines
-  urirun_connector_twin.session.discover_browser_sessions → urirun_connector_twin.session._extract_chrome_info
-  urirun_connector_twin.session._check_auth_cookies → urirun_connector_twin.session._cdp_ws_call
-  urirun_connector_twin.session.probe_session → urirun_connector_twin.session._cdp_pages
-  urirun_connector_twin.session.probe_session → urirun_connector_twin.session._check_auth_cookies
   urirun_connector_twin.prompt_plan._extract_domain → urirun_connector_twin.prompt_plan._extract_url
   urirun_connector_twin.prompt_plan._browser_fill_and_submit_steps → urirun_connector_twin.prompt_plan._browser_open_steps
   urirun_connector_twin.prompt_plan.derive_task_target → urirun_connector_twin.prompt_plan._extract_domain
@@ -261,9 +239,22 @@ EDGES:
   urirun_connector_twin.prompt_plan.steps_from_prompt → urirun_connector_twin.prompt_plan._guess_service_name
   urirun_connector_twin.prompt_plan.plan_from_prompt → urirun_connector_twin.prompt_plan.derive_task_target
   urirun_connector_twin.prompt_plan.plan_from_prompt → urirun_connector_twin.prompt_plan.steps_from_prompt
-  urirun_connector_twin.core._local_browser_profile → urirun_connector_twin.browser.discover_browser_sessions
-  urirun_connector_twin.core._local_browser_profile → urirun_connector_twin.browser.select_session
-  urirun_connector_twin.core._prompt_result → urirun_connector_twin.mock.generate_mock
+  urirun_connector_twin.environment._kvm_query → urirun_connector_twin.dispatch.uri_call
+  urirun_connector_twin.environment._kvm_query → urirun_connector_twin.dispatch.value_of
+  urirun_connector_twin.environment._constraints_from_profile_local → urirun_connector_twin.environment._safe_import
+  urirun_connector_twin.environment._constraints_via_uri → urirun_connector_twin.dispatch.uri_call
+  urirun_connector_twin.environment._constraints_via_uri → urirun_connector_twin.environment._constraints_from_profile_local
+  urirun_connector_twin.environment._probe_browser → urirun_connector_twin.dispatch.uri_call
+  urirun_connector_twin.environment._probe_browser → urirun_connector_twin.browser.select_session
+  urirun_connector_twin.environment._probe_browser → urirun_connector_twin.browser.discover_browser_sessions
+  urirun_connector_twin.environment.probe → urirun_connector_twin.environment._host_os_info
+  urirun_connector_twin.environment.probe → urirun_connector_twin.environment._constraints_via_uri
+  urirun_connector_twin.environment.probe → urirun_connector_twin.environment._probe_browser
+  urirun_connector_twin.environment.probe → urirun_connector_twin.environment._kvm_query
+  urirun_connector_twin.environment.probe → urirun_connector_twin.prompt_plan.derive_task_target
+  urirun_connector_twin.browser._cdp_cookies → urirun_connector_twin.browser._cdp_pages
+  urirun_connector_twin.browser.discover_browser_sessions → urirun_connector_twin.browser._proc_cmdline
+  urirun_connector_twin.browser.discover_browser_sessions → urirun_connector_twin.browser._extract_flag
 ```
 
 ## Test Contracts
@@ -289,63 +280,63 @@ EDGES:
 ```toon markpact:analysis path=project/calls.toon.yaml
 # code2llm call graph | /home/tom/github/if-uri/urirun-connector-twin
 # generated in 0.03s
-# nodes: 77 | edges: 91 | modules: 9
-# CC̄=4.6
+# nodes: 70 | edges: 88 | modules: 8
+# CC̄=4.4
 
 HUBS[20]:
   urirun_connector_twin.browser._cdp_cookies
     CC=13  in:1  out:32  total:33
   urirun_connector_twin.environment.probe
     CC=11  in:7  out:17  total:24
-  urirun_connector_twin.session._cdp_ws_call
-    CC=11  in:1  out:23  total:24
   urirun_connector_twin.browser.discover_browser_sessions
     CC=15  in:4  out:17  total:21
   urirun_connector_twin.planner.build_imperative_plan
     CC=8  in:6  out:14  total:20
   urirun_connector_twin.core.plan_from_prompt_route
     CC=13  in:0  out:18  total:18
+  urirun_connector_twin.prompt_plan.derive_task_target
+    CC=22  in:5  out:12  total:17
   urirun_connector_twin.core.mock_start_probe_stop
     CC=7  in:0  out:16  total:16
   urirun_connector_twin.prompt_plan.steps_from_prompt
     CC=16  in:1  out:14  total:15
   urirun_connector_twin.planner.annotate_steps
     CC=8  in:2  out:13  total:15
-  urirun_connector_twin.core.flow_preflight
-    CC=9  in:0  out:14  total:14
-  urirun_connector_twin.prompt_plan.derive_task_target
-    CC=22  in:2  out:12  total:14
   urirun_connector_twin.browser.select_session
     CC=15  in:3  out:11  total:14
+  urirun_connector_twin.core.flow_preflight
+    CC=9  in:0  out:14  total:14
   urirun_connector_twin.sandbox._simulated_probe
     CC=1  in:1  out:12  total:13
-  urirun_connector_twin.core._prompt_result
-    CC=5  in:1  out:11  total:12
-  urirun_connector_twin.core.browser_profile
-    CC=7  in:0  out:12  total:12
   urirun_connector_twin.core.step_feasibility
     CC=4  in:0  out:12  total:12
+  urirun_connector_twin.core.browser_profile
+    CC=7  in:0  out:12  total:12
+  urirun_connector_twin.core._prompt_result
+    CC=5  in:1  out:11  total:12
   urirun_connector_twin.dispatch.uri_call
     CC=10  in:6  out:5  total:11
   urirun_connector_twin.browser._selection
     CC=6  in:3  out:7  total:10
   urirun_connector_twin.mock.generate_mock
     CC=5  in:4  out:6  total:10
-  urirun_connector_twin.session.probe_session
-    CC=12  in:0  out:9  total:9
+  urirun_connector_twin.prompt_plan._extract_text_to_type
+    CC=5  in:1  out:8  total:9
+  urirun_connector_twin.environment._host_os_info
+    CC=1  in:1  out:7  total:8
 
 MODULES:
-  urirun_connector_twin.browser  [10 funcs]
+  urirun_connector_twin.browser  [11 funcs]
     _cdp_cookies  CC=13  out:32
     _cdp_pages  CC=2  out:4
     _domain_key  CC=3  out:3
+    _extract_chrome_info  CC=5  out:4
     _extract_flag  CC=3  out:3
     _is_browser  CC=3  out:3
     _port_open  CC=2  out:1
     _proc_cmdline  CC=2  out:4
     _selection  CC=6  out:7
     discover_browser_sessions  CC=15  out:17
-    select_session  CC=15  out:11
   urirun_connector_twin.core  [17 funcs]
     _local_browser_profile  CC=1  out:3
     _prompt_result  CC=5  out:11
@@ -401,15 +392,6 @@ MODULES:
     _verdict  CC=4  out:0
     probe_reversibility  CC=2  out:4
     scenario_for_uri  CC=6  out:3
-  urirun_connector_twin.session  [8 funcs]
-    _cdp_pages  CC=2  out:3
-    _cdp_ws_call  CC=11  out:23
-    _check_auth_cookies  CC=10  out:7
-    _extract_chrome_info  CC=9  out:8
-    _proc_cmdlines  CC=7  out:5
-    derive_task_target  CC=3  out:2
-    discover_browser_sessions  CC=4  out:5
-    probe_session  CC=12  out:9
 
 EDGES:
   urirun_connector_twin.sandbox._docker_probe → urirun_connector_twin.sandbox._run
@@ -422,14 +404,6 @@ EDGES:
   urirun_connector_twin.mock._resolve_service → urirun_connector_twin.mock._detect_service
   urirun_connector_twin.mock.generate_mock → urirun_connector_twin.mock._resolve_service
   urirun_connector_twin.mock.generate_mock → urirun_connector_twin.mock._compose_yaml
-  urirun_connector_twin.browser._cdp_cookies → urirun_connector_twin.browser._cdp_pages
-  urirun_connector_twin.browser.discover_browser_sessions → urirun_connector_twin.browser._proc_cmdline
-  urirun_connector_twin.browser.discover_browser_sessions → urirun_connector_twin.browser._extract_flag
-  urirun_connector_twin.browser.discover_browser_sessions → urirun_connector_twin.browser._port_open
-  urirun_connector_twin.browser.discover_browser_sessions → urirun_connector_twin.browser._is_browser
-  urirun_connector_twin.browser.discover_browser_sessions → urirun_connector_twin.browser._cdp_pages
-  urirun_connector_twin.browser.select_session → urirun_connector_twin.browser._domain_key
-  urirun_connector_twin.browser.select_session → urirun_connector_twin.browser._selection
   urirun_connector_twin.planner._is_infeasible → urirun_connector_twin.planner._route_suffix
   urirun_connector_twin.planner._step_surface → urirun_connector_twin.planner._route_suffix
   urirun_connector_twin.planner._step_reversible → urirun_connector_twin.planner._route_suffix
@@ -438,11 +412,6 @@ EDGES:
   urirun_connector_twin.planner.annotate_steps → urirun_connector_twin.planner._step_surface
   urirun_connector_twin.planner.build_imperative_plan → urirun_connector_twin.planner.extract_steps_from_flow
   urirun_connector_twin.planner.build_imperative_plan → urirun_connector_twin.planner.annotate_steps
-  urirun_connector_twin.session.discover_browser_sessions → urirun_connector_twin.session._proc_cmdlines
-  urirun_connector_twin.session.discover_browser_sessions → urirun_connector_twin.session._extract_chrome_info
-  urirun_connector_twin.session._check_auth_cookies → urirun_connector_twin.session._cdp_ws_call
-  urirun_connector_twin.session.probe_session → urirun_connector_twin.session._cdp_pages
-  urirun_connector_twin.session.probe_session → urirun_connector_twin.session._check_auth_cookies
   urirun_connector_twin.prompt_plan._extract_domain → urirun_connector_twin.prompt_plan._extract_url
   urirun_connector_twin.prompt_plan._browser_fill_and_submit_steps → urirun_connector_twin.prompt_plan._browser_open_steps
   urirun_connector_twin.prompt_plan.derive_task_target → urirun_connector_twin.prompt_plan._extract_domain
@@ -459,33 +428,46 @@ EDGES:
   urirun_connector_twin.prompt_plan.steps_from_prompt → urirun_connector_twin.prompt_plan._guess_service_name
   urirun_connector_twin.prompt_plan.plan_from_prompt → urirun_connector_twin.prompt_plan.derive_task_target
   urirun_connector_twin.prompt_plan.plan_from_prompt → urirun_connector_twin.prompt_plan.steps_from_prompt
-  urirun_connector_twin.core._local_browser_profile → urirun_connector_twin.browser.discover_browser_sessions
-  urirun_connector_twin.core._local_browser_profile → urirun_connector_twin.browser.select_session
-  urirun_connector_twin.core._prompt_result → urirun_connector_twin.mock.generate_mock
+  urirun_connector_twin.environment._kvm_query → urirun_connector_twin.dispatch.uri_call
+  urirun_connector_twin.environment._kvm_query → urirun_connector_twin.dispatch.value_of
+  urirun_connector_twin.environment._constraints_from_profile_local → urirun_connector_twin.environment._safe_import
+  urirun_connector_twin.environment._constraints_via_uri → urirun_connector_twin.dispatch.uri_call
+  urirun_connector_twin.environment._constraints_via_uri → urirun_connector_twin.environment._constraints_from_profile_local
+  urirun_connector_twin.environment._probe_browser → urirun_connector_twin.dispatch.uri_call
+  urirun_connector_twin.environment._probe_browser → urirun_connector_twin.browser.select_session
+  urirun_connector_twin.environment._probe_browser → urirun_connector_twin.browser.discover_browser_sessions
+  urirun_connector_twin.environment.probe → urirun_connector_twin.environment._host_os_info
+  urirun_connector_twin.environment.probe → urirun_connector_twin.environment._constraints_via_uri
+  urirun_connector_twin.environment.probe → urirun_connector_twin.environment._probe_browser
+  urirun_connector_twin.environment.probe → urirun_connector_twin.environment._kvm_query
+  urirun_connector_twin.environment.probe → urirun_connector_twin.prompt_plan.derive_task_target
+  urirun_connector_twin.browser._cdp_cookies → urirun_connector_twin.browser._cdp_pages
+  urirun_connector_twin.browser.discover_browser_sessions → urirun_connector_twin.browser._proc_cmdline
+  urirun_connector_twin.browser.discover_browser_sessions → urirun_connector_twin.browser._extract_flag
 ```
 
 ### Code Analysis (`project/analysis.toon.yaml`)
 
 ```toon markpact:analysis path=project/analysis.toon.yaml
-# code2llm | 18f 3327L | python:10,yaml:4,shell:2,json:1,toml:1 | 2026-06-26
+# code2llm | 18f 3206L | python:10,yaml:4,shell:2,json:1,toml:1 | 2026-06-26
 # generated in 0.00s
-# CC̅=4.6 | critical:4/94 | dups:0 | cycles:0
+# CC̅=4.4 | critical:4/90 | dups:0 | cycles:0
 
 HEALTH[4]:
-  🟡 CC    discover_browser_sessions CC=15 (limit:15)
-  🟡 CC    select_session CC=15 (limit:15)
   🟡 CC    derive_task_target CC=22 (limit:15)
   🟡 CC    steps_from_prompt CC=16 (limit:15)
+  🟡 CC    discover_browser_sessions CC=15 (limit:15)
+  🟡 CC    select_session CC=15 (limit:15)
 
 REFACTOR[1]:
   1. split 4 high-CC methods  (CC>15)
 
-PIPELINES[22]:
-  [1] Src [discover_browser_sessions]: discover_browser_sessions → _proc_cmdlines
+PIPELINES[24]:
+  [1] Src [_extract_chrome_info]: _extract_chrome_info → _extract_flag
       PURITY: 100% pure
-  [2] Src [probe_session]: probe_session → _cdp_pages
+  [2] Src [select_best_session]: select_best_session
       PURITY: 100% pure
-  [3] Src [select_best_session]: select_best_session
+  [3] Src [derive_task_target]: derive_task_target
       PURITY: 100% pure
   [4] Src [environment_profile]: environment_profile → probe → _host_os_info
       PURITY: 100% pure
@@ -495,7 +477,7 @@ PIPELINES[22]:
       PURITY: 100% pure
   [7] Src [browser_profile]: browser_profile → discover_browser_sessions → _proc_cmdline
       PURITY: 100% pure
-  [8] Src [plan_from_prompt_route]: plan_from_prompt_route → derive_task_target
+  [8] Src [plan_from_prompt_route]: plan_from_prompt_route → derive_task_target → _extract_domain → _extract_url
       PURITY: 100% pure
   [9] Src [plan_annotate]: plan_annotate → build_imperative_plan → extract_steps_from_flow
       PURITY: 100% pure
@@ -517,26 +499,30 @@ PIPELINES[22]:
       PURITY: 100% pure
   [18] Src [step_evaluate]: step_evaluate
       PURITY: 100% pure
-  [19] Src [monitor_event]: monitor_event
+  [19] Src [flow_execute]: flow_execute
       PURITY: 100% pure
-  [20] Src [bindings]: bindings
+  [20] Src [flow_diagnose]: flow_diagnose
       PURITY: 100% pure
-  [21] Src [manifest]: manifest
+  [21] Src [monitor_event]: monitor_event
       PURITY: 100% pure
-  [22] Src [main]: main
+  [22] Src [bindings]: bindings
+      PURITY: 100% pure
+  [23] Src [manifest]: manifest
+      PURITY: 100% pure
+  [24] Src [main]: main
       PURITY: 100% pure
 
 LAYERS:
-  urirun_connector_twin/          CC̄=4.6    ←in:0  →out:0
-  │ !! core                       512L  0C   26m  CC=13     ←0
-  │ session                    282L  0C    9m  CC=12     ←2
-  │ !! browser                    278L  0C   11m  CC=15     ←2
-  │ !! prompt_plan                256L  0C   18m  CC=22     ←1
+  urirun_connector_twin/          CC̄=4.4    ←in:0  →out:0
+  │ !! core                       573L  0C   28m  CC=13     ←0
+  │ !! browser                    327L  0C   13m  CC=15     ←2
+  │ !! prompt_plan                256L  0C   18m  CC=22     ←2
   │ sandbox                    162L  1C    8m  CC=6      ←1
   │ environment                161L  0C    8m  CC=11     ←1
   │ planner                    127L  0C    7m  CC=8      ←1
   │ mock                       114L  0C    4m  CC=5      ←1
   │ dispatch                    72L  0C    3m  CC=10     ←2
+  │ session                     51L  0C    1m  CC=3      ←0
   │ __init__                     4L  0C    0m  CC=0.0    ←0
   │
   ./                              CC̄=0.0    ←in:0  →out:0
@@ -576,13 +562,13 @@ SUMMARY:
 ### Evolution / Churn (`project/evolution.toon.yaml`)
 
 ```toon markpact:analysis path=project/evolution.toon.yaml
-# code2llm/evolution | 94 func | 9f | 2026-06-26
+# code2llm/evolution | 90 func | 9f | 2026-06-26
 # generated in 0.00s
 
 NEXT[7] (ranked by impact):
   [1] !! SPLIT           urirun_connector_twin/core.py
-      WHY: 512L, 0 classes, max CC=13
-      EFFORT: ~4h  IMPACT: 6656
+      WHY: 573L, 0 classes, max CC=13
+      EFFORT: ~4h  IMPACT: 7449
 
   [2] !  SPLIT-FUNC      steps_from_prompt  CC=16  fan=13
       WHY: CC=16 exceeds 15
@@ -611,11 +597,11 @@ NEXT[7] (ranked by impact):
 
 RISKS[3]:
   ⚠ Splitting connector.manifest.json may break 0 import paths
-  ⚠ Splitting urirun_connector_twin/core.py may break 26 import paths
+  ⚠ Splitting urirun_connector_twin/core.py may break 28 import paths
   ⚠ Splitting planfile.yaml may break 0 import paths
 
 METRICS-TARGET:
-  CC̄:          4.6 → ≤3.2
+  CC̄:          4.4 → ≤3.1
   max-CC:      22 → ≤11
   god-modules: 3 → 0
   high-CC(≥15): 4 → ≤2
@@ -646,7 +632,7 @@ PATTERNS (language parser shared logic):
     - Standardized FunctionInfo/ClassInfo models
 
 HISTORY:
-  prev CC̄=4.6 → now CC̄=4.6
+  prev CC̄=4.6 → now CC̄=4.4
 ```
 
 ## Intent

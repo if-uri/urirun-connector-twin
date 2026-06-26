@@ -381,19 +381,6 @@ sprints:
     model_hints:
       planning: balanced
       implementation: balanced
-  - id: ticket-d6d48725
-    name: Fix string-concat issues
-    description: Resolve 2 string-concat issues in urirun_connector_twin/session.py
-    task_type: prefactor
-    priority: medium
-    estimate: 1d
-    files:
-    - urirun_connector_twin/session.py
-    rule_id: string-concat
-    count: 2
-    model_hints:
-      planning: balanced
-      implementation: balanced
   - id: ticket-ddf72135
     name: Fix unused-imports issues
     description: Resolve 2 unused-imports issues in urirun_connector_twin/session.py
@@ -403,19 +390,6 @@ sprints:
     files:
     - urirun_connector_twin/session.py
     rule_id: unused-imports
-    count: 2
-    model_hints:
-      planning: balanced
-      implementation: balanced
-  - id: ticket-ad722606
-    name: Fix magic-numbers issues
-    description: Resolve 2 magic-numbers issues in urirun_connector_twin/session.py
-    task_type: prefactor
-    priority: medium
-    estimate: 1d
-    files:
-    - urirun_connector_twin/session.py
-    rule_id: magic-numbers
     count: 2
     model_hints:
       planning: balanced
@@ -495,6 +469,19 @@ sprints:
     - urirun_connector_twin/prompt_plan.py
     rule_id: llm-generated-code
     count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-748b481c
+    name: Fix relative-imports issues
+    description: Resolve 4 relative-imports issues in urirun_connector_twin/session.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - urirun_connector_twin/session.py
+    rule_id: relative-imports
+    count: 4
     model_hints:
       planning: balanced
       implementation: balanced

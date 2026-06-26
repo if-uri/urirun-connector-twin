@@ -155,6 +155,35 @@ _SERVICE_START = ("start", "uruchom", "włącz")
 _SERVICE_STOP = ("stop", "restart", "zatrzymaj", "wyłącz")
 
 
+_TASK_RULES: list[tuple] = [
+    # (verbs, location_check, task_type)
+    # location_check: None=no check, "domain"=needs domain, "any"=needs url or domain
+    (_SOCIAL_VERBS,  "domain", "social-post"),
+    (_SEARCH_VERBS,  None,     "web-search"),
+    (_FILL_VERBS,    "any",    "browser-fill"),
+    (_OPEN_VERBS,    "any",    "browser-open"),
+    (_SCREEN_VERBS,  None,     "screenshot"),
+    (_SERVICE_START, None,     "service-start"),
+    (_SERVICE_STOP,  None,     "service-stop"),
+]
+
+
+def _location_ok(check: str | None, domain: str | None, url: str | None) -> bool:
+    if check is None:
+        return True
+    if check == "domain":
+        return bool(domain)
+    return bool(domain or url)
+
+
+def _classify_task_type(low: str, domain: str | None, url: str | None) -> str:
+    """Map a lowered prompt + extracted domain/url to a task-type string."""
+    for verbs, loc, label in _TASK_RULES:
+        if any(v in low for v in verbs) and _location_ok(loc, domain, url):
+            return label
+    return "browser-open" if url else "unknown"
+
+
 def derive_task_target(prompt: str) -> dict:
     """Extract domain, content, and task type from a natural language prompt.
 
@@ -162,70 +191,44 @@ def derive_task_target(prompt: str) -> dict:
     low = prompt.lower()
     domain = _extract_domain(prompt)
     url = _extract_url(prompt)
-    content = _extract_text_to_type(prompt)
-    needs_auth = any(svc in low for svc in ("linkedin", "github", "facebook", "instagram", "twitter"))
-    task_type = "unknown"
-
-    if any(v in low for v in _SOCIAL_VERBS) and domain:
-        task_type = "social-post"
-    elif any(v in low for v in _SEARCH_VERBS):
-        task_type = "web-search"
-    elif any(v in low for v in _FILL_VERBS) and (url or domain):
-        task_type = "browser-fill"
-    elif any(v in low for v in _OPEN_VERBS) and (url or domain):
-        task_type = "browser-open"
-    elif any(v in low for v in _SCREEN_VERBS):
-        task_type = "screenshot"
-    elif any(v in low for v in _SERVICE_START):
-        task_type = "service-start"
-    elif any(v in low for v in _SERVICE_STOP):
-        task_type = "service-stop"
-    elif url:
-        task_type = "browser-open"
-
     return {
         "domain": domain,
         "url": url,
-        "content": content,
-        "needsAuth": needs_auth,
-        "taskType": task_type,
+        "content": _extract_text_to_type(prompt),
+        "needsAuth": any(svc in low for svc in ("linkedin", "github", "facebook", "instagram", "twitter")),
+        "taskType": _classify_task_type(low, domain, url),
     }
+
+
+def _raw_steps_for_target(target: dict, prompt: str) -> list[dict]:
+    """Return un-bound step list for a derive_task_target result."""
+    task_type = target["taskType"]
+    domain = target["domain"]
+    url = target["url"]
+    content = target["content"]
+    nav_url = url or (f"https://{domain}" if domain else None)
+    if task_type == "social-post" and domain:
+        return _post_on_social_steps(domain, content)
+    if task_type == "web-search":
+        return _search_steps(_extract_query(prompt))
+    if task_type == "browser-fill" and nav_url:
+        return _browser_fill_and_submit_steps(nav_url, content)
+    if task_type == "browser-open" and nav_url:
+        return _browser_open_steps(nav_url)
+    if task_type == "screenshot":
+        return _screenshot_steps()
+    if task_type == "service-start":
+        return _service_start_steps(_guess_service_name(prompt))
+    if task_type == "service-stop":
+        return _service_stop_steps(_guess_service_name(prompt))
+    return _fallback_describe_steps(prompt)
 
 
 def steps_from_prompt(prompt: str, node: str = "host") -> list[dict]:
     """Derive concrete URI step list from a natural language prompt.
 
     Steps use `{node}` as a placeholder — caller substitutes the actual node name."""
-    low = prompt.lower()
-    target = derive_task_target(prompt)
-    task_type = target["taskType"]
-    domain = target["domain"]
-    url = target["url"]
-    content = target["content"]
-
-    raw: list[dict] = []
-
-    if task_type == "social-post" and domain:
-        raw = _post_on_social_steps(domain, content)
-    elif task_type == "web-search":
-        raw = _search_steps(_extract_query(prompt))
-    elif task_type == "browser-fill" and (url or domain):
-        raw = _browser_fill_and_submit_steps(url or f"https://{domain}", content)
-    elif task_type == "browser-open" and (url or domain):
-        raw = _browser_open_steps(url or f"https://{domain}")
-    elif task_type == "screenshot":
-        raw = _screenshot_steps()
-    elif task_type == "service-start":
-        svc = _guess_service_name(prompt)
-        raw = _service_start_steps(svc)
-    elif task_type == "service-stop":
-        svc = _guess_service_name(prompt)
-        raw = _service_stop_steps(svc)
-    else:
-        raw = _fallback_describe_steps(prompt)
-
-    # Substitute {node} placeholder
-    return [_bind_node(s, node) for s in raw]
+    return [_bind_node(s, node) for s in _raw_steps_for_target(derive_task_target(prompt), prompt)]
 
 
 def _guess_service_name(prompt: str) -> str:

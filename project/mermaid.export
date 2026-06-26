@@ -10,6 +10,8 @@ flowchart TD
         urirun_connector_twin__browser___port_open["_port_open"]
         urirun_connector_twin__browser__discover_browser_sessions{{discover_browser_sessions CC=15}}
         urirun_connector_twin__browser__select_session{{select_session CC=15}}
+        urirun_connector_twin__browser___extract_chrome_info["_extract_chrome_info"]
+        urirun_connector_twin__browser__select_best_session("select_best_session CC=12")
         urirun_connector_twin__browser___domain_key["_domain_key"]
         urirun_connector_twin__browser___selection["_selection"]
     end
@@ -34,8 +36,10 @@ flowchart TD
         urirun_connector_twin__core__flow_preflight("flow_preflight CC=9")
         urirun_connector_twin__core___target_of["_target_of"]
         urirun_connector_twin__core__flow_goal_verify["flow_goal_verify"]
-        urirun_connector_twin__core__flow_rollback("flow_rollback CC=8")
+        urirun_connector_twin__core__flow_rollback("flow_rollback CC=10")
         urirun_connector_twin__core__step_evaluate("step_evaluate CC=9")
+        urirun_connector_twin__core__flow_execute["flow_execute"]
+        urirun_connector_twin__core__flow_diagnose["flow_diagnose"]
         urirun_connector_twin__core__monitor_event["monitor_event"]
         urirun_connector_twin__core__bindings["bindings"]
         urirun_connector_twin__core__manifest["manifest"]
@@ -103,14 +107,6 @@ flowchart TD
     end
     subgraph urirun_connector_twin__session
         urirun_connector_twin__session__derive_task_target["derive_task_target"]
-        urirun_connector_twin__session___proc_cmdlines["_proc_cmdlines"]
-        urirun_connector_twin__session___extract_chrome_info("_extract_chrome_info CC=9")
-        urirun_connector_twin__session__discover_browser_sessions["discover_browser_sessions"]
-        urirun_connector_twin__session___cdp_pages["_cdp_pages"]
-        urirun_connector_twin__session___cdp_ws_call("_cdp_ws_call CC=11")
-        urirun_connector_twin__session___check_auth_cookies("_check_auth_cookies CC=10")
-        urirun_connector_twin__session__probe_session("probe_session CC=12")
-        urirun_connector_twin__session__select_best_session("select_best_session CC=12")
     end
     urirun_connector_twin__sandbox___docker_probe --> urirun_connector_twin__sandbox___run
     urirun_connector_twin__sandbox___docker_probe --> urirun_connector_twin__sandbox___parse_sections
@@ -123,15 +119,6 @@ flowchart TD
     urirun_connector_twin__mock___resolve_service --> urirun_connector_twin__mock___detect_service
     urirun_connector_twin__mock__generate_mock --> urirun_connector_twin__mock___resolve_service
     urirun_connector_twin__mock__generate_mock --> urirun_connector_twin__mock___compose_yaml
-    urirun_connector_twin__browser___cdp_cookies --> urirun_connector_twin__browser___cdp_pages
-    urirun_connector_twin__browser__discover_browser_sessions --> urirun_connector_twin__browser___proc_cmdline
-    urirun_connector_twin__browser__discover_browser_sessions --> urirun_connector_twin__browser___extract_flag
-    urirun_connector_twin__browser__discover_browser_sessions --> urirun_connector_twin__browser___port_open
-    urirun_connector_twin__browser__discover_browser_sessions --> urirun_connector_twin__browser___is_browser
-    urirun_connector_twin__browser__discover_browser_sessions --> urirun_connector_twin__browser___cdp_pages
-    urirun_connector_twin__browser__discover_browser_sessions --> urirun_connector_twin__browser___cdp_cookies
-    urirun_connector_twin__browser__select_session --> urirun_connector_twin__browser___domain_key
-    urirun_connector_twin__browser__select_session --> urirun_connector_twin__browser___selection
     urirun_connector_twin__planner___is_infeasible --> urirun_connector_twin__planner___route_suffix
     urirun_connector_twin__planner___step_surface --> urirun_connector_twin__planner___route_suffix
     urirun_connector_twin__planner___step_reversible --> urirun_connector_twin__planner___route_suffix
@@ -140,11 +127,6 @@ flowchart TD
     urirun_connector_twin__planner__annotate_steps --> urirun_connector_twin__planner___step_surface
     urirun_connector_twin__planner__build_imperative_plan --> urirun_connector_twin__planner__extract_steps_from_flow
     urirun_connector_twin__planner__build_imperative_plan --> urirun_connector_twin__planner__annotate_steps
-    urirun_connector_twin__session__discover_browser_sessions --> urirun_connector_twin__session___proc_cmdlines
-    urirun_connector_twin__session__discover_browser_sessions --> urirun_connector_twin__session___extract_chrome_info
-    urirun_connector_twin__session___check_auth_cookies --> urirun_connector_twin__session___cdp_ws_call
-    urirun_connector_twin__session__probe_session --> urirun_connector_twin__session___cdp_pages
-    urirun_connector_twin__session__probe_session --> urirun_connector_twin__session___check_auth_cookies
     urirun_connector_twin__prompt_plan___extract_domain --> urirun_connector_twin__prompt_plan___extract_url
     urirun_connector_twin__prompt_plan___browser_fill_and_submit_steps --> urirun_connector_twin__prompt_plan___browser_open_steps
     urirun_connector_twin__prompt_plan__derive_task_target --> urirun_connector_twin__prompt_plan___extract_domain
@@ -164,6 +146,31 @@ flowchart TD
     urirun_connector_twin__prompt_plan__steps_from_prompt --> urirun_connector_twin__prompt_plan___fallback_describe_steps
     urirun_connector_twin__prompt_plan__plan_from_prompt --> urirun_connector_twin__prompt_plan__derive_task_target
     urirun_connector_twin__prompt_plan__plan_from_prompt --> urirun_connector_twin__prompt_plan__steps_from_prompt
+    urirun_connector_twin__environment___kvm_query --> urirun_connector_twin__dispatch__uri_call
+    urirun_connector_twin__environment___kvm_query --> urirun_connector_twin__dispatch__value_of
+    urirun_connector_twin__environment___constraints_from_profile_local --> urirun_connector_twin__environment___safe_import
+    urirun_connector_twin__environment___constraints_via_uri --> urirun_connector_twin__dispatch__uri_call
+    urirun_connector_twin__environment___constraints_via_uri --> urirun_connector_twin__environment___constraints_from_profile_local
+    urirun_connector_twin__environment___probe_browser --> urirun_connector_twin__dispatch__uri_call
+    urirun_connector_twin__environment___probe_browser --> urirun_connector_twin__browser__select_session
+    urirun_connector_twin__environment___probe_browser --> urirun_connector_twin__browser__discover_browser_sessions
+    urirun_connector_twin__environment__probe --> urirun_connector_twin__environment___host_os_info
+    urirun_connector_twin__environment__probe --> urirun_connector_twin__environment___constraints_via_uri
+    urirun_connector_twin__environment__probe --> urirun_connector_twin__environment___probe_browser
+    urirun_connector_twin__environment__probe --> urirun_connector_twin__environment___kvm_query
+    urirun_connector_twin__environment__probe --> urirun_connector_twin__prompt_plan__derive_task_target
+    urirun_connector_twin__environment__probe --> urirun_connector_twin__environment___docker_available
+    urirun_connector_twin__browser___cdp_cookies --> urirun_connector_twin__browser___cdp_pages
+    urirun_connector_twin__browser__discover_browser_sessions --> urirun_connector_twin__browser___proc_cmdline
+    urirun_connector_twin__browser__discover_browser_sessions --> urirun_connector_twin__browser___extract_flag
+    urirun_connector_twin__browser__discover_browser_sessions --> urirun_connector_twin__browser___port_open
+    urirun_connector_twin__browser__discover_browser_sessions --> urirun_connector_twin__browser___is_browser
+    urirun_connector_twin__browser__discover_browser_sessions --> urirun_connector_twin__browser___cdp_pages
+    urirun_connector_twin__browser__discover_browser_sessions --> urirun_connector_twin__browser___cdp_cookies
+    urirun_connector_twin__browser__select_session --> urirun_connector_twin__browser___domain_key
+    urirun_connector_twin__browser__select_session --> urirun_connector_twin__browser___selection
+    urirun_connector_twin__browser___extract_chrome_info --> urirun_connector_twin__browser___extract_flag
+    urirun_connector_twin__browser___extract_chrome_info --> urirun_connector_twin__browser___is_browser
     urirun_connector_twin__core___local_browser_profile --> urirun_connector_twin__browser__discover_browser_sessions
     urirun_connector_twin__core___local_browser_profile --> urirun_connector_twin__browser__select_session
     urirun_connector_twin__core___prompt_result --> urirun_connector_twin__mock__generate_mock
@@ -172,8 +179,8 @@ flowchart TD
     urirun_connector_twin__core__browser_sessions --> urirun_connector_twin__browser__discover_browser_sessions
     urirun_connector_twin__core__browser_profile --> urirun_connector_twin__browser__discover_browser_sessions
     urirun_connector_twin__core__browser_profile --> urirun_connector_twin__browser__select_session
-    urirun_connector_twin__core__browser_profile --> urirun_connector_twin__session__derive_task_target
-    urirun_connector_twin__core__plan_from_prompt_route --> urirun_connector_twin__session__derive_task_target
+    urirun_connector_twin__core__browser_profile --> urirun_connector_twin__prompt_plan__derive_task_target
+    urirun_connector_twin__core__plan_from_prompt_route --> urirun_connector_twin__prompt_plan__derive_task_target
     urirun_connector_twin__core__plan_from_prompt_route --> urirun_connector_twin__prompt_plan__plan_from_prompt
     urirun_connector_twin__core__plan_from_prompt_route --> urirun_connector_twin__dispatch__uri_call
     urirun_connector_twin__core__plan_from_prompt_route --> urirun_connector_twin__core___prompt_result
@@ -198,22 +205,8 @@ flowchart TD
     urirun_connector_twin__core__sandbox_probe --> urirun_connector_twin__sandbox__probe_reversibility
     urirun_connector_twin__core__sandbox_probe --> urirun_connector_twin__sandbox__scenario_for_uri
     urirun_connector_twin__core__flow_preflight --> urirun_connector_twin__core___target_of
-    urirun_connector_twin__environment___kvm_query --> urirun_connector_twin__dispatch__uri_call
-    urirun_connector_twin__environment___kvm_query --> urirun_connector_twin__dispatch__value_of
-    urirun_connector_twin__environment___constraints_from_profile_local --> urirun_connector_twin__environment___safe_import
-    urirun_connector_twin__environment___constraints_via_uri --> urirun_connector_twin__dispatch__uri_call
-    urirun_connector_twin__environment___constraints_via_uri --> urirun_connector_twin__environment___constraints_from_profile_local
-    urirun_connector_twin__environment___probe_browser --> urirun_connector_twin__dispatch__uri_call
-    urirun_connector_twin__environment___probe_browser --> urirun_connector_twin__browser__select_session
-    urirun_connector_twin__environment___probe_browser --> urirun_connector_twin__browser__discover_browser_sessions
-    urirun_connector_twin__environment__probe --> urirun_connector_twin__environment___host_os_info
-    urirun_connector_twin__environment__probe --> urirun_connector_twin__environment___constraints_via_uri
-    urirun_connector_twin__environment__probe --> urirun_connector_twin__environment___probe_browser
-    urirun_connector_twin__environment__probe --> urirun_connector_twin__environment___kvm_query
-    urirun_connector_twin__environment__probe --> urirun_connector_twin__session__derive_task_target
-    urirun_connector_twin__environment__probe --> urirun_connector_twin__environment___docker_available
 
     classDef highCC fill:#ff6b6b,stroke:#c92a2a,color:#fff
     classDef medCC fill:#ffd43b,stroke:#f08c00,color:#000
-    class urirun_connector_twin__browser__discover_browser_sessions,urirun_connector_twin__browser__select_session,urirun_connector_twin__prompt_plan__derive_task_target,urirun_connector_twin__prompt_plan__steps_from_prompt highCC
-    class urirun_connector_twin__browser___cdp_cookies,urirun_connector_twin__dispatch__uri_call,urirun_connector_twin__planner__annotate_steps,urirun_connector_twin__planner__build_imperative_plan,urirun_connector_twin__session___extract_chrome_info,urirun_connector_twin__session___cdp_ws_call,urirun_connector_twin__session___check_auth_cookies,urirun_connector_twin__session__probe_session,urirun_connector_twin__session__select_best_session,urirun_connector_twin__core__plan_from_prompt_route,urirun_connector_twin__core__flow_preflight,urirun_connector_twin__core__flow_rollback,urirun_connector_twin__core__step_evaluate,urirun_connector_twin__environment__probe medCC
+    class urirun_connector_twin__prompt_plan__derive_task_target,urirun_connector_twin__prompt_plan__steps_from_prompt,urirun_connector_twin__browser__discover_browser_sessions,urirun_connector_twin__browser__select_session highCC
+    class urirun_connector_twin__dispatch__uri_call,urirun_connector_twin__planner__annotate_steps,urirun_connector_twin__planner__build_imperative_plan,urirun_connector_twin__environment__probe,urirun_connector_twin__browser___cdp_cookies,urirun_connector_twin__browser__select_best_session,urirun_connector_twin__core__plan_from_prompt_route,urirun_connector_twin__core__flow_preflight,urirun_connector_twin__core__flow_rollback,urirun_connector_twin__core__step_evaluate medCC

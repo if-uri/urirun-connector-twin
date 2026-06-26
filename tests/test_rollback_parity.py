@@ -253,9 +253,35 @@ def test_flow_rollback_none_inverse_skipped():
 # All three rollback paths must produce the same {undone} list for the same ledger.
 # Any silent divergence here means bugs that pass tests individually.
 
+def _undone_uris(undone: list) -> set:
+    """Normalize undone list to a set of URI strings.
+
+    _thin_rollback and flow_rollback return str URIs directly.
+    _uri_rollback (via ReversibleProcess.rollback_flow) returns (Transition, did) tuples."""
+    result = set()
+    for item in undone:
+        if isinstance(item, str):
+            result.add(item)
+        elif isinstance(item, tuple) and len(item) >= 1:
+            tr = item[0]
+            if hasattr(tr, "inverse"):
+                result.add(tr.inverse.uri)
+    return result
+
+
+def _stuck_uri(r: dict) -> "str | None":
+    stuck = r.get("stuck")
+    if stuck is None:
+        return None
+    if isinstance(stuck, str):
+        return stuck
+    if hasattr(stuck, "inverse"):
+        return stuck.inverse.uri
+    return str(stuck)
+
+
 def test_three_path_rollback_convergence_success():
-    """_thin_rollback, flow_rollback, and _uri_rollback all undo the same ledger."""
-    import sys
+    """_thin_rollback, flow_rollback, and _uri_rollback all undo the same ledger (by URI set)."""
     from urirun.node.flow import _thin_rollback, FlowEnvelope
     from urirun_connector_twin.core import flow_rollback
     from urirun.node.reversible import _uri_rollback as uri_rollback_fn
@@ -266,93 +292,70 @@ def test_three_path_rollback_convergence_success():
         {"uri": "kvm://host/window/command/open-a", "inverse": inv_a, "args": {}, "before": "", "after": ""},
         {"uri": "kvm://host/window/command/open-b", "inverse": inv_b, "args": {}, "before": "", "after": ""},
     ]
-    called: list[str] = []
 
     # ── path 1: _thin_rollback (in-process via dispatch_uri) ─────────────────
-    def dispatch(uri, payload=None):
-        if inv_a in uri or inv_b in uri:
-            called.append(uri)
-            return {"ok": True}
-        return {"ok": True}
-
     env = FlowEnvelope()
     env.ledger = list(ledger)
-    r1 = _thin_rollback(dispatch, env, [], {}, "failed")
-    undone_thin = (r1.get("rollback") or {}).get("undone") or []
+    r1 = _thin_rollback(lambda uri, payload=None: {"ok": True}, env, [], {}, "failed")
+    undone_thin = _undone_uris((r1.get("rollback") or {}).get("undone") or [])
 
     # ── path 2: flow_rollback connector handler (patched v2_service) ─────────
     import urirun.v2_service as _svc
     _orig_call = _svc.call
-    connector_calls: list[str] = []
-    def _mock_call(uri, payload, registry, mode="execute"):
-        if inv_a in uri or inv_b in uri:
-            connector_calls.append(uri)
-            return {"ok": True}
-        return {"ok": True}
-    _svc.call = _mock_call
+    _svc.call = lambda uri, p, reg, mode="execute": {"ok": True}
     try:
         r2 = flow_rollback(ledger=ledger)
     finally:
         _svc.call = _orig_call
-    undone_connector = r2.get("undone") or []
+    undone_connector = _undone_uris(r2.get("undone") or [])
 
     # ── path 3: _uri_rollback from reversible.py (ledger shape) ──────────────
-    reversible_calls: list[str] = []
-    # _uri_rollback builds a ReversibleProcess + transport — mock _flow_transport
     from urirun.node import flow as _flow_mod
-    from urirun.node.reversible import CallableTransport, ReversibleProcess
-    def _mock_transport(mesh):
-        def _call(uri, args):
-            reversible_calls.append(uri)
-            return {"ok": True}
-        return CallableTransport(_call)
+    from urirun.node.reversible import CallableTransport
     _orig_transport = _flow_mod._flow_transport
-    _flow_mod._flow_transport = _mock_transport
+    _flow_mod._flow_transport = lambda mesh: CallableTransport(lambda uri, args: {"ok": True})
     try:
         r3 = uri_rollback_fn({"ledger": ledger, "mesh": {}})
     finally:
         _flow_mod._flow_transport = _orig_transport
-    undone_reversible = r3.get("undone") or []
+    undone_reversible = _undone_uris(r3.get("undone") or [])
 
     # ── convergence assertion ─────────────────────────────────────────────────
-    assert set(undone_thin) == {inv_a, inv_b}, f"thin: {undone_thin}"
-    assert set(undone_connector) == {inv_a, inv_b}, f"connector: {undone_connector}"
-    assert set(undone_reversible) == {inv_a, inv_b}, f"reversible: {undone_reversible}"
-    # All three must agree on what was undone
-    assert set(undone_thin) == set(undone_connector) == set(undone_reversible), \
+    expected = {inv_a, inv_b}
+    assert undone_thin == expected, f"thin undone: {undone_thin}"
+    assert undone_connector == expected, f"connector undone: {undone_connector}"
+    assert undone_reversible == expected, f"reversible undone: {undone_reversible}"
+    assert undone_thin == undone_connector == undone_reversible, \
         f"DIVERGENCE: thin={undone_thin} connector={undone_connector} reversible={undone_reversible}"
 
 
 def test_three_path_rollback_convergence_stuck():
-    """When an inverse fails, all three paths must halt at the same URI."""
+    """When an inverse fails, all three paths halt and identify the same stuck URI."""
     from urirun.node.flow import _thin_rollback, FlowEnvelope
     from urirun_connector_twin.core import flow_rollback
     from urirun.node.reversible import _uri_rollback as uri_rollback_fn
 
     inv_ok = "kvm://host/window/command/restore-ok"
     inv_fail = "kvm://host/window/command/restore-fail"
+    # LIFO: open-fail was applied second, so restore-fail is attempted first
     ledger = [
-        {"uri": "kvm://host/window/command/open-ok", "inverse": inv_ok, "args": {}, "before": "", "after": ""},
+        {"uri": "kvm://host/window/command/open-ok",  "inverse": inv_ok,   "args": {}, "before": "", "after": ""},
         {"uri": "kvm://host/window/command/open-fail", "inverse": inv_fail, "args": {}, "before": "", "after": ""},
     ]
 
-    def dispatch(uri, payload=None):
-        if inv_fail in uri:
-            return {"ok": False, "error": "display not reachable"}
-        return {"ok": True}
+    def _dispatch(uri, payload=None):
+        return {"ok": False, "error": "display not reachable"} if inv_fail in uri else {"ok": True}
 
     # path 1
     env = FlowEnvelope()
     env.ledger = list(ledger)
-    r1 = _thin_rollback(dispatch, env, [], {}, "failed")
+    r1 = _thin_rollback(_dispatch, env, [], {}, "failed")
     rb1 = r1.get("rollback") or {}
 
     # path 2
     import urirun.v2_service as _svc
     _orig_call = _svc.call
-    _svc.call = lambda uri, p, reg, mode="execute": (
-        {"ok": False, "error": "display not reachable"} if inv_fail in uri else {"ok": True}
-    )
+    _svc.call = lambda uri, p, reg, mode="execute": _dispatch(uri)
     try:
         r2 = flow_rollback(ledger=ledger)
     finally:
@@ -361,22 +364,16 @@ def test_three_path_rollback_convergence_stuck():
     # path 3
     from urirun.node import flow as _flow_mod
     from urirun.node.reversible import CallableTransport
-    def _mock_transport(mesh):
-        return CallableTransport(lambda uri, args: (
-            {"ok": False, "error": "display not reachable"} if inv_fail in uri else {"ok": True}
-        ))
     _orig_transport = _flow_mod._flow_transport
-    _flow_mod._flow_transport = _mock_transport
+    _flow_mod._flow_transport = lambda mesh: CallableTransport(lambda uri, args: _dispatch(uri))
     try:
-        from urirun.node.reversible import _uri_rollback as uri_rollback_fn
         r3 = uri_rollback_fn({"ledger": ledger, "mesh": {}})
     finally:
         _flow_mod._flow_transport = _orig_transport
 
-    # All three must report failure at the same stuck URI
     assert rb1.get("ok") is False, f"thin should fail: {rb1}"
     assert r2.get("ok") is False, f"connector should fail: {r2}"
     assert r3.get("ok") is False, f"reversible should fail: {r3}"
-    assert rb1.get("stuck") == inv_fail, f"thin stuck: {rb1.get('stuck')}"
-    assert r2.get("stuck") == inv_fail, f"connector stuck: {r2.get('stuck')}"
-    assert r3.get("stuck") == inv_fail, f"reversible stuck: {r3.get('stuck')}"
+    assert _stuck_uri(rb1) == inv_fail, f"thin stuck: {_stuck_uri(rb1)}"
+    assert _stuck_uri(r2) == inv_fail, f"connector stuck: {_stuck_uri(r2)}"
+    assert _stuck_uri(r3) == inv_fail, f"reversible stuck: {_stuck_uri(r3)}"
