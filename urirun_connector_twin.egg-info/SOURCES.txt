@@ -4,6 +4,7 @@ tests/test_contract.py
 tests/test_dispatch.py
 tests/test_proof_cache.py
 tests/test_proof_routes.py
+tests/test_recall_routes.py
 tests/test_rollback_parity.py
 tests/test_session.py
 tests/test_twin_connector.py
