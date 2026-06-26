@@ -98,7 +98,15 @@ flowchart TD
         urirun_connector_twin__prompt_plan___bind_node["_bind_node"]
         urirun_connector_twin__prompt_plan__plan_from_prompt["plan_from_prompt"]
     end
+    subgraph urirun_connector_twin__proof_cache
+        urirun_connector_twin__proof_cache__proof_key["proof_key"]
+        urirun_connector_twin__proof_cache__proof_check["proof_check"]
+        urirun_connector_twin__proof_cache__proof_record("proof_record CC=10")
+        urirun_connector_twin__proof_cache__preflight_step("preflight_step CC=9")
+        urirun_connector_twin__proof_cache__DictProofStore__get["get"]
+    end
     subgraph urirun_connector_twin__sandbox
+        urirun_connector_twin__sandbox__Scenario__signature["signature"]
         urirun_connector_twin__sandbox__scenario_for_uri["scenario_for_uri"]
         urirun_connector_twin__sandbox___docker_available["_docker_available"]
         urirun_connector_twin__sandbox___run["_run"]
@@ -208,8 +216,11 @@ flowchart TD
     urirun_connector_twin__environment__probe --> urirun_connector_twin__environment___kvm_query
     urirun_connector_twin__environment__probe --> urirun_connector_twin__prompt_plan__derive_task_target
     urirun_connector_twin__environment__probe --> urirun_connector_twin__environment___docker_available
+    urirun_connector_twin__proof_cache__preflight_step --> urirun_connector_twin__proof_cache__proof_key
+    urirun_connector_twin__proof_cache__preflight_step --> urirun_connector_twin__proof_cache__proof_check
+    urirun_connector_twin__proof_cache__preflight_step --> urirun_connector_twin__proof_cache__proof_record
 
     classDef highCC fill:#ff6b6b,stroke:#c92a2a,color:#fff
     classDef medCC fill:#ffd43b,stroke:#f08c00,color:#000
     class urirun_connector_twin__browser__discover_browser_sessions,urirun_connector_twin__browser__select_session highCC
-    class urirun_connector_twin__browser___cdp_cookies,urirun_connector_twin__browser__select_best_session,urirun_connector_twin__dispatch__uri_call,urirun_connector_twin__planner__annotate_steps,urirun_connector_twin__planner__build_imperative_plan,urirun_connector_twin__prompt_plan___raw_steps_for_target,urirun_connector_twin__core__plan_from_prompt_route,urirun_connector_twin__core__flow_preflight,urirun_connector_twin__core__flow_rollback,urirun_connector_twin__core__step_evaluate,urirun_connector_twin__environment__probe medCC
+    class urirun_connector_twin__browser___cdp_cookies,urirun_connector_twin__browser__select_best_session,urirun_connector_twin__dispatch__uri_call,urirun_connector_twin__planner__annotate_steps,urirun_connector_twin__planner__build_imperative_plan,urirun_connector_twin__prompt_plan___raw_steps_for_target,urirun_connector_twin__core__plan_from_prompt_route,urirun_connector_twin__core__flow_preflight,urirun_connector_twin__core__flow_rollback,urirun_connector_twin__core__step_evaluate,urirun_connector_twin__environment__probe,urirun_connector_twin__proof_cache__proof_record,urirun_connector_twin__proof_cache__preflight_step medCC

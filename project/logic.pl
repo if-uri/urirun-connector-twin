@@ -7,9 +7,10 @@ project_file('project.sh', 69, 'shell').
 project_file('tests/test_browser_session.py', 270, 'python').
 project_file('tests/test_contract.py', 40, 'python').
 project_file('tests/test_dispatch.py', 209, 'python').
+project_file('tests/test_proof_cache.py', 216, 'python').
 project_file('tests/test_rollback_parity.py', 380, 'python').
 project_file('tests/test_session.py', 233, 'python').
-project_file('tests/test_twin_connector.py', 1340, 'python').
+project_file('tests/test_twin_connector.py', 1407, 'python').
 project_file('tree.sh', 5, 'shell').
 project_file('urirun_connector_twin/__init__.py', 5, 'python').
 project_file('urirun_connector_twin/browser.py', 328, 'python').
@@ -19,7 +20,8 @@ project_file('urirun_connector_twin/environment.py', 162, 'python').
 project_file('urirun_connector_twin/mock.py', 115, 'python').
 project_file('urirun_connector_twin/planner.py', 128, 'python').
 project_file('urirun_connector_twin/prompt_plan.py', 260, 'python').
-project_file('urirun_connector_twin/sandbox.py', 163, 'python').
+project_file('urirun_connector_twin/proof_cache.py', 142, 'python').
+project_file('urirun_connector_twin/sandbox.py', 177, 'python').
 
 % ── Python Functions ─────────────────────────────────────
 python_function('tests/test_browser_session.py', 'test_derive_task_target_linkedin', 0, 3, 1).
@@ -203,12 +205,14 @@ python_function('tests/test_twin_connector.py', 'test_step_inverse_unknown_comma
 python_function('tests/test_twin_connector.py', 'test_step_inverse_unknown_query_is_reversible', 0, 2, 1).
 python_function('tests/test_twin_connector.py', 'test_is_infra_step_skips_drift_and_preflight', 0, 4, 1).
 python_function('tests/test_twin_connector.py', 'test_is_infra_step_passes_real_steps', 0, 3, 1).
-python_function('tests/test_twin_connector.py', 'test_append_twin_widget_emits_events_with_inverse', 1, 17, 7).
-python_function('tests/test_twin_connector.py', 'test_convergence_navigate_inverse_matches_rollback_ledger', 1, 9, 7).
-python_function('tests/test_twin_connector.py', 'test_convergence_query_no_inverse_no_ledger', 1, 7, 7).
-python_function('tests/test_twin_connector.py', 'test_inverse_from_results_prefers_connector_over_static', 1, 4, 5).
+python_function('tests/test_twin_connector.py', 'test_append_twin_widget_emits_events_with_inverse', 1, 20, 9).
+python_function('tests/test_twin_connector.py', 'test_convergence_navigate_inverse_matches_rollback_ledger', 1, 11, 8).
+python_function('tests/test_twin_connector.py', 'test_convergence_query_no_inverse_no_ledger', 1, 9, 8).
+python_function('tests/test_twin_connector.py', 'test_inverse_from_results_prefers_connector_over_static', 1, 6, 6).
 python_function('tests/test_twin_connector.py', 'test_inverse_from_results_handles_path_based_inverse', 1, 2, 2).
-python_function('tests/test_twin_connector.py', 'test_convergence_kvm_navigate_path_inverse_matches_ledger', 1, 7, 6).
+python_function('tests/test_twin_connector.py', 'test_convergence_kvm_navigate_path_inverse_matches_ledger', 1, 9, 7).
+python_function('tests/test_twin_connector.py', 'test_degraded_step_shows_degraded_status_in_sse_event', 1, 12, 8).
+python_function('tests/test_twin_connector.py', 'test_non_degraded_query_step_shows_applied_status', 1, 6, 5).
 python_function('urirun_connector_twin/browser.py', '_proc_cmdline', 1, 2, 4).
 python_function('urirun_connector_twin/browser.py', '_is_browser', 1, 3, 3).
 python_function('urirun_connector_twin/browser.py', '_extract_flag', 2, 3, 3).
@@ -293,6 +297,10 @@ python_function('urirun_connector_twin/prompt_plan.py', 'steps_from_prompt', 2, 
 python_function('urirun_connector_twin/prompt_plan.py', '_guess_service_name', 1, 2, 3).
 python_function('urirun_connector_twin/prompt_plan.py', '_bind_node', 2, 1, 1).
 python_function('urirun_connector_twin/prompt_plan.py', 'plan_from_prompt', 2, 1, 3).
+python_function('urirun_connector_twin/proof_cache.py', 'proof_key', 3, 1, 2).
+python_function('urirun_connector_twin/proof_cache.py', 'proof_check', 2, 4, 1).
+python_function('urirun_connector_twin/proof_cache.py', 'proof_record', 2, 10, 3).
+python_function('urirun_connector_twin/proof_cache.py', 'preflight_step', 6, 9, 9).
 python_function('urirun_connector_twin/sandbox.py', 'scenario_for_uri', 1, 6, 3).
 python_function('urirun_connector_twin/sandbox.py', '_docker_available', 0, 1, 1).
 python_function('urirun_connector_twin/sandbox.py', '_run', 2, 4, 2).
@@ -305,7 +313,37 @@ python_function('urirun_connector_twin/sandbox.py', 'probe_reversibility', 1, 2,
 % ── Python Classes ───────────────────────────────────────
 python_class('tests/test_contract.py', 'TestTwinConnectorContract').
 python_method('TestTwinConnectorContract', 'test_twin_routes_present', 0, 5, 2).
+python_class('tests/test_proof_cache.py', 'TestScenarioSignature').
+python_method('TestScenarioSignature', 'test_signature_is_stable', 0, 1, 2).
+python_method('TestScenarioSignature', 'test_signature_changes_on_inverse_change', 0, 1, 3).
+python_method('TestScenarioSignature', 'test_signature_changes_on_forward_change', 0, 1, 3).
+python_class('tests/test_proof_cache.py', 'TestProofKey').
+python_method('TestProofKey', 'setUp', 0, 1, 0).
+python_method('TestProofKey', 'test_proof_key_is_stable', 0, 1, 2).
+python_method('TestProofKey', 'test_proof_key_starts_with_pf', 0, 1, 3).
+python_method('TestProofKey', 'test_proof_key_changes_on_env_drift', 0, 1, 2).
+python_method('TestProofKey', 'test_proof_key_changes_on_scenario_change', 0, 1, 3).
+python_class('tests/test_proof_cache.py', 'TestRouteHandlers').
+python_method('TestRouteHandlers', 'setUp', 0, 1, 2).
+python_method('TestRouteHandlers', 'test_proof_check_miss', 0, 1, 3).
+python_method('TestRouteHandlers', 'test_proof_check_hit_after_record', 0, 1, 5).
+python_method('TestRouteHandlers', 'test_proof_record_stores_positive_verdict', 0, 1, 4).
+python_method('TestRouteHandlers', 'test_proof_record_does_not_store_negative_verdict', 0, 1, 4).
+python_method('TestRouteHandlers', 'test_proof_check_missing_key_returns_error', 0, 1, 2).
+python_class('tests/test_proof_cache.py', 'TestPreflightPaths').
+python_method('TestPreflightPaths', 'setUp', 0, 1, 1).
+python_method('TestPreflightPaths', '_reversible_probe', 0, 1, 0).
+python_method('TestPreflightPaths', '_irreversible_probe', 0, 1, 0).
+python_method('TestPreflightPaths', 'test_path1_new_env_miss_probe_proven_cached', 0, 1, 4).
+python_method('TestPreflightPaths', 'test_path2_same_env_hit_sandbox_skipped', 0, 1, 3).
+python_method('TestPreflightPaths', 'test_path3_env_drift_different_key_re_probed', 0, 1, 5).
+python_method('TestPreflightPaths', 'test_path4_negative_block_not_cached', 0, 1, 6).
+python_class('tests/test_proof_cache.py', 'TestStoreContainsOnlyPositives').
+python_method('TestStoreContainsOnlyPositives', 'test_store_shows_only_positive_entries', 0, 2, 7).
+python_class('urirun_connector_twin/proof_cache.py', 'DictProofStore').
+python_method('DictProofStore', 'get', 2, 1, 2).
 python_class('urirun_connector_twin/sandbox.py', 'Scenario').
+python_method('Scenario', 'signature', 0, 1, 4).
 
 % ── Dependencies ─────────────────────────────────────────
 

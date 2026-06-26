@@ -485,3 +485,81 @@ sprints:
     model_hints:
       planning: balanced
       implementation: balanced
+  - id: ticket-a9ad7f86
+    name: Fix smart-return-type issues
+    description: Resolve 22 smart-return-type issues in tests/test_proof_cache.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - tests/test_proof_cache.py
+    rule_id: smart-return-type
+    count: 22
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-31a94b34
+    name: Fix string-concat issues
+    description: Resolve 2 string-concat issues in tests/test_proof_cache.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - tests/test_proof_cache.py
+    rule_id: string-concat
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-d6b8a78d
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in tests/test_proof_cache.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - tests/test_proof_cache.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-5017d14c
+    name: Fix relative-imports issues
+    description: Resolve 2 relative-imports issues in urirun_connector_twin/proof_cache.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - urirun_connector_twin/proof_cache.py
+    rule_id: relative-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-80eb5fa8
+    name: Fix smart-return-type issues
+    description: Resolve 1 smart-return-type issues in urirun_connector_twin/proof_cache.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - urirun_connector_twin/proof_cache.py
+    rule_id: smart-return-type
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-ec94839f
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in urirun_connector_twin/proof_cache.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - urirun_connector_twin/proof_cache.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced

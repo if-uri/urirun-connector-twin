@@ -1147,17 +1147,20 @@ def test_append_twin_widget_emits_events_with_inverse(monkeypatch):
     attachments = []
     append_twin_widget(True, flow, attachments, "test", ["host"], timeline)
 
-    assert len(captured) == 3  # only 3 real steps, 2 infra skipped
+    step_events = [e for e in captured if e.get("uri") == "twin://monitor/event"]
+    assert len(step_events) == 3  # only 3 real steps, 2 infra skipped
+    # flowCompleted event is emitted after all steps
+    assert any(e.get("flowCompleted") for e in captured)
     # ensure: reversible, inverse=close
-    ev_ensure = next(e for e in captured if "session/command/ensure" in e["transition"]["forward"])
+    ev_ensure = next(e for e in step_events if "session/command/ensure" in e["transition"]["forward"])
     assert ev_ensure["transition"]["reversible"] is True
     assert ev_ensure["transition"]["inverse"] == "kvm://host/cdp/session/command/close"
     # navigate: reversible, inverse=back
-    ev_nav = next(e for e in captured if "navigate" in e["transition"]["forward"])
+    ev_nav = next(e for e in step_events if "navigate" in e["transition"]["forward"])
     assert ev_nav["transition"]["reversible"] is True
     assert ev_nav["transition"]["inverse"] == "browser://cdp/page/command/back"
     # click: irreversible
-    ev_click = next(e for e in captured if "click" in e["transition"]["forward"])
+    ev_click = next(e for e in step_events if "click" in e["transition"]["forward"])
     assert ev_click["transition"]["reversible"] is False
     assert ev_click["transition"]["inverse"] is None
     assert ev_click["status"] == "applied"
@@ -1206,10 +1209,11 @@ def test_convergence_navigate_inverse_matches_rollback_ledger(monkeypatch):
     timeline = [{"id": "nav", "uri": NAV_URI, "ok": True, "target": "cdp"}]
     append_twin_widget(True, flow, [], "test", ["host"], timeline,
                        results=execution["results"])
-    assert len(captured) == 1
-    sse_inv = captured[0]["transition"]["inverse"]
+    step_events = [e for e in captured if e.get("uri") == "twin://monitor/event"]
+    assert len(step_events) == 1
+    sse_inv = step_events[0]["transition"]["inverse"]
     assert sse_inv == BACK_URI                 # ← convergence with paths 1 & 2
-    assert captured[0]["transition"]["reversible"] is True
+    assert step_events[0]["transition"]["reversible"] is True
 
 
 def test_convergence_query_no_inverse_no_ledger(monkeypatch):
@@ -1242,9 +1246,10 @@ def test_convergence_query_no_inverse_no_ledger(monkeypatch):
     timeline = [{"id": "cap", "uri": QUERY_URI, "ok": True, "target": "host"}]
     append_twin_widget(True, flow, [], "test", ["host"], timeline,
                        results=execution["results"])
-    assert len(captured) == 1
-    assert captured[0]["transition"]["inverse"] is None    # consistent: no undo for queries
-    assert captured[0]["transition"]["reversible"] is True
+    step_events = [e for e in captured if e.get("uri") == "twin://monitor/event"]
+    assert len(step_events) == 1
+    assert step_events[0]["transition"]["inverse"] is None    # consistent: no undo for queries
+    assert step_events[0]["transition"]["reversible"] is True
 
 
 def test_inverse_from_results_prefers_connector_over_static(monkeypatch):
@@ -1268,10 +1273,11 @@ def test_inverse_from_results_prefers_connector_over_static(monkeypatch):
         "inverse": {"uri": SPECIFIC_CLOSE, "args": {}},
     }}}}
     append_twin_widget(True, flow, [], "test", ["host"], timeline, results=results)
-    assert len(captured) == 1
+    step_events = [e for e in captured if e.get("uri") == "twin://monitor/event"]
+    assert len(step_events) == 1
     # Connector-specific URI wins over generic _step_inverse() output
-    assert captured[0]["transition"]["inverse"] == SPECIFIC_CLOSE
-    assert captured[0]["transition"]["reversible"] is True
+    assert step_events[0]["transition"]["inverse"] == SPECIFIC_CLOSE
+    assert step_events[0]["transition"]["reversible"] is True
 
 
 def test_inverse_from_results_handles_path_based_inverse(monkeypatch):
@@ -1334,6 +1340,67 @@ def test_convergence_kvm_navigate_path_inverse_matches_ledger(monkeypatch):
     timeline = [{"id": "nav", "uri": KVM_NAV, "ok": True, "target": "lenovo"}]
     append_twin_widget(True, flow, [], "test", ["lenovo"], timeline,
                        results=execution["results"])
-    assert len(captured) == 1
-    assert captured[0]["transition"]["inverse"] == REBASED_INVERSE  # ← CONVERGENCE
-    assert captured[0]["transition"]["reversible"] is True
+    step_events = [e for e in captured if e.get("uri") == "twin://monitor/event"]
+    assert len(step_events) == 1
+    assert step_events[0]["transition"]["inverse"] == REBASED_INVERSE  # ← CONVERGENCE
+    assert step_events[0]["transition"]["reversible"] is True
+
+
+def test_degraded_step_shows_degraded_status_in_sse_event(monkeypatch):
+    """A step that returned ok=True but degraded=True must produce status='degraded'
+    (not 'applied') in the SSE event, so the twin panel can show yellow instead of green.
+
+    Real scenario: kvm capture returns ok=True but degraded=True when the Wayland portal
+    permission is denied. The flow succeeds with graceful degradation, but the twin panel
+    should reflect that the actual output quality was reduced."""
+    import sys
+    sys.path.insert(0, '/home/tom/github/if-uri/urirun/adapters/python')
+    from urirun.host.twin_bridge import append_twin_widget, TWIN_EVENT_HUB
+
+    CAPTURE_URI = "kvm://host/screen/query/capture"
+
+    captured = []
+    monkeypatch.setattr(TWIN_EVENT_HUB, "publish", lambda ev: captured.append(ev))
+
+    flow = {"steps": [{"uri": CAPTURE_URI}]}
+    timeline = [{"id": "cap", "uri": CAPTURE_URI, "ok": True, "target": "host"}]
+    results = {"cap": {"result": {"value": {
+        "ok": True,
+        "degraded": True,
+        "degradedReason": "Portal permission denied, no screenshot captured",
+    }}}}
+    append_twin_widget(True, flow, [], "zrob screenshot ekranu", ["host"], timeline,
+                       results=results)
+
+    step_events = [e for e in captured if e.get("uri") == "twin://monitor/event"]
+    assert len(step_events) == 1
+    ev = step_events[0]
+    assert ev["status"] == "degraded"             # not "applied"
+    assert ev["degraded"] is True
+    assert ev["degradedReason"] == "Portal permission denied, no screenshot captured"
+    assert "⚠ degraded" in ev["narration"]
+    # flowCompleted is emitted after all steps
+    assert any(e.get("flowCompleted") for e in captured)
+    fc = next(e for e in captured if e.get("flowCompleted"))
+    assert fc["prompt"] == "zrob screenshot ekranu"
+
+
+def test_non_degraded_query_step_shows_applied_status(monkeypatch):
+    """A query step that returned ok=True without degraded must show status='applied'."""
+    import sys
+    sys.path.insert(0, '/home/tom/github/if-uri/urirun/adapters/python')
+    from urirun.host.twin_bridge import append_twin_widget, TWIN_EVENT_HUB
+
+    CAPTURE_URI = "kvm://host/screen/query/capture"
+    captured = []
+    monkeypatch.setattr(TWIN_EVENT_HUB, "publish", lambda ev: captured.append(ev))
+
+    flow = {"steps": [{"uri": CAPTURE_URI}]}
+    timeline = [{"id": "cap", "uri": CAPTURE_URI, "ok": True, "target": "host"}]
+    results = {"cap": {"result": {"value": {"ok": True, "image": "base64data"}}}}
+    append_twin_widget(True, flow, [], "screenshot", ["host"], timeline, results=results)
+
+    step_events = [e for e in captured if e.get("uri") == "twin://monitor/event"]
+    assert step_events[0]["status"] == "applied"
+    assert step_events[0]["degraded"] is False
+    assert "degraded" not in step_events[0]["narration"]

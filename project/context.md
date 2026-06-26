@@ -5,12 +5,12 @@
 
 - **Project**: /home/tom/github/if-uri/urirun-connector-twin
 - **Primary Language**: python
-- **Languages**: python: 9, yaml: 4, shell: 2, json: 1, toml: 1
+- **Languages**: python: 10, yaml: 4, shell: 2, json: 1, toml: 1
 - **Analysis Mode**: static
-- **Total Functions**: 92
-- **Total Classes**: 1
-- **Modules**: 17
-- **Entry Points**: 25
+- **Total Functions**: 98
+- **Total Classes**: 2
+- **Modules**: 18
+- **Entry Points**: 28
 
 ## Architecture by Module
 
@@ -27,7 +27,7 @@
 - **File**: `browser.py`
 
 ### urirun_connector_twin.sandbox
-- **Functions**: 8
+- **Functions**: 9
 - **Classes**: 1
 - **File**: `sandbox.py`
 
@@ -38,6 +38,11 @@
 ### urirun_connector_twin.planner
 - **Functions**: 7
 - **File**: `planner.py`
+
+### urirun_connector_twin.proof_cache
+- **Functions**: 5
+- **Classes**: 1
+- **File**: `proof_cache.py`
 
 ### urirun_connector_twin.mock
 - **Functions**: 4
@@ -64,6 +69,13 @@ fallback to local browser.py scan.
 Proves that the generated Docker mock is:
   - reachable (HTTP 200 on testUri w
 - **Calls**: conn.handler, urirun_connector_twin.environment.probe, urirun_connector_twin.planner.build_imperative_plan, urirun_connector_twin.mock.generate_mock, tempfile.mkdtemp, urirun.ok, mock.get, shutil.which
+
+### urirun_connector_twin.proof_cache.preflight_step
+> Check → probe → record gate.
+
+``probe_fn`` defaults to ``sandbox.probe_reversibility`` (Docker / simulated).
+Pass a stub in tests to control the verdi
+- **Calls**: urirun_connector_twin.proof_cache.proof_key, urirun_connector_twin.proof_cache.proof_check, check.get, fn, result.get, urirun_connector_twin.proof_cache.proof_record, scenario.signature, result.get
 
 ### urirun_connector_twin.core.flow_preflight
 > Identify which surfaces the flow steps need and provision them up-front.
@@ -132,6 +144,13 @@ blo
 > Annotate a pre-built urirun flow with feasibility, reversibility and surface.
 - **Calls**: conn.handler, urirun_connector_twin.environment.probe, urirun_connector_twin.planner.build_imperative_plan, plan.get, urirun_connector_twin.mock.generate_mock
 
+### urirun_connector_twin.sandbox.Scenario.signature
+> Stable hash of the commands that DEFINE this proof.
+
+Changing the inverse command changes the signature, so a cached proof that
+was built with the old
+- **Calls**: json.dumps, None.hexdigest, hashlib.sha256, payload.encode
+
 ### urirun_connector_twin.browser._extract_chrome_info
 > Compat shim: combine _is_browser + _extract_flag into the shape session.py exported.
 
@@ -180,6 +199,9 @@ twin conn
 ### urirun_connector_twin.core.main
 - **Calls**: conn.cli, urirun.load_manifest
 
+### urirun_connector_twin.proof_cache.DictProofStore.get
+- **Calls**: None.get, super
+
 ### urirun_connector_twin.core.bindings
 - **Calls**: conn.bindings
 
@@ -226,22 +248,29 @@ mock_start_probe_stop [urirun_connector_twin.core]
       └─> _compose_yaml
 ```
 
-### Flow 3: flow_preflight
+### Flow 3: preflight_step
+```
+preflight_step [urirun_connector_twin.proof_cache]
+  └─> proof_key
+  └─> proof_check
+```
+
+### Flow 4: flow_preflight
 ```
 flow_preflight [urirun_connector_twin.core]
 ```
 
-### Flow 4: flow_rollback
+### Flow 5: flow_rollback
 ```
 flow_rollback [urirun_connector_twin.core]
 ```
 
-### Flow 5: select_best_session
+### Flow 6: select_best_session
 ```
 select_best_session [urirun_connector_twin.browser]
 ```
 
-### Flow 6: browser_profile
+### Flow 7: browser_profile
 ```
 browser_profile [urirun_connector_twin.core]
   └─ →> discover_browser_sessions
@@ -256,7 +285,7 @@ browser_profile [urirun_connector_twin.core]
       └─> _extract_url
 ```
 
-### Flow 7: step_feasibility
+### Flow 8: step_feasibility
 ```
 step_feasibility [urirun_connector_twin.core]
   └─ →> probe
@@ -268,12 +297,12 @@ step_feasibility [urirun_connector_twin.core]
           └─> _route_suffix
 ```
 
-### Flow 8: step_evaluate
+### Flow 9: step_evaluate
 ```
 step_evaluate [urirun_connector_twin.core]
 ```
 
-### Flow 9: mock_create
+### Flow 10: mock_create
 ```
 mock_create [urirun_connector_twin.core]
   └─ →> probe
@@ -290,18 +319,22 @@ mock_create [urirun_connector_twin.core]
       └─> _compose_yaml
 ```
 
-### Flow 10: flow_goal_verify
-```
-flow_goal_verify [urirun_connector_twin.core]
-```
-
 ## Key Classes
 
 ### urirun_connector_twin.sandbox.Scenario
 > One reversibility experiment.
 
 Every *_cmd is a POSIX sh command executed inside the sandbox (contai
-- **Methods**: 0
+- **Methods**: 1
+- **Key Methods**: urirun_connector_twin.sandbox.Scenario.signature
+
+### urirun_connector_twin.proof_cache.DictProofStore
+> A plain dict that satisfies the store interface (get / __setitem__ / __contains__).
+
+Use this in uni
+- **Methods**: 1
+- **Key Methods**: urirun_connector_twin.proof_cache.DictProofStore.get
+- **Inherits**: dict
 
 ## Data Transformation Functions
 
@@ -318,6 +351,7 @@ Functions exposed as public API (no underscore prefix):
 - `urirun_connector_twin.browser.discover_browser_sessions` - 17 calls
 - `urirun_connector_twin.environment.probe` - 17 calls
 - `urirun_connector_twin.core.mock_start_probe_stop` - 16 calls
+- `urirun_connector_twin.proof_cache.preflight_step` - 15 calls
 - `urirun_connector_twin.planner.build_imperative_plan` - 14 calls
 - `urirun_connector_twin.core.flow_preflight` - 14 calls
 - `urirun_connector_twin.planner.annotate_steps` - 13 calls
@@ -327,6 +361,7 @@ Functions exposed as public API (no underscore prefix):
 - `urirun_connector_twin.core.step_feasibility` - 12 calls
 - `urirun_connector_twin.browser.select_session` - 11 calls
 - `urirun_connector_twin.core.step_evaluate` - 11 calls
+- `urirun_connector_twin.proof_cache.proof_record` - 10 calls
 - `urirun_connector_twin.core.mock_create` - 7 calls
 - `urirun_connector_twin.core.flow_goal_verify` - 7 calls
 - `urirun_connector_twin.mock.generate_mock` - 6 calls
@@ -335,11 +370,13 @@ Functions exposed as public API (no underscore prefix):
 - `urirun_connector_twin.dispatch.uri_call` - 5 calls
 - `urirun_connector_twin.core.constraints_from_profile` - 5 calls
 - `urirun_connector_twin.core.plan_generate` - 5 calls
+- `urirun_connector_twin.sandbox.Scenario.signature` - 4 calls
 - `urirun_connector_twin.sandbox.probe_reversibility` - 4 calls
 - `urirun_connector_twin.dispatch.value_of` - 4 calls
 - `urirun_connector_twin.planner.extract_steps_from_flow` - 4 calls
 - `urirun_connector_twin.core.sandbox_probe` - 4 calls
 - `urirun_connector_twin.core.flow_diagnose` - 4 calls
+- `urirun_connector_twin.proof_cache.proof_check` - 4 calls
 - `urirun_connector_twin.sandbox.scenario_for_uri` - 3 calls
 - `urirun_connector_twin.prompt_plan.steps_from_prompt` - 3 calls
 - `urirun_connector_twin.prompt_plan.plan_from_prompt` - 3 calls
@@ -349,8 +386,7 @@ Functions exposed as public API (no underscore prefix):
 - `urirun_connector_twin.core.monitor_event` - 2 calls
 - `urirun_connector_twin.core.manifest` - 2 calls
 - `urirun_connector_twin.core.main` - 2 calls
-- `urirun_connector_twin.core.bindings` - 1 calls
-- `urirun_connector_twin.dispatch.set_transport` - 0 calls
+- `urirun_connector_twin.proof_cache.proof_key` - 2 calls
 
 ## System Interactions
 
@@ -367,6 +403,10 @@ graph TD
     mock_start_probe_sto --> build_imperative_pla
     mock_start_probe_sto --> generate_mock
     mock_start_probe_sto --> mkdtemp
+    preflight_step --> proof_key
+    preflight_step --> proof_check
+    preflight_step --> get
+    preflight_step --> fn
     flow_preflight --> handler
     flow_preflight --> sorted
     flow_preflight --> ok
@@ -384,10 +424,6 @@ graph TD
     browser_profile --> discover_browser_ses
     browser_profile --> select_session
     browser_profile --> ok
-    browser_profile --> derive_task_target
-    step_feasibility --> handler
-    step_feasibility --> probe
-    step_feasibility --> annotate_steps
 ```
 
 ## Reverse Engineering Guidelines

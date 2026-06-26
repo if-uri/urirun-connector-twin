@@ -24,7 +24,7 @@ tickets:
     Function: _cdp_cookies'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: domain'
-  description: 'code2llm reports `Shotgun Surgery: domain` in `urirun_connector_twin/core.py:129`.
+  description: 'code2llm reports `Shotgun Surgery: domain` in `urirun_connector_twin/prompt_plan.py:203`.
 
 
     Mutation of variable ''domain'' spans 5 functions. Changing this logic requires
@@ -39,12 +39,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - urirun_connector_twin/core.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/core.py:129:Shotgun
+  - urirun_connector_twin/prompt_plan.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/prompt_plan.py:203:Shotgun
     Surgery: domain'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: env'
-  description: 'code2llm reports `Shotgun Surgery: env` in `urirun_connector_twin/core.py:361`.
+  description: 'code2llm reports `Shotgun Surgery: env` in `urirun_connector_twin/core.py:315`.
 
 
     Mutation of variable ''env'' spans 7 functions. Changing this logic requires work
@@ -60,11 +60,11 @@ tickets:
   - shotgun-surgery
   files:
   - urirun_connector_twin/core.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/core.py:361:Shotgun
+  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/core.py:315:Shotgun
     Surgery: env'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: m'
-  description: 'code2llm reports `Shotgun Surgery: m` in `urirun_connector_twin/prompt_plan.py:234`.
+  description: 'code2llm reports `Shotgun Surgery: m` in `urirun_connector_twin/prompt_plan.py:37`.
 
 
     Mutation of variable ''m'' spans 5 functions. Changing this logic requires work
@@ -80,7 +80,7 @@ tickets:
   - shotgun-surgery
   files:
   - urirun_connector_twin/prompt_plan.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/prompt_plan.py:234:Shotgun
+  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/prompt_plan.py:37:Shotgun
     Surgery: m'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: plan'
@@ -104,7 +104,7 @@ tickets:
     Surgery: plan'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: r'
-  description: 'code2llm reports `Shotgun Surgery: r` in `urirun_connector_twin/dispatch.py:33`.
+  description: 'code2llm reports `Shotgun Surgery: r` in `urirun_connector_twin/environment.py:38`.
 
 
     Mutation of variable ''r'' spans 6 functions. Changing this logic requires work
@@ -119,12 +119,32 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - urirun_connector_twin/dispatch.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/dispatch.py:33:Shotgun
+  - urirun_connector_twin/environment.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/environment.py:38:Shotgun
     Surgery: r'
 - signal: code2llm_smell_shotgun_surgery
+  title: 'Address code smell: Shotgun Surgery: result'
+  description: 'code2llm reports `Shotgun Surgery: result` in `urirun_connector_twin/core.py:210`.
+
+
+    Mutation of variable ''result'' spans 5 functions. Changing this logic requires
+    work in many places.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: high
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - shotgun-surgery
+  files:
+  - urirun_connector_twin/core.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/core.py:210:Shotgun
+    Surgery: result'
+- signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: s'
-  description: 'code2llm reports `Shotgun Surgery: s` in `urirun_connector_twin/browser.py:202`.
+  description: 'code2llm reports `Shotgun Surgery: s` in `urirun_connector_twin/planner.py:59`.
 
 
     Mutation of variable ''s'' spans 5 functions. Changing this logic requires work
@@ -139,8 +159,8 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - urirun_connector_twin/browser.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/browser.py:202:Shotgun
+  - urirun_connector_twin/planner.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/planner.py:59:Shotgun
     Surgery: s'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: sessions'
@@ -164,7 +184,7 @@ tickets:
     Surgery: sessions'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: steps'
-  description: 'code2llm reports `Shotgun Surgery: steps` in `urirun_connector_twin/planner.py:106`.
+  description: 'code2llm reports `Shotgun Surgery: steps` in `urirun_connector_twin/prompt_plan.py:245`.
 
 
     Mutation of variable ''steps'' spans 5 functions. Changing this logic requires
@@ -179,12 +199,12 @@ tickets:
   - code-smell
   - shotgun-surgery
   files:
-  - urirun_connector_twin/planner.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/planner.py:106:Shotgun
+  - urirun_connector_twin/prompt_plan.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/prompt_plan.py:245:Shotgun
     Surgery: steps'
 - signal: code2llm_smell_shotgun_surgery
   title: 'Address code smell: Shotgun Surgery: url'
-  description: 'code2llm reports `Shotgun Surgery: url` in `urirun_connector_twin/prompt_plan.py:82`.
+  description: 'code2llm reports `Shotgun Surgery: url` in `urirun_connector_twin/prompt_plan.py:203`.
 
 
     Mutation of variable ''url'' spans 5 functions. Changing this logic requires work
@@ -200,7 +220,7 @@ tickets:
   - shotgun-surgery
   files:
   - urirun_connector_twin/prompt_plan.py
-  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/prompt_plan.py:82:Shotgun
+  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/prompt_plan.py:203:Shotgun
     Surgery: url'
 - signal: code2llm_cc
   title: 'Reduce cyclomatic complexity: urirun_connector_twin.browser.discover_browser_sessions
@@ -240,11 +260,11 @@ tickets:
   - urirun_connector_twin/browser.py
   dedupe_key: code2llm:cc:urirun_connector_twin/browser.py:urirun_connector_twin.browser.select_session
 - signal: code2llm_smell_data_clump
-  title: 'Address code smell: Data Clump: flow, prompt, env'
-  description: 'code2llm reports `Data Clump: flow, prompt, env` in `urirun_connector_twin/planner.py:106`.
+  title: 'Address code smell: Data Clump: env, prompt, flow'
+  description: 'code2llm reports `Data Clump: env, prompt, flow` in `urirun_connector_twin/planner.py:106`.
 
 
-    Arguments (flow, prompt, env) are used together in multiple functions: urirun_connector_twin.planner.build_imperative_plan,
+    Arguments (env, prompt, flow) are used together in multiple functions: urirun_connector_twin.planner.build_imperative_plan,
     urirun_connector_twin.core.plan_annotate.
 
 
@@ -258,13 +278,13 @@ tickets:
   files:
   - urirun_connector_twin/planner.py
   dedupe_key: 'code2llm:smell:data_clump:urirun_connector_twin/planner.py:106:Data
-    Clump: flow, prompt, env'
+    Clump: env, prompt, flow'
 - signal: code2llm_smell_data_clump
-  title: 'Address code smell: Data Clump: flow, prompt, env'
-  description: 'code2llm reports `Data Clump: flow, prompt, env` in `urirun_connector_twin/core.py:199`.
+  title: 'Address code smell: Data Clump: env, prompt, flow'
+  description: 'code2llm reports `Data Clump: env, prompt, flow` in `urirun_connector_twin/core.py:199`.
 
 
-    Arguments (flow, prompt, env) are used together in multiple functions: urirun_connector_twin.planner.build_imperative_plan,
+    Arguments (env, prompt, flow) are used together in multiple functions: urirun_connector_twin.planner.build_imperative_plan,
     urirun_connector_twin.core.plan_annotate.
 
 
@@ -278,10 +298,10 @@ tickets:
   files:
   - urirun_connector_twin/core.py
   dedupe_key: 'code2llm:smell:data_clump:urirun_connector_twin/core.py:199:Data Clump:
-    flow, prompt, env'
+    env, prompt, flow'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: _docker_probe'
-  description: 'code2llm reports `God Function: _docker_probe` in `urirun_connector_twin/sandbox.py:117`.
+  description: 'code2llm reports `God Function: _docker_probe` in `urirun_connector_twin/sandbox.py:131`.
 
 
     Function ''_docker_probe'' is oversized: CC=1, fan-out=5, mutations=12.
@@ -296,7 +316,7 @@ tickets:
   - god-function
   files:
   - urirun_connector_twin/sandbox.py
-  dedupe_key: 'code2llm:smell:god_function:urirun_connector_twin/sandbox.py:117:God
+  dedupe_key: 'code2llm:smell:god_function:urirun_connector_twin/sandbox.py:131:God
     Function: _docker_probe'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: _raw_steps_for_target'

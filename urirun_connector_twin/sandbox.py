@@ -9,6 +9,8 @@ vouch for, without touching the real machine.
 """
 from __future__ import annotations
 
+import hashlib
+import json
 import os
 import shutil
 import subprocess
@@ -30,6 +32,18 @@ class Scenario:
     forward_cmd: str = "true"
     inverse_cmd: str = "true"
     setup_cmd: str = "mkdir -p /data"
+
+    def signature(self) -> str:
+        """Stable hash of the commands that DEFINE this proof.
+
+        Changing the inverse command changes the signature, so a cached proof that
+        was built with the old command automatically misses — no explicit invalidation."""
+        payload = json.dumps(
+            {"image": self.image, "setup": self.setup_cmd, "scan": self.scan_cmd,
+             "forward": self.forward_cmd, "inverse": self.inverse_cmd},
+            sort_keys=True, separators=(",", ":"),
+        )
+        return hashlib.sha256(payload.encode()).hexdigest()[:16]
 
 
 # Predefined scenarios keyed by URI scheme / action family.
