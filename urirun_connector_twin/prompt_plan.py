@@ -110,8 +110,10 @@ def _search_steps(query: str) -> list[dict]:
 
 
 def _screenshot_steps() -> list[dict]:
+    # kvm routes always use "host" in the URI — node targeting happens via serviceMap dispatch,
+    # not via the URI host. "kvm://host/screen/query/capture" is the real registered route.
     return [
-        {"id": "capture_screen", "uri": "kvm://{node}/display/query/screenshot",
+        {"id": "capture_screen", "uri": "kvm://host/screen/query/capture",
          "payload": {}},
     ]
 
