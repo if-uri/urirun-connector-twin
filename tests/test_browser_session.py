@@ -3,13 +3,12 @@ from __future__ import annotations
 
 import pytest
 from urirun_connector_twin.session import (
-    derive_task_target,
     _extract_chrome_info,
     select_best_session,
     _AUTH_COOKIES,
 )
 from urirun_connector_twin.prompt_plan import (
-    derive_task_target as prompt_derive_task_target,
+    derive_task_target,
     steps_from_prompt,
     plan_from_prompt,
     _extract_url,
@@ -18,7 +17,7 @@ from urirun_connector_twin.prompt_plan import (
 )
 
 
-# ─── session.derive_task_target ──────────────────────────────────────────────
+# ─── derive_task_target (canonical: prompt_plan.py) ──────────────────────────
 
 def test_derive_task_target_linkedin():
     t = derive_task_target("opublikuj post na linkedin")
@@ -151,33 +150,33 @@ def test_extract_text_to_type_after_verb():
     assert "hello" in result.lower()
 
 
-# ─── prompt_plan.derive_task_target ──────────────────────────────────────────
+# ─── derive_task_target full shape ───────────────────────────────────────────
 
 def test_prompt_derive_social_post():
-    t = prompt_derive_task_target("opublikuj post na linkedin")
+    t = derive_task_target("opublikuj post na linkedin")
     assert t["taskType"] == "social-post"
     assert t["domain"] == "linkedin.com"
     assert t["needsAuth"] is True
 
 
 def test_prompt_derive_search():
-    t = prompt_derive_task_target("search for urirun framework")
+    t = derive_task_target("search for urirun framework")
     assert t["taskType"] == "web-search"
 
 
 def test_prompt_derive_screenshot():
-    t = prompt_derive_task_target("take a screenshot of the screen")
+    t = derive_task_target("take a screenshot of the screen")
     assert t["taskType"] == "screenshot"
 
 
 def test_prompt_derive_browser_open():
-    t = prompt_derive_task_target("open https://github.com")
+    t = derive_task_target("open https://github.com")
     assert t["taskType"] == "browser-open"
     assert t["url"] == "https://github.com"
 
 
 def test_prompt_derive_unknown():
-    t = prompt_derive_task_target("oblicz sumę wektora")
+    t = derive_task_target("oblicz sumę wektora")
     assert t["taskType"] == "unknown"
 
 

@@ -1049,3 +1049,291 @@ def test_flow_diagnose_in_bindings():
     from urirun_connector_twin.core import bindings
     uris = list(bindings().get("bindings", {}).keys())
     assert any("flow/command/diagnose" in u for u in uris), f"missing diagnose route; got: {uris}"
+
+
+# ─── twin_bridge: inverse classification ────────────────────────────────────
+
+def test_step_inverse_query_is_reversible_no_inverse():
+    from urirun.host.twin_bridge import _step_inverse
+    inv, rev = _step_inverse("kvm://host/screen/query/capture")
+    assert rev is True
+    assert inv is None
+
+
+def test_step_inverse_navigate_is_reversible_with_back():
+    from urirun.host.twin_bridge import _step_inverse
+    inv, rev = _step_inverse("browser://cdp/page/command/navigate")
+    assert rev is True
+    assert inv == "browser://cdp/page/command/back"
+
+
+def test_step_inverse_session_ensure_reversible():
+    from urirun.host.twin_bridge import _step_inverse
+    inv, rev = _step_inverse("kvm://host/cdp/session/command/ensure")
+    assert rev is True
+    assert inv == "kvm://host/cdp/session/command/close"
+
+
+def test_step_inverse_click_is_irreversible():
+    from urirun.host.twin_bridge import _step_inverse
+    inv, rev = _step_inverse("kvm://host/cdp/page/command/click")
+    assert rev is False
+    assert inv is None
+
+
+def test_step_inverse_fill_is_irreversible():
+    from urirun.host.twin_bridge import _step_inverse
+    inv, rev = _step_inverse("browser://cdp/page/command/fill")
+    assert rev is False
+    assert inv is None
+
+
+def test_step_inverse_wait_is_reversible():
+    from urirun.host.twin_bridge import _step_inverse
+    inv, rev = _step_inverse("kvm://host/input/command/wait")
+    assert rev is True
+    assert inv is None
+
+
+def test_step_inverse_unknown_command_is_irreversible():
+    from urirun.host.twin_bridge import _step_inverse
+    inv, rev = _step_inverse("kvm://host/custom/command/frobnicate")
+    assert rev is False
+
+
+def test_step_inverse_unknown_query_is_reversible():
+    from urirun.host.twin_bridge import _step_inverse
+    inv, rev = _step_inverse("kvm://host/custom/query/inspect")
+    assert rev is True
+
+
+def test_is_infra_step_skips_drift_and_preflight():
+    from urirun.host.twin_bridge import _is_infra_step
+    assert _is_infra_step({"id": "twin:drift:host", "uri": "twin://host/env/query/drift"}) is True
+    assert _is_infra_step({"id": "preflight", "uri": "twin://host/flow/command/preflight"}) is True
+    assert _is_infra_step({"id": "memory:remember", "uri": "twin://host/memory/command/remember"}) is True
+
+
+def test_is_infra_step_passes_real_steps():
+    from urirun.host.twin_bridge import _is_infra_step
+    assert _is_infra_step({"id": "step_1", "uri": "kvm://host/screen/query/capture"}) is False
+    assert _is_infra_step({"id": "nav", "uri": "browser://cdp/page/command/navigate"}) is False
+
+
+def test_append_twin_widget_emits_events_with_inverse(monkeypatch):
+    """append_twin_widget publishes TwinEvent with correct inverse for each non-infra step."""
+    import sys
+    sys.path.insert(0, '/home/tom/github/if-uri/urirun/adapters/python')
+    from urirun.host.twin_bridge import append_twin_widget, TWIN_EVENT_HUB
+    from urirun.node.mesh import EventHub
+
+    # Use a fresh hub so we get clean counts
+    captured = []
+    original_publish = TWIN_EVENT_HUB.publish
+    monkeypatch.setattr(TWIN_EVENT_HUB, "publish", lambda ev: captured.append(ev) or original_publish(ev))
+
+    flow = {"steps": [
+        {"uri": "kvm://host/cdp/session/command/ensure"},
+        {"uri": "browser://cdp/page/command/navigate"},
+        {"uri": "kvm://host/cdp/page/command/click"},
+    ]}
+    timeline = [
+        {"id": "twin:drift:host", "uri": "twin://host/env/query/drift", "ok": True},  # infra
+        {"id": "preflight", "uri": "twin://host/flow/command/preflight", "ok": True},  # infra
+        {"id": "s1", "uri": "kvm://host/cdp/session/command/ensure", "ok": True, "target": "host"},
+        {"id": "s2", "uri": "browser://cdp/page/command/navigate", "ok": True, "target": "cdp"},
+        {"id": "s3", "uri": "kvm://host/cdp/page/command/click", "ok": True, "target": "host"},
+    ]
+    attachments = []
+    append_twin_widget(True, flow, attachments, "test", ["host"], timeline)
+
+    assert len(captured) == 3  # only 3 real steps, 2 infra skipped
+    # ensure: reversible, inverse=close
+    ev_ensure = next(e for e in captured if "session/command/ensure" in e["transition"]["forward"])
+    assert ev_ensure["transition"]["reversible"] is True
+    assert ev_ensure["transition"]["inverse"] == "kvm://host/cdp/session/command/close"
+    # navigate: reversible, inverse=back
+    ev_nav = next(e for e in captured if "navigate" in e["transition"]["forward"])
+    assert ev_nav["transition"]["reversible"] is True
+    assert ev_nav["transition"]["inverse"] == "browser://cdp/page/command/back"
+    # click: irreversible
+    ev_click = next(e for e in captured if "click" in e["transition"]["forward"])
+    assert ev_click["transition"]["reversible"] is False
+    assert ev_click["transition"]["inverse"] is None
+    assert ev_click["status"] == "applied"
+    assert "irreversible" in ev_click["narration"]
+
+
+def test_convergence_navigate_inverse_matches_rollback_ledger(monkeypatch):
+    """Three-path convergence: _step_inverse, ledger_from_execution, and SSE event all agree
+    on the same inverse URI for a browser navigate step.
+
+    This is the KEY invariant of the twin engine: the static classification (used to display
+    inverse in the SSE widget) must match what a connector-aware rollback ledger would use.
+    When connectors return inverse, both sources CONVERGE on the same URI — the widget can
+    show the actual captured state while the engine rolls back with it."""
+    import sys
+    sys.path.insert(0, '/home/tom/github/if-uri/urirun/adapters/python')
+    from urirun.host.twin_bridge import _step_inverse, append_twin_widget, TWIN_EVENT_HUB
+    from urirun.node.flow import ledger_from_execution
+
+    NAV_URI = "browser://cdp/page/command/navigate"
+    BACK_URI = "browser://cdp/page/command/back"
+
+    # Path 1: static classification predicts the inverse URI
+    static_inv, static_rev = _step_inverse(NAV_URI)
+    assert static_inv == BACK_URI
+    assert static_rev is True
+
+    # Path 2: rollback ledger built from connector-returned inverse
+    execution = {
+        "ok": True,
+        "timeline": [{"id": "nav", "uri": NAV_URI, "ok": True}],
+        "results": {"nav": {"result": {"value": {
+            "ok": True,
+            "inverse": {"uri": BACK_URI, "args": {}},
+        }}}},
+    }
+    ledger = ledger_from_execution(execution)
+    assert len(ledger) == 1
+    assert ledger[0].forward.uri == NAV_URI
+    assert ledger[0].inverse.uri == BACK_URI   # ← convergence with path 1
+
+    # Path 3: SSE event emitted by append_twin_widget with connector results
+    captured = []
+    monkeypatch.setattr(TWIN_EVENT_HUB, "publish", lambda ev: captured.append(ev))
+    flow = {"steps": [{"uri": NAV_URI}]}
+    timeline = [{"id": "nav", "uri": NAV_URI, "ok": True, "target": "cdp"}]
+    append_twin_widget(True, flow, [], "test", ["host"], timeline,
+                       results=execution["results"])
+    assert len(captured) == 1
+    sse_inv = captured[0]["transition"]["inverse"]
+    assert sse_inv == BACK_URI                 # ← convergence with paths 1 & 2
+    assert captured[0]["transition"]["reversible"] is True
+
+
+def test_convergence_query_no_inverse_no_ledger(monkeypatch):
+    """Query steps: no inverse in SSE, no ledger entry, no rollback needed — consistent."""
+    import sys
+    sys.path.insert(0, '/home/tom/github/if-uri/urirun/adapters/python')
+    from urirun.host.twin_bridge import _step_inverse, append_twin_widget, TWIN_EVENT_HUB
+    from urirun.node.flow import ledger_from_execution
+
+    QUERY_URI = "kvm://host/screen/query/capture"
+
+    # Path 1: static classification — no inverse, reversible (no state change)
+    static_inv, static_rev = _step_inverse(QUERY_URI)
+    assert static_inv is None
+    assert static_rev is True
+
+    # Path 2: query connectors don't return inverse → empty ledger (correct, nothing to undo)
+    execution = {
+        "ok": True,
+        "timeline": [{"id": "cap", "uri": QUERY_URI, "ok": True}],
+        "results": {"cap": {"result": {"value": {"ok": True, "image": "..."}}}},
+    }
+    ledger = ledger_from_execution(execution)
+    assert ledger == []  # no inverse → no ledger entry
+
+    # Path 3: SSE event shows inverse=None, reversible=True
+    captured = []
+    monkeypatch.setattr(TWIN_EVENT_HUB, "publish", lambda ev: captured.append(ev))
+    flow = {"steps": [{"uri": QUERY_URI}]}
+    timeline = [{"id": "cap", "uri": QUERY_URI, "ok": True, "target": "host"}]
+    append_twin_widget(True, flow, [], "test", ["host"], timeline,
+                       results=execution["results"])
+    assert len(captured) == 1
+    assert captured[0]["transition"]["inverse"] is None    # consistent: no undo for queries
+    assert captured[0]["transition"]["reversible"] is True
+
+
+def test_inverse_from_results_prefers_connector_over_static(monkeypatch):
+    """When a connector returns a concrete inverse URI, append_twin_widget uses it
+    instead of the static _step_inverse() fallback."""
+    import sys
+    sys.path.insert(0, '/home/tom/github/if-uri/urirun/adapters/python')
+    from urirun.host.twin_bridge import append_twin_widget, TWIN_EVENT_HUB
+
+    # A session/ensure step normally gets a generic close URI from _step_inverse(),
+    # but the connector here carries a more specific one with session_id.
+    ENSURE_URI = "kvm://host/cdp/session/command/ensure"
+    SPECIFIC_CLOSE = "kvm://host/cdp/session/command/close?session_id=abc123"
+
+    captured = []
+    monkeypatch.setattr(TWIN_EVENT_HUB, "publish", lambda ev: captured.append(ev))
+    flow = {"steps": [{"uri": ENSURE_URI}]}
+    timeline = [{"id": "sess", "uri": ENSURE_URI, "ok": True, "target": "host"}]
+    results = {"sess": {"result": {"value": {
+        "ok": True,
+        "inverse": {"uri": SPECIFIC_CLOSE, "args": {}},
+    }}}}
+    append_twin_widget(True, flow, [], "test", ["host"], timeline, results=results)
+    assert len(captured) == 1
+    # Connector-specific URI wins over generic _step_inverse() output
+    assert captured[0]["transition"]["inverse"] == SPECIFIC_CLOSE
+    assert captured[0]["transition"]["reversible"] is True
+
+
+def test_inverse_from_results_handles_path_based_inverse(monkeypatch):
+    """Connectors that don't know their own address use inverse.path instead of inverse.uri.
+    _inverse_from_results must rebase path onto the forward step's scheme://node.
+
+    This is the actual shape returned by kvm connector's cdp_navigate:
+      inverse = {"path": "cdp/page/command/navigate", "args": {"url": prev}}
+    which should rebase to kvm://{node}/cdp/page/command/navigate."""
+    import sys
+    sys.path.insert(0, '/home/tom/github/if-uri/urirun/adapters/python')
+    from urirun.host.twin_bridge import _inverse_from_results
+
+    KVM_NAV = "kvm://lenovo/cdp/page/command/navigate"
+    results = {"nav": {"result": {"value": {
+        "ok": True,
+        "inverse": {"path": "cdp/page/command/navigate", "args": {"url": "https://prev.example.com"}},
+    }}}}
+    inv = _inverse_from_results(results, "nav", KVM_NAV)
+    # path rebased onto kvm://lenovo/
+    assert inv == "kvm://lenovo/cdp/page/command/navigate"
+
+
+def test_convergence_kvm_navigate_path_inverse_matches_ledger(monkeypatch):
+    """Real KVM connector convergence: cdp_navigate returns path-based inverse.
+
+    The rollback ledger (ledger_from_execution) and the SSE event (append_twin_widget)
+    BOTH produce the same rebased inverse URI — proving the three paths converge even
+    when the connector uses the path convention instead of uri."""
+    import sys
+    sys.path.insert(0, '/home/tom/github/if-uri/urirun/adapters/python')
+    from urirun.host.twin_bridge import append_twin_widget, TWIN_EVENT_HUB
+    from urirun.node.flow import ledger_from_execution
+
+    KVM_NAV = "kvm://lenovo/cdp/page/command/navigate"
+    REBASED_INVERSE = "kvm://lenovo/cdp/page/command/navigate"
+    PREV_URL = "https://prev.example.com"
+
+    # This is exactly the shape kvm connector's cdp_navigate emits
+    kvm_result = {"result": {"value": {
+        "ok": True, "action": "cdp-navigate", "url": "https://new.example.com",
+        "inverse": {"path": "cdp/page/command/navigate", "args": {"url": PREV_URL}},
+    }}}
+    execution = {
+        "ok": True,
+        "timeline": [{"id": "nav", "uri": KVM_NAV, "ok": True}],
+        "results": {"nav": kvm_result},
+    }
+
+    # Path 1 (rollback ledger) — ledger_from_execution handles path via _inverse_uri
+    ledger = ledger_from_execution(execution)
+    assert len(ledger) == 1
+    assert ledger[0].inverse.uri == REBASED_INVERSE
+    assert ledger[0].inverse.args == {"url": PREV_URL}
+
+    # Path 2 (SSE event) — append_twin_widget via _inverse_from_results handles path
+    captured = []
+    monkeypatch.setattr(TWIN_EVENT_HUB, "publish", lambda ev: captured.append(ev))
+    flow = {"steps": [{"uri": KVM_NAV}]}
+    timeline = [{"id": "nav", "uri": KVM_NAV, "ok": True, "target": "lenovo"}]
+    append_twin_widget(True, flow, [], "test", ["lenovo"], timeline,
+                       results=execution["results"])
+    assert len(captured) == 1
+    assert captured[0]["transition"]["inverse"] == REBASED_INVERSE  # ← CONVERGENCE
+    assert captured[0]["transition"]["reversible"] is True

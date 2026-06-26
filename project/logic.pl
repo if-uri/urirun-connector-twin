@@ -4,11 +4,11 @@ project_metadata('urirun-connector-twin', '0.1.0', 'python').
 % ── Project Files ────────────────────────────────────────
 project_file('app.doql.less', 32, 'less').
 project_file('project.sh', 69, 'shell').
-project_file('tests/test_browser_session.py', 271, 'python').
+project_file('tests/test_browser_session.py', 270, 'python').
 project_file('tests/test_dispatch.py', 209, 'python').
-project_file('tests/test_rollback_parity.py', 383, 'python').
+project_file('tests/test_rollback_parity.py', 380, 'python').
 project_file('tests/test_session.py', 233, 'python').
-project_file('tests/test_twin_connector.py', 1052, 'python').
+project_file('tests/test_twin_connector.py', 1275, 'python').
 project_file('tree.sh', 5, 'shell').
 project_file('urirun_connector_twin/__init__.py', 5, 'python').
 project_file('urirun_connector_twin/browser.py', 328, 'python').
@@ -17,9 +17,9 @@ project_file('urirun_connector_twin/dispatch.py', 73, 'python').
 project_file('urirun_connector_twin/environment.py', 162, 'python').
 project_file('urirun_connector_twin/mock.py', 115, 'python').
 project_file('urirun_connector_twin/planner.py', 128, 'python').
-project_file('urirun_connector_twin/prompt_plan.py', 257, 'python').
+project_file('urirun_connector_twin/prompt_plan.py', 260, 'python').
 project_file('urirun_connector_twin/sandbox.py', 163, 'python').
-project_file('urirun_connector_twin/session.py', 52, 'python').
+project_file('urirun_connector_twin/session.py', 25, 'python').
 
 % ── Python Functions ─────────────────────────────────────
 python_function('tests/test_browser_session.py', 'test_derive_task_target_linkedin', 0, 3, 1).
@@ -85,8 +85,10 @@ python_function('tests/test_rollback_parity.py', 'test_flow_goal_verify_no_uri_i
 python_function('tests/test_rollback_parity.py', 'test_flow_goal_verify_no_goal_arg', 0, 2, 1).
 python_function('tests/test_rollback_parity.py', 'test_flow_rollback_empty_ledger', 0, 3, 2).
 python_function('tests/test_rollback_parity.py', 'test_flow_rollback_none_inverse_skipped', 0, 2, 1).
-python_function('tests/test_rollback_parity.py', 'test_three_path_rollback_convergence_success', 0, 9, 9).
-python_function('tests/test_rollback_parity.py', 'test_three_path_rollback_convergence_stuck', 0, 9, 7).
+python_function('tests/test_rollback_parity.py', '_undone_uris', 1, 6, 5).
+python_function('tests/test_rollback_parity.py', '_stuck_uri', 1, 4, 4).
+python_function('tests/test_rollback_parity.py', 'test_three_path_rollback_convergence_success', 0, 9, 8).
+python_function('tests/test_rollback_parity.py', 'test_three_path_rollback_convergence_stuck', 0, 8, 9).
 python_function('tests/test_session.py', 'test_derive_linkedin', 0, 3, 1).
 python_function('tests/test_session.py', 'test_derive_github', 0, 3, 1).
 python_function('tests/test_session.py', 'test_derive_google_no_auth', 0, 3, 1).
@@ -191,6 +193,20 @@ python_function('tests/test_twin_connector.py', 'test_flow_diagnose_no_match_ret
 python_function('tests/test_twin_connector.py', 'test_flow_diagnose_service_stopped_matches', 0, 4, 2).
 python_function('tests/test_twin_connector.py', 'test_flow_diagnose_returns_remediation_list', 0, 4, 2).
 python_function('tests/test_twin_connector.py', 'test_flow_diagnose_in_bindings', 0, 2, 5).
+python_function('tests/test_twin_connector.py', 'test_step_inverse_query_is_reversible_no_inverse', 0, 3, 1).
+python_function('tests/test_twin_connector.py', 'test_step_inverse_navigate_is_reversible_with_back', 0, 3, 1).
+python_function('tests/test_twin_connector.py', 'test_step_inverse_session_ensure_reversible', 0, 3, 1).
+python_function('tests/test_twin_connector.py', 'test_step_inverse_click_is_irreversible', 0, 3, 1).
+python_function('tests/test_twin_connector.py', 'test_step_inverse_fill_is_irreversible', 0, 3, 1).
+python_function('tests/test_twin_connector.py', 'test_step_inverse_wait_is_reversible', 0, 3, 1).
+python_function('tests/test_twin_connector.py', 'test_step_inverse_unknown_command_is_irreversible', 0, 2, 1).
+python_function('tests/test_twin_connector.py', 'test_step_inverse_unknown_query_is_reversible', 0, 2, 1).
+python_function('tests/test_twin_connector.py', 'test_is_infra_step_skips_drift_and_preflight', 0, 4, 1).
+python_function('tests/test_twin_connector.py', 'test_is_infra_step_passes_real_steps', 0, 3, 1).
+python_function('tests/test_twin_connector.py', 'test_append_twin_widget_emits_events_with_inverse', 1, 17, 7).
+python_function('tests/test_twin_connector.py', 'test_convergence_navigate_inverse_matches_rollback_ledger', 1, 9, 7).
+python_function('tests/test_twin_connector.py', 'test_convergence_query_no_inverse_no_ledger', 1, 7, 7).
+python_function('tests/test_twin_connector.py', 'test_inverse_from_results_prefers_connector_over_static', 1, 4, 5).
 python_function('urirun_connector_twin/browser.py', '_proc_cmdline', 1, 2, 4).
 python_function('urirun_connector_twin/browser.py', '_is_browser', 1, 3, 3).
 python_function('urirun_connector_twin/browser.py', '_extract_flag', 2, 3, 3).
@@ -267,8 +283,11 @@ python_function('urirun_connector_twin/prompt_plan.py', '_file_write_steps', 2, 
 python_function('urirun_connector_twin/prompt_plan.py', '_service_start_steps', 1, 1, 0).
 python_function('urirun_connector_twin/prompt_plan.py', '_service_stop_steps', 1, 1, 0).
 python_function('urirun_connector_twin/prompt_plan.py', '_fallback_describe_steps', 1, 1, 0).
-python_function('urirun_connector_twin/prompt_plan.py', 'derive_task_target', 1, 22, 5).
-python_function('urirun_connector_twin/prompt_plan.py', 'steps_from_prompt', 2, 16, 13).
+python_function('urirun_connector_twin/prompt_plan.py', '_location_ok', 3, 4, 1).
+python_function('urirun_connector_twin/prompt_plan.py', '_classify_task_type', 3, 6, 2).
+python_function('urirun_connector_twin/prompt_plan.py', 'derive_task_target', 1, 2, 6).
+python_function('urirun_connector_twin/prompt_plan.py', '_raw_steps_for_target', 2, 13, 10).
+python_function('urirun_connector_twin/prompt_plan.py', 'steps_from_prompt', 2, 2, 3).
 python_function('urirun_connector_twin/prompt_plan.py', '_guess_service_name', 1, 2, 3).
 python_function('urirun_connector_twin/prompt_plan.py', '_bind_node', 2, 1, 1).
 python_function('urirun_connector_twin/prompt_plan.py', 'plan_from_prompt', 2, 1, 3).
@@ -280,7 +299,6 @@ python_function('urirun_connector_twin/sandbox.py', '_verdict', 3, 4, 0).
 python_function('urirun_connector_twin/sandbox.py', '_docker_probe', 1, 1, 5).
 python_function('urirun_connector_twin/sandbox.py', '_simulated_probe', 1, 1, 7).
 python_function('urirun_connector_twin/sandbox.py', 'probe_reversibility', 1, 2, 4).
-python_function('urirun_connector_twin/session.py', 'derive_task_target', 1, 3, 2).
 
 % ── Python Classes ───────────────────────────────────────
 python_class('urirun_connector_twin/sandbox.py', 'Scenario').

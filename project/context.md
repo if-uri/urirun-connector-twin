@@ -7,10 +7,10 @@
 - **Primary Language**: python
 - **Languages**: python: 10, yaml: 4, shell: 2, json: 1, toml: 1
 - **Analysis Mode**: static
-- **Total Functions**: 90
+- **Total Functions**: 92
 - **Total Classes**: 1
 - **Modules**: 18
-- **Entry Points**: 26
+- **Entry Points**: 25
 
 ## Architecture by Module
 
@@ -19,7 +19,7 @@
 - **File**: `core.py`
 
 ### urirun_connector_twin.prompt_plan
-- **Functions**: 18
+- **Functions**: 21
 - **File**: `prompt_plan.py`
 
 ### urirun_connector_twin.browser
@@ -46,10 +46,6 @@
 ### urirun_connector_twin.dispatch
 - **Functions**: 3
 - **File**: `dispatch.py`
-
-### urirun_connector_twin.session
-- **Functions**: 1
-- **File**: `session.py`
 
 ## Key Entry Points
 
@@ -173,13 +169,6 @@ Deploying a different twin connector with a smarter annotator (e.g. LLM-augment
 Exposes execute_flow() as a URI boundary so callers can point to a different
 twin conn
 - **Calls**: conn.handler, execute_flow, _svc.call
-
-### urirun_connector_twin.session.derive_task_target
-> Extract domain and auth requirement from a natural-language prompt.
-
-Simple shape: {domain, needsAuth}.  For the full classification (taskType, url,
-c
-- **Calls**: prompt.lower, re.search
 
 ### urirun_connector_twin.core.monitor_event
 > Receive a twin state-transition event (distributed to /events?scheme=twin SSE).
@@ -326,15 +315,13 @@ Key functions that process and transform data:
 Functions exposed as public API (no underscore prefix):
 
 - `urirun_connector_twin.core.plan_from_prompt_route` - 18 calls
-- `urirun_connector_twin.environment.probe` - 17 calls
 - `urirun_connector_twin.browser.discover_browser_sessions` - 17 calls
+- `urirun_connector_twin.environment.probe` - 17 calls
 - `urirun_connector_twin.core.mock_start_probe_stop` - 16 calls
 - `urirun_connector_twin.planner.build_imperative_plan` - 14 calls
-- `urirun_connector_twin.prompt_plan.steps_from_prompt` - 14 calls
 - `urirun_connector_twin.core.flow_preflight` - 14 calls
 - `urirun_connector_twin.planner.annotate_steps` - 13 calls
 - `urirun_connector_twin.core.flow_rollback` - 13 calls
-- `urirun_connector_twin.prompt_plan.derive_task_target` - 12 calls
 - `urirun_connector_twin.browser.select_best_session` - 12 calls
 - `urirun_connector_twin.core.browser_profile` - 12 calls
 - `urirun_connector_twin.core.step_feasibility` - 12 calls
@@ -344,6 +331,7 @@ Functions exposed as public API (no underscore prefix):
 - `urirun_connector_twin.core.flow_goal_verify` - 7 calls
 - `urirun_connector_twin.mock.generate_mock` - 6 calls
 - `urirun_connector_twin.core.browser_sessions` - 6 calls
+- `urirun_connector_twin.prompt_plan.derive_task_target` - 6 calls
 - `urirun_connector_twin.dispatch.uri_call` - 5 calls
 - `urirun_connector_twin.core.constraints_from_profile` - 5 calls
 - `urirun_connector_twin.core.plan_generate` - 5 calls
@@ -353,11 +341,11 @@ Functions exposed as public API (no underscore prefix):
 - `urirun_connector_twin.core.sandbox_probe` - 4 calls
 - `urirun_connector_twin.core.flow_diagnose` - 4 calls
 - `urirun_connector_twin.sandbox.scenario_for_uri` - 3 calls
-- `urirun_connector_twin.prompt_plan.plan_from_prompt` - 3 calls
 - `urirun_connector_twin.core.environment_profile` - 3 calls
 - `urirun_connector_twin.core.plan_annotate` - 3 calls
 - `urirun_connector_twin.core.flow_execute` - 3 calls
-- `urirun_connector_twin.session.derive_task_target` - 2 calls
+- `urirun_connector_twin.prompt_plan.steps_from_prompt` - 3 calls
+- `urirun_connector_twin.prompt_plan.plan_from_prompt` - 3 calls
 - `urirun_connector_twin.core.monitor_event` - 2 calls
 - `urirun_connector_twin.core.manifest` - 2 calls
 - `urirun_connector_twin.core.main` - 2 calls
