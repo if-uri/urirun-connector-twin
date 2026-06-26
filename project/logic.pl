@@ -9,14 +9,14 @@ project_file('tests/test_contract.py', 40, 'python').
 project_file('tests/test_dispatch.py', 209, 'python').
 project_file('tests/test_proof_cache.py', 216, 'python').
 project_file('tests/test_proof_routes.py', 76, 'python').
-project_file('tests/test_recall_routes.py', 134, 'python').
+project_file('tests/test_recall_routes.py', 140, 'python').
 project_file('tests/test_rollback_parity.py', 380, 'python').
 project_file('tests/test_session.py', 233, 'python').
-project_file('tests/test_twin_connector.py', 1407, 'python').
+project_file('tests/test_twin_connector.py', 1401, 'python').
 project_file('tree.sh', 5, 'shell').
 project_file('urirun_connector_twin/__init__.py', 5, 'python').
 project_file('urirun_connector_twin/browser.py', 328, 'python').
-project_file('urirun_connector_twin/core.py', 705, 'python').
+project_file('urirun_connector_twin/core.py', 734, 'python').
 project_file('urirun_connector_twin/dispatch.py', 73, 'python').
 project_file('urirun_connector_twin/environment.py', 162, 'python').
 project_file('urirun_connector_twin/mock.py', 115, 'python').
@@ -157,7 +157,7 @@ python_function('tests/test_twin_connector.py', 'test_step_evaluate_rollback_dry
 python_function('tests/test_twin_connector.py', 'test_flow_rollback_empty_ledger', 0, 2, 2).
 python_function('tests/test_twin_connector.py', 'test_flow_rollback_handler_in_bindings', 0, 5, 3).
 python_function('tests/test_twin_connector.py', 'test_flow_rollback_ledger_calls_inverses', 0, 5, 2).
-python_function('tests/test_twin_connector.py', 'test_abort_envelope_dispatches_rollback_ledger', 1, 8, 5).
+python_function('tests/test_twin_connector.py', 'test_abort_envelope_dispatches_rollback_ledger', 1, 7, 3).
 python_function('tests/test_twin_connector.py', 'test_evaluate_step_next_routes_through_dispatch_uri', 0, 4, 3).
 python_function('tests/test_twin_connector.py', 'test_evaluate_step_next_in_process_fallback', 1, 2, 2).
 python_function('tests/test_twin_connector.py', 'test_flow_preflight_no_cdp_steps_returns_empty', 1, 4, 2).
@@ -256,7 +256,7 @@ python_function('urirun_connector_twin/core.py', 'flow_goal_verify', 2, 5, 6).
 python_function('urirun_connector_twin/core.py', 'flow_rollback', 2, 10, 8).
 python_function('urirun_connector_twin/core.py', 'step_evaluate', 7, 9, 4).
 python_function('urirun_connector_twin/core.py', 'flow_execute', 5, 3, 3).
-python_function('urirun_connector_twin/core.py', 'flow_recall', 4, 18, 7).
+python_function('urirun_connector_twin/core.py', 'flow_recall', 5, 20, 11).
 python_function('urirun_connector_twin/core.py', 'flow_episode_run', 5, 8, 6).
 python_function('urirun_connector_twin/core.py', 'flow_diagnose', 5, 4, 3).
 python_function('urirun_connector_twin/core.py', 'monitor_event', 3, 1, 2).
@@ -361,7 +361,7 @@ python_method('TestFlowRecallRoute', 'setUp', 0, 1, 3).
 python_method('TestFlowRecallRoute', 'tearDown', 0, 2, 2).
 python_method('TestFlowRecallRoute', '_mem', 0, 1, 1).
 python_method('TestFlowRecallRoute', 'test_recall_by_episode_id_direct', 0, 2, 8).
-python_method('TestFlowRecallRoute', 'test_recall_by_intent_and_env_fp', 0, 1, 7).
+python_method('TestFlowRecallRoute', 'test_recall_by_intent_and_env_fp', 0, 1, 8).
 python_method('TestFlowRecallRoute', 'test_recall_intent_only_fallback_via_flow_store', 0, 2, 8).
 python_method('TestFlowRecallRoute', 'test_recall_returns_not_found_for_unknown_prompt', 0, 1, 5).
 python_method('TestFlowRecallRoute', 'test_recall_episode_id_missing_returns_not_found', 0, 1, 3).

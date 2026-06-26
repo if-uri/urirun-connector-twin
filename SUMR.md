@@ -111,30 +111,30 @@ HUBS[20]:
     CC=9  in:1  out:15  total:16
   urirun_connector_twin.planner.annotate_steps
     CC=8  in:2  out:13  total:15
-  urirun_connector_twin.core.flow_preflight
-    CC=9  in:0  out:14  total:14
   urirun_connector_twin.browser.select_session
     CC=15  in:3  out:11  total:14
+  urirun_connector_twin.core.flow_preflight
+    CC=9  in:0  out:14  total:14
   urirun_connector_twin.sandbox._simulated_probe
     CC=1  in:1  out:12  total:13
-  urirun_connector_twin.core.step_feasibility
-    CC=4  in:0  out:12  total:12
-  urirun_connector_twin.proof_cache.proof_record
-    CC=10  in:2  out:10  total:12
-  urirun_connector_twin.core._prompt_result
-    CC=5  in:1  out:11  total:12
   urirun_connector_twin.prompt_plan._raw_steps_for_target
     CC=13  in:1  out:11  total:12
   urirun_connector_twin.core.browser_profile
     CC=7  in:0  out:12  total:12
+  urirun_connector_twin.proof_cache.proof_record
+    CC=10  in:2  out:10  total:12
+  urirun_connector_twin.core.step_feasibility
+    CC=4  in:0  out:12  total:12
+  urirun_connector_twin.core._prompt_result
+    CC=5  in:1  out:11  total:12
   urirun_connector_twin.dispatch.uri_call
     CC=10  in:6  out:5  total:11
   urirun_connector_twin.prompt_plan.derive_task_target
     CC=2  in:5  out:6  total:11
-  urirun_connector_twin.mock.generate_mock
-    CC=5  in:4  out:6  total:10
   urirun_connector_twin.browser._selection
     CC=6  in:3  out:7  total:10
+  urirun_connector_twin.mock.generate_mock
+    CC=5  in:4  out:6  total:10
 
 MODULES:
   urirun_connector_twin.browser  [11 funcs]
@@ -305,30 +305,30 @@ HUBS[20]:
     CC=9  in:1  out:15  total:16
   urirun_connector_twin.planner.annotate_steps
     CC=8  in:2  out:13  total:15
-  urirun_connector_twin.core.flow_preflight
-    CC=9  in:0  out:14  total:14
   urirun_connector_twin.browser.select_session
     CC=15  in:3  out:11  total:14
+  urirun_connector_twin.core.flow_preflight
+    CC=9  in:0  out:14  total:14
   urirun_connector_twin.sandbox._simulated_probe
     CC=1  in:1  out:12  total:13
-  urirun_connector_twin.core.step_feasibility
-    CC=4  in:0  out:12  total:12
-  urirun_connector_twin.proof_cache.proof_record
-    CC=10  in:2  out:10  total:12
-  urirun_connector_twin.core._prompt_result
-    CC=5  in:1  out:11  total:12
   urirun_connector_twin.prompt_plan._raw_steps_for_target
     CC=13  in:1  out:11  total:12
   urirun_connector_twin.core.browser_profile
     CC=7  in:0  out:12  total:12
+  urirun_connector_twin.proof_cache.proof_record
+    CC=10  in:2  out:10  total:12
+  urirun_connector_twin.core.step_feasibility
+    CC=4  in:0  out:12  total:12
+  urirun_connector_twin.core._prompt_result
+    CC=5  in:1  out:11  total:12
   urirun_connector_twin.dispatch.uri_call
     CC=10  in:6  out:5  total:11
   urirun_connector_twin.prompt_plan.derive_task_target
     CC=2  in:5  out:6  total:11
-  urirun_connector_twin.mock.generate_mock
-    CC=5  in:4  out:6  total:10
   urirun_connector_twin.browser._selection
     CC=6  in:3  out:7  total:10
+  urirun_connector_twin.mock.generate_mock
+    CC=5  in:4  out:6  total:10
 
 MODULES:
   urirun_connector_twin.browser  [11 funcs]
@@ -459,14 +459,14 @@ EDGES:
 ### Code Analysis (`project/analysis.toon.yaml`)
 
 ```toon markpact:analysis path=project/analysis.toon.yaml
-# code2llm | 18f 3535L | python:10,yaml:4,shell:2,json:1,toml:1 | 2026-06-26
+# code2llm | 18f 3564L | python:10,yaml:4,shell:2,json:1,toml:1 | 2026-06-26
 # generated in 0.00s
 # CC̅=4.2 | critical:3/104 | dups:0 | cycles:0
 
 HEALTH[3]:
   🟡 CC    discover_browser_sessions CC=15 (limit:15)
   🟡 CC    select_session CC=15 (limit:15)
-  🟡 CC    flow_recall CC=18 (limit:15)
+  🟡 CC    flow_recall CC=20 (limit:15)
 
 REFACTOR[1]:
   1. split 3 high-CC methods  (CC>15)
@@ -535,7 +535,7 @@ PIPELINES[30]:
 
 LAYERS:
   urirun_connector_twin/          CC̄=4.2    ←in:0  →out:0
-  │ !! core                       704L  0C   34m  CC=18     ←0
+  │ !! core                       733L  0C   34m  CC=20     ←0
   │ !! browser                    327L  0C   13m  CC=15     ←2
   │ prompt_plan                259L  0C   21m  CC=13     ←2
   │ sandbox                    176L  1C    9m  CC=6      ←1
@@ -588,16 +588,16 @@ SUMMARY:
 
 NEXT[6] (ranked by impact):
   [1] !! SPLIT           urirun_connector_twin/core.py
-      WHY: 704L, 0 classes, max CC=18
-      EFFORT: ~4h  IMPACT: 12672
+      WHY: 733L, 0 classes, max CC=20
+      EFFORT: ~4h  IMPACT: 14660
 
-  [2] !  SPLIT-FUNC      discover_browser_sessions  CC=15  fan=13
+  [2] !  SPLIT-FUNC      flow_recall  CC=20  fan=16
+      WHY: CC=20 exceeds 15
+      EFFORT: ~1h  IMPACT: 320
+
+  [3] !  SPLIT-FUNC      discover_browser_sessions  CC=15  fan=13
       WHY: CC=15 exceeds 15
       EFFORT: ~1h  IMPACT: 195
-
-  [3] !  SPLIT-FUNC      flow_recall  CC=18  fan=10
-      WHY: CC=18 exceeds 15
-      EFFORT: ~1h  IMPACT: 180
 
   [4] !  SPLIT-FUNC      select_session  CC=15  fan=7
       WHY: CC=15 exceeds 15
@@ -619,7 +619,7 @@ RISKS[3]:
 
 METRICS-TARGET:
   CC̄:          4.2 → ≤2.9
-  max-CC:      18 → ≤9
+  max-CC:      20 → ≤10
   god-modules: 3 → 0
   high-CC(≥15): 3 → ≤1
   hub-types:   0 → ≤0
@@ -649,7 +649,7 @@ PATTERNS (language parser shared logic):
     - Standardized FunctionInfo/ClassInfo models
 
 HISTORY:
-  prev CC̄=4.0 → now CC̄=4.2
+  prev CC̄=4.2 → now CC̄=4.2
 ```
 
 ## Intent

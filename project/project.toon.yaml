@@ -1,4 +1,4 @@
-# urirun-connector-twin | 104 func | 9f | 3535L | python | 2026-06-26
+# urirun-connector-twin | 104 func | 9f | 3564L | python | 2026-06-26
 # generated in 0.00s
 
 HEALTH:
@@ -6,7 +6,8 @@ HEALTH:
 
 ALERTS[14]:
   !!! high_fan_out     _cdp_cookies = 22 (limit:10)
-  !   cc_exceeded      flow_recall = 18 (limit:15)
+  !!  cc_exceeded      flow_recall = 20 (limit:15)
+  !!  high_fan_out     flow_recall = 16 (limit:10)
   !   cc_exceeded      discover_browser_sessions = 15 (limit:15)
   !   cc_exceeded      select_session = 15 (limit:15)
   !   high_fan_out     discover_browser_sessions = 13 (limit:10)
@@ -14,10 +15,9 @@ ALERTS[14]:
   !   high_fan_out     plan_from_prompt_route = 12 (limit:10)
   !   high_fan_out     flow_preflight = 12 (limit:10)
   !   high_fan_out     probe = 11 (limit:10)
-  !   high_fan_out     _raw_steps_for_target = 10 (limit:10)
 
 MODULES[18] (top by size):
-  M[urirun_connector_twin/core.py] 704L C:0 F:34 CC↑18 D:0 (python)
+  M[urirun_connector_twin/core.py] 733L C:0 F:34 CC↑20 D:0 (python)
   M[connector.manifest.json] 616L C:0 F:0 CC↑0 D:0 (json)
   M[planfile.yaml] 591L C:0 F:0 CC↑0 D:0 (yaml)
   M[urirun_connector_twin/browser.py] 327L C:0 F:13 CC↑15 D:2 (python)
@@ -36,6 +36,7 @@ MODULES[18] (top by size):
 
 HOTSPOTS[10]:
   ★ _cdp_cookies fan=22  // Fetch all cookies via CDP Network.getAllCookies (one-shot WS call).
+  ★ flow_recall fan=16  // URI boundary for the recall gate: check episode_store then flow_store before the
   ★ discover_browser_sessions fan=13  // Enumerate live Chrome/Chromium processes and their debug sessions.
 
 Returns a li
@@ -45,16 +46,13 @@ Proves t
   ★ plan_from_prompt_route fan=12  // Full twin loop from a single NL prompt.
 
 Calls twin://host/browser/query/profile
-  ★ flow_preflight fan=12  // Identify which surfaces the flow steps need and provision them up-front.
 
-For CD
-
-REFACTOR[7]:
-  [1] H/H Split god module urirun_connector_twin/core.py (704L, 0 classes)
+REFACTOR[8]:
+  [1] H/H Split god module urirun_connector_twin/core.py (733L, 0 classes)
   [2] H/H Split god module connector.manifest.json (616L, 0 classes)
   [3] H/H Split god module planfile.yaml (591L, 0 classes)
   [4] M/L Split discover_browser_sessions (CC=15)
   [5] M/L Split select_session (CC=15)
 
 EVOLUTION:
-  2026-06-26 CC̄=4.2 crit=11 3535L // Automated analysis
+  2026-06-26 CC̄=4.2 crit=11 3564L // Automated analysis

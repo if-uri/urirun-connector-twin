@@ -1,11 +1,11 @@
-# code2llm | 18f 3535L | python:10,yaml:4,shell:2,json:1,toml:1 | 2026-06-26
+# code2llm | 18f 3564L | python:10,yaml:4,shell:2,json:1,toml:1 | 2026-06-26
 # generated in 0.00s
 # CC̅=4.2 | critical:3/104 | dups:0 | cycles:0
 
 HEALTH[3]:
   🟡 CC    discover_browser_sessions CC=15 (limit:15)
   🟡 CC    select_session CC=15 (limit:15)
-  🟡 CC    flow_recall CC=18 (limit:15)
+  🟡 CC    flow_recall CC=20 (limit:15)
 
 REFACTOR[1]:
   1. split 3 high-CC methods  (CC>15)
@@ -74,7 +74,7 @@ PIPELINES[30]:
 
 LAYERS:
   urirun_connector_twin/          CC̄=4.2    ←in:0  →out:0
-  │ !! core                       704L  0C   34m  CC=18     ←0
+  │ !! core                       733L  0C   34m  CC=20     ←0
   │ !! browser                    327L  0C   13m  CC=15     ←2
   │ prompt_plan                259L  0C   21m  CC=13     ←2
   │ sandbox                    176L  1C    9m  CC=6      ←1

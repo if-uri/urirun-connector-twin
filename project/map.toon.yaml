@@ -1,7 +1,7 @@
-# urirun-connector-twin | 22f 5166L | python:19,shell:2,less:1 | 2026-06-26
+# urirun-connector-twin | 22f 5195L | python:19,shell:2,less:1 | 2026-06-26
 # stats: 292 func | 11 cls | 22 mod | CC̄=3.7 | critical:14 | cycles:0
-# alerts[5]: CC test_append_twin_widget_emits_events_with_inverse=20; CC flow_recall=18; CC discover_browser_sessions=15; CC select_session=15; CC _cdp_cookies=13
-# hotspots[5]: _cdp_cookies fan=19; discover_browser_sessions fan=13; mock_start_probe_stop fan=13; plan_from_prompt_route fan=11; flow_preflight fan=10
+# alerts[5]: CC test_append_twin_widget_emits_events_with_inverse=20; CC flow_recall=20; CC discover_browser_sessions=15; CC select_session=15; CC _cdp_cookies=13
+# hotspots[5]: _cdp_cookies fan=19; discover_browser_sessions fan=13; mock_start_probe_stop fan=13; plan_from_prompt_route fan=11; flow_recall fan=11
 # evolution: baseline
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
 M[22]:
@@ -12,14 +12,14 @@ M[22]:
   tests/test_dispatch.py,209
   tests/test_proof_cache.py,216
   tests/test_proof_routes.py,76
-  tests/test_recall_routes.py,134
+  tests/test_recall_routes.py,140
   tests/test_rollback_parity.py,380
   tests/test_session.py,233
-  tests/test_twin_connector.py,1407
+  tests/test_twin_connector.py,1401
   tree.sh,5
   urirun_connector_twin/__init__.py,5
   urirun_connector_twin/browser.py,328
-  urirun_connector_twin/core.py,705
+  urirun_connector_twin/core.py,734
   urirun_connector_twin/dispatch.py,73
   urirun_connector_twin/environment.py,162
   urirun_connector_twin/mock.py,115
@@ -290,7 +290,7 @@ D:
     flow_rollback(ledger;mesh)
     step_evaluate(step;entry;routes;execute;attempt;max_retries;healed)
     flow_execute(flow;execute;max_retries;max_remediations;max_wall_clock)
-    flow_recall(prompt;env_fp;episode_id;node)
+    flow_recall(prompt;env_fp;episode_id;node;skip_drift_check)
     flow_episode_run(episode_id;execute;max_retries;max_remediations;max_wall_clock)
     flow_diagnose(error;step;routes;environment;surface)
     monitor_event(node;stateSig;narration)

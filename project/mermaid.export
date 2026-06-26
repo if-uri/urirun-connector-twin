@@ -43,7 +43,7 @@ flowchart TD
         urirun_connector_twin__core__flow_rollback("flow_rollback CC=10")
         urirun_connector_twin__core__step_evaluate("step_evaluate CC=9")
         urirun_connector_twin__core__flow_execute["flow_execute"]
-        urirun_connector_twin__core__flow_recall{{flow_recall CC=18}}
+        urirun_connector_twin__core__flow_recall{{flow_recall CC=20}}
         urirun_connector_twin__core__flow_episode_run("flow_episode_run CC=8")
         urirun_connector_twin__core__flow_diagnose["flow_diagnose"]
         urirun_connector_twin__core__monitor_event["monitor_event"]

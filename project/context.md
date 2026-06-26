@@ -61,7 +61,7 @@ Main execution flows into the system:
 
 Priority:
   1. episode_id — direct lookup (content-addressed, a
-- **Calls**: conn.handler, durable_memory, urirun.ok, mem.episode_store.get, intent_signature, mem.recall_episode, mem.recall_flow_by_intent, None.get
+- **Calls**: conn.handler, durable_memory, urirun.ok, mem.episode_store.get, intent_signature, mem.recall_episode, mem.recall_flow_by_intent, _svc.call
 
 ### urirun_connector_twin.core.plan_from_prompt_route
 > Full twin loop from a single NL prompt.
@@ -344,7 +344,7 @@ Key functions that process and transform data:
 
 Functions exposed as public API (no underscore prefix):
 
-- `urirun_connector_twin.core.flow_recall` - 22 calls
+- `urirun_connector_twin.core.flow_recall` - 33 calls
 - `urirun_connector_twin.core.plan_from_prompt_route` - 18 calls
 - `urirun_connector_twin.browser.discover_browser_sessions` - 17 calls
 - `urirun_connector_twin.environment.probe` - 17 calls
