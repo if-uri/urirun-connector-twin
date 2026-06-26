@@ -43,10 +43,17 @@ BUILTIN_SCENARIOS: dict[str, Scenario] = {
     ),
     "sqlite": Scenario(
         image="alpine:3",
-        setup_cmd="mkdir -p /data && apk add --no-cache sqlite-dev 2>/dev/null && sqlite3 /data/db.sqlite 'CREATE TABLE IF NOT EXISTS items(id INTEGER)'",
+        setup_cmd="mkdir -p /data && apk add --no-cache sqlite 2>/dev/null && sqlite3 /data/db.sqlite 'CREATE TABLE IF NOT EXISTS items(id INTEGER)'",
         scan_cmd="sqlite3 /data/db.sqlite 'SELECT count(*) FROM items' 2>/dev/null || echo 0",
         forward_cmd="sqlite3 /data/db.sqlite 'INSERT INTO items VALUES(1)'",
         inverse_cmd="sqlite3 /data/db.sqlite 'DELETE FROM items WHERE id=1'",
+    ),
+    "mqtt": Scenario(
+        image="eclipse-mosquitto:2",
+        setup_cmd="mkdir -p /mosquitto/config && echo 'listener 1883\\nallow_anonymous true' > /mosquitto/config/mosquitto.conf",
+        scan_cmd="mosquitto_sub -h localhost -t 'test/probe' -C 1 -W 1 2>/dev/null | wc -l || echo 0",
+        forward_cmd="mosquitto_pub -h localhost -t 'test/probe' -m 'forward' -r 2>/dev/null || echo 0",
+        inverse_cmd="mosquitto_pub -h localhost -t 'test/probe' -m '' -r --null-message 2>/dev/null || echo 0",
     ),
     "web-post": Scenario(
         image="alpine:3",
@@ -59,11 +66,13 @@ BUILTIN_SCENARIOS: dict[str, Scenario] = {
 
 
 def scenario_for_uri(uri: str) -> Scenario:
-    """Pick a built-in scenario from URI scheme, falling back to generic fs."""
+    """Pick a built-in scenario from URI scheme/path, falling back to generic fs."""
     uri_l = uri.lower()
     if "sqlite" in uri_l:
         return BUILTIN_SCENARIOS["sqlite"]
-    if any(k in uri_l for k in ("post", "publish", "create", "write")):
+    if uri_l.startswith("mqtt://") or "/mqtt/" in uri_l:
+        return BUILTIN_SCENARIOS["mqtt"]
+    if any(k in uri_l for k in ("post", "publish", "create", "write", "send")):
         return BUILTIN_SCENARIOS["web-post"]
     return BUILTIN_SCENARIOS["fs"]
 

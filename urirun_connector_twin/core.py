@@ -12,7 +12,8 @@ Routes served:
   twin://host/browser/query/sessions      — list live Chrome sessions
   twin://host/browser/query/profile       — select best session for domain/task
   twin://host/plan/command/from-prompt    — NL prompt → annotated imperative plan
-  twin://host/plan/command/generate       — flow + env → annotated imperative plan
+  twin://host/plan/command/annotate       — flow + env → annotated plan (switchable logic)
+  twin://host/plan/command/generate       — flow + node → probe env then annotate
   twin://host/mock/command/create         — Docker Compose mock for infeasible steps
   twin://host/step/query/feasibility      — per-step feasibility check
   twin://host/monitor/event               — SSE event marker
@@ -51,6 +52,37 @@ def _local_browser_profile(domain: str, needs_auth: bool) -> dict:
     sessions = discover_browser_sessions(probe_cookies=needs_auth)
     sel = select_session(sessions, domain, needs_auth)
     return {"ok": True, "selection": sel, "sessions": len(sessions)}
+
+
+def _apply_browser_sel(plan: dict, browser_sel: dict) -> None:
+    """Merge browser session selection into plan (mutates in place)."""
+    plan["browserSelection"] = browser_sel
+    if browser_sel.get("mode") in ("needs-login", "none"):
+        plan["needsMock"] = True
+        plan["humanGated"] = True
+        plan["blockedBy"] = "auth-required"
+        plan["guidance"] = browser_sel.get("rationale") or browser_sel.get("reason")
+
+
+def _prompt_result(prompt: str, target: dict, plan: dict, env: dict,
+                   include_mock: bool) -> dict:
+    """Build the final result dict for plan_from_prompt_route."""
+    result: dict = {
+        "ok": True, "prompt": prompt,
+        "taskType": target.get("taskType"),
+        "domain": target.get("domain"),
+        "needsAuth": target.get("needsAuth"),
+        "plan": plan,
+        "environment": {
+            "node": env.get("node"), "bestSurface": env.get("bestSurface"),
+            "controllable": env.get("controllable"),
+            "constraints": env.get("constraints") or [],
+            "warnings": env.get("warnings") or [],
+        },
+    }
+    if include_mock and plan.get("needsMock"):
+        result["mock"] = generate_mock(prompt, plan, target=target.get("domain"))
+    return result
 
 
 # ─── routes ───────────────────────────────────────────────────────────────────
@@ -150,32 +182,27 @@ def plan_from_prompt_route(
                                                     target.get("needsAuth", False)),
         )
         browser_sel = (r or {}).get("selection") or {}
-    plan = build_imperative_plan(raw_plan, env, prompt=prompt)
+    # ③ Annotation — URI first (hot-swap annotator: different feasibility logic, remote node)
+    plan_r = uri_call(
+        f"twin://{_node}/plan/command/annotate",
+        {"flow": raw_plan, "env": env, "prompt": prompt},
+        fallback=lambda: {"ok": True, "plan": build_imperative_plan(raw_plan, env, prompt=prompt)},
+    )
+    plan = (plan_r or {}).get("plan") or build_imperative_plan(raw_plan, env, prompt=prompt)
     if browser_sel:
-        plan["browserSelection"] = browser_sel
-        if browser_sel.get("mode") in ("needs-login", "none"):
-            plan["needsMock"] = True
-            plan["humanGated"] = True
-            plan["blockedBy"] = "auth-required"
-            plan["guidance"] = browser_sel.get("rationale") or browser_sel.get("reason")
-    result: dict = {
-        "ok": True,
-        "prompt": prompt,
-        "taskType": target.get("taskType"),
-        "domain": target.get("domain"),
-        "needsAuth": target.get("needsAuth"),
-        "plan": plan,
-        "environment": {
-            "node": env.get("node"),
-            "bestSurface": env.get("bestSurface"),
-            "controllable": env.get("controllable"),
-            "constraints": env.get("constraints") or [],
-            "warnings": env.get("warnings") or [],
-        },
-    }
-    if include_mock and plan.get("needsMock"):
-        result["mock"] = generate_mock(prompt, plan, target=target.get("domain"))
-    return result
+        _apply_browser_sel(plan, browser_sel)
+    return _prompt_result(prompt, target, plan, env, include_mock)
+
+
+@conn.handler("plan/command/annotate",
+              meta={"label": "Annotate a flow with feasibility, reversibility and surface"})
+def plan_annotate(flow: dict, env: dict, prompt: str = "") -> dict:
+    """URI boundary for build_imperative_plan — switchable annotation logic.
+
+    Deploying a different twin connector with a smarter annotator (e.g. LLM-augmented
+    constraint reasoning) causes all callers to pick it up without code changes."""
+    plan = build_imperative_plan(flow, env, prompt=prompt)
+    return urirun.ok(plan=plan)
 
 
 @conn.handler("plan/command/generate", external=True,
@@ -206,6 +233,82 @@ def mock_create(prompt: str = "", flow: dict | None = None, target: str = "") ->
         mock=mock, plan=plan, reversible=True,
         inverseCmd=mock.get("inverseCmd"), notes=mock.get("notes"),
     )
+
+
+@conn.handler("mock/command/start-probe-stop", external=True,
+              meta={"label": "Start mock → health-check → stop, prove reversibility"})
+def mock_start_probe_stop(
+    prompt: str = "",
+    flow: dict | None = None,
+    target: str = "",
+    health_timeout: float = 15.0,
+) -> dict:
+    """Close the mock ↔ sandbox loop: generate → up → health-check → down -v.
+
+    Proves that the generated Docker mock is:
+      - reachable (HTTP 200 on testUri within health_timeout seconds)
+      - reversible by contract (compose down -v removes all state — no re-scan needed)
+
+    Without Docker: degrades gracefully, returning reachable=False, simulated=True,
+    reversible=True (the guarantee is structural, not empirical).
+
+    Typical caller: plan_from_prompt_route when include_mock=True and needsMock=True."""
+    import shutil, subprocess, tempfile, time as _time  # noqa: E401
+    env = probe(None, prompt=prompt)
+    plan = build_imperative_plan(flow or {}, env, prompt=prompt)
+    mock = generate_mock(prompt, plan, target=target or None)
+    test_uri = mock.get("testUri") or ""
+
+    if not shutil.which("docker"):
+        return urirun.ok(
+            mock=mock, reachable=False, reversible=True, simulated=True,
+            note="Docker not found — reversibility is structural (compose down -v removes all state)",
+        )
+
+    work = tempfile.mkdtemp(prefix="twin-mock-")
+    compose_path = f"{work}/docker-compose.yml"
+    try:
+        with open(compose_path, "w") as f:
+            f.write(mock.get("dockerCompose") or "")
+        _run_compose(["docker", "compose", "-f", compose_path, "up", "-d"])
+        reachable = _wait_for_http(test_uri, timeout=health_timeout)
+    finally:
+        _run_compose(["docker", "compose", "-f", compose_path, "down", "-v"])
+        import shutil as _sh
+        _sh.rmtree(work, ignore_errors=True)
+
+    return urirun.ok(
+        mock=mock, reachable=reachable, reversible=True, simulated=False,
+        testUri=test_uri,
+        proof="compose-down-removes-all-state",
+        note=None if reachable else f"service not reachable at {test_uri} within {health_timeout}s",
+    )
+
+
+def _run_compose(cmd: list) -> tuple[int, str]:
+    import subprocess
+    try:
+        p = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+        return p.returncode, (p.stdout or "") + (p.stderr or "")
+    except Exception as exc:
+        return 1, str(exc)
+
+
+def _wait_for_http(url: str, *, timeout: float) -> bool:
+    import time as _t
+    import urllib.request
+    if not url:
+        return False
+    deadline = _t.monotonic() + timeout
+    while _t.monotonic() < deadline:
+        try:
+            with urllib.request.urlopen(url, timeout=2) as resp:
+                if resp.status < 400:
+                    return True
+        except Exception:
+            pass
+        _t.sleep(1)
+    return False
 
 
 @conn.handler("step/query/feasibility", meta={"label": "Check URI step feasibility"})
@@ -321,14 +424,21 @@ def flow_goal_verify(goal: dict | None = None, results: dict | None = None) -> d
 
 @conn.handler("flow/command/rollback-ledger",
               meta={"label": "Roll back reversible mutations from ledger"})
-def flow_rollback(ledger: list | None = None) -> dict:
+def flow_rollback(ledger: list | None = None, mesh: dict | None = None) -> dict:
     """Undo reversible mutations from a pre-built thin-driver ledger (LIFO).
 
     Each entry: {uri, inverse, args, before, after}.  Applies inverses in reverse
     order via v2_service.  Named rollback-ledger to avoid shadowing
     urirun.node.reversible's handler at twin://…/flow/command/rollback, which takes
-    {execution, mesh} and does full proof-by-re-scan."""
+    {execution, mesh} and does full proof-by-re-scan.
+
+    ``mesh`` is forwarded as the registry so mesh-routed inverses (kvm://, cdp://, etc.)
+    resolve correctly — without it, only in-process connectors are reachable.  The thin
+    driver passes mesh routes when it delegates rollback via this URI."""
     import urirun.v2_service as _svc
+    from urirun.node.routing import registry_from_routes  # noqa: PLC0415
+    routes = (mesh or {}).get("routes") or []
+    registry = registry_from_routes(routes)
     ledger = ledger or []
     if not ledger:
         return urirun.ok(undone=[], note="empty ledger")
@@ -338,7 +448,7 @@ def flow_rollback(ledger: list | None = None) -> dict:
         if not inv_uri:
             continue
         try:
-            rb = _svc.call(inv_uri, entry.get("args") or {}, {}, mode="execute")
+            rb = _svc.call(inv_uri, entry.get("args") or {}, registry, mode="execute")
         except Exception as exc:
             return {"ok": False, "undone": undone, "stuck": inv_uri, "error": str(exc)}
         if not rb.get("ok", True):
@@ -384,6 +494,60 @@ def step_evaluate(
             return urirun.ok(next="heal", diagnosis=diagnosis)
 
     return urirun.ok(next="rollback", reason=error.get("category"))
+
+
+@conn.handler("flow/command/execute",
+              meta={"label": "Execute a URI flow plan via the thin-driver"})
+def flow_execute(
+    flow: dict,
+    execute: bool = True,
+    max_retries: int = 1,
+    max_remediations: int = 6,
+    max_wall_clock: float = 180.0,
+) -> dict:
+    """Run a flow plan through the thin-driver path via URI dispatch.
+
+    Exposes execute_flow() as a URI boundary so callers can point to a different
+    twin connector (remote node, heavier executor, sandboxed runner) without changing
+    call sites.  Each step in the flow is dispatched through v2_service — the same
+    mesh routing the dashboard uses — so remote kvm:// and browser:// steps work
+    identically to in-process calls."""
+    import urirun.v2_service as _svc
+    from urirun.node.flow import execute_flow
+
+    mode = "execute" if execute else "dry-run"
+    dispatch = lambda uri, payload=None: _svc.call(uri, payload or {}, {}, mode=mode)
+    return execute_flow(
+        flow, {}, {}, execute=execute,
+        dispatch_uri=dispatch,
+        max_retries=max_retries,
+        max_remediations=max_remediations,
+        max_wall_clock=max_wall_clock,
+    )
+
+
+@conn.handler("flow/command/diagnose",
+              meta={"label": "Match a step error against the diagnostics playbook"})
+def flow_diagnose(
+    error: dict,
+    step: dict | None = None,
+    routes: list | None = None,
+    environment: dict | None = None,
+    surface: dict | None = None,
+) -> dict:
+    """URI boundary for the diagnostics playbook (diagnose()).
+
+    Replace this route with a smarter connector (e.g. LLM-augmented root-cause
+    analysis) without touching the flow engine.  Returns
+    {ok, found, rule, cause, confidence, remediation, autoApplicable} or
+    {ok, found: false} when no playbook rule matches."""
+    from urirun.node.diagnostics import diagnose
+
+    diagnosis = diagnose(error or {}, step=step, routes=routes or [],
+                         environment=environment, surface=surface)
+    if diagnosis is None:
+        return urirun.ok(found=False)
+    return urirun.ok(found=True, **diagnosis)
 
 
 @conn.handler("monitor/event", meta={"label": "Twin monitor SSE event marker"})

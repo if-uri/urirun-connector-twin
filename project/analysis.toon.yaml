@@ -1,0 +1,90 @@
+# code2llm | 18f 3327L | python:10,yaml:4,shell:2,json:1,toml:1 | 2026-06-26
+# generated in 0.00s
+# CC̅=4.6 | critical:4/94 | dups:0 | cycles:0
+
+HEALTH[4]:
+  🟡 CC    discover_browser_sessions CC=15 (limit:15)
+  🟡 CC    select_session CC=15 (limit:15)
+  🟡 CC    derive_task_target CC=22 (limit:15)
+  🟡 CC    steps_from_prompt CC=16 (limit:15)
+
+REFACTOR[1]:
+  1. split 4 high-CC methods  (CC>15)
+
+PIPELINES[22]:
+  [1] Src [discover_browser_sessions]: discover_browser_sessions → _proc_cmdlines
+      PURITY: 100% pure
+  [2] Src [probe_session]: probe_session → _cdp_pages
+      PURITY: 100% pure
+  [3] Src [select_best_session]: select_best_session
+      PURITY: 100% pure
+  [4] Src [environment_profile]: environment_profile → probe → _host_os_info
+      PURITY: 100% pure
+  [5] Src [constraints_from_profile]: constraints_from_profile → _safe_import
+      PURITY: 100% pure
+  [6] Src [browser_sessions]: browser_sessions → discover_browser_sessions → _proc_cmdline
+      PURITY: 100% pure
+  [7] Src [browser_profile]: browser_profile → discover_browser_sessions → _proc_cmdline
+      PURITY: 100% pure
+  [8] Src [plan_from_prompt_route]: plan_from_prompt_route → derive_task_target
+      PURITY: 100% pure
+  [9] Src [plan_annotate]: plan_annotate → build_imperative_plan → extract_steps_from_flow
+      PURITY: 100% pure
+  [10] Src [plan_generate]: plan_generate → probe → _host_os_info
+      PURITY: 100% pure
+  [11] Src [mock_create]: mock_create → probe → _host_os_info
+      PURITY: 100% pure
+  [12] Src [mock_start_probe_stop]: mock_start_probe_stop → probe → _host_os_info
+      PURITY: 100% pure
+  [13] Src [step_feasibility]: step_feasibility → probe → _host_os_info
+      PURITY: 100% pure
+  [14] Src [sandbox_probe]: sandbox_probe → probe_reversibility → _docker_available
+      PURITY: 100% pure
+  [15] Src [flow_preflight]: flow_preflight → _target_of
+      PURITY: 100% pure
+  [16] Src [flow_goal_verify]: flow_goal_verify
+      PURITY: 100% pure
+  [17] Src [flow_rollback]: flow_rollback
+      PURITY: 100% pure
+  [18] Src [step_evaluate]: step_evaluate
+      PURITY: 100% pure
+  [19] Src [monitor_event]: monitor_event
+      PURITY: 100% pure
+  [20] Src [bindings]: bindings
+      PURITY: 100% pure
+  [21] Src [manifest]: manifest
+      PURITY: 100% pure
+  [22] Src [main]: main
+      PURITY: 100% pure
+
+LAYERS:
+  urirun_connector_twin/          CC̄=4.6    ←in:0  →out:0
+  │ !! core                       512L  0C   26m  CC=13     ←0
+  │ session                    282L  0C    9m  CC=12     ←2
+  │ !! browser                    278L  0C   11m  CC=15     ←2
+  │ !! prompt_plan                256L  0C   18m  CC=22     ←1
+  │ sandbox                    162L  1C    8m  CC=6      ←1
+  │ environment                161L  0C    8m  CC=11     ←1
+  │ planner                    127L  0C    7m  CC=8      ←1
+  │ mock                       114L  0C    4m  CC=5      ←1
+  │ dispatch                    72L  0C    3m  CC=10     ←2
+  │ __init__                     4L  0C    0m  CC=0.0    ←0
+  │
+  ./                              CC̄=0.0    ←in:0  →out:0
+  │ !! connector.manifest.json    616L  0C    0m  CC=0.0    ←0
+  │ !! planfile.yaml              500L  0C    0m  CC=0.0    ←0
+  │ prefact.yaml                94L  0C    0m  CC=0.0    ←0
+  │ project.sh                  69L  0C    0m  CC=0.0    ←0
+  │ pyproject.toml              28L  0C    0m  CC=0.0    ←0
+  │ tree.sh                      4L  0C    0m  CC=0.0    ←0
+  │
+  testql-scenarios/               CC̄=0.0    ←in:0  →out:0
+  │ generated-from-pytests.testql.toon.yaml    28L  0C    0m  CC=0.0    ←0
+  │ generated-cli-tests.testql.toon.yaml    20L  0C    0m  CC=0.0    ←0
+  │
+
+COUPLING: no cross-package imports detected
+
+EXTERNAL:
+  validation: run `vallm batch .` → validation.toon
+  duplication: run `redup scan .` → duplication.toon

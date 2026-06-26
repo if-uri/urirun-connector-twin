@@ -1,0 +1,31 @@
+// LESS format — define @variables here as needed
+
+app {
+  name: urirun-connector-twin;
+  version: 0.1.0;
+}
+
+dependencies {
+  runtime: "urirun @ git+https://github.com/if-uri/urirun.git#subdirectory=adapters/python";
+  test: pytest>=8;
+}
+
+interface[type="cli"] {
+  framework: argparse;
+}
+interface[type="cli"] page[name="urirun-connector-twin"] {
+  entry: urirun_connector_twin.core:main;
+}
+
+tests {
+  import: testql-scenarios/**/*.testql.toon.yaml;
+}
+
+deploy {
+  target: pip;
+}
+
+environment[name="local"] {
+  runtime: python;
+  python_version: >=3.10;
+}

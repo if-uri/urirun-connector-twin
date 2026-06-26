@@ -1,0 +1,22 @@
+flowchart TD
+%% generated in 0.00s
+    urirun_connector_twin__browser["urirun_connector_twin.browser<br/>11 funcs"]
+    urirun_connector_twin__core["urirun_connector_twin.core<br/>26 funcs"]
+    urirun_connector_twin__dispatch["urirun_connector_twin.dispatch<br/>3 funcs"]
+    urirun_connector_twin__environment["urirun_connector_twin.environment<br/>8 funcs"]
+    urirun_connector_twin__mock["urirun_connector_twin.mock<br/>4 funcs"]
+    urirun_connector_twin__planner["urirun_connector_twin.planner<br/>7 funcs"]
+    urirun_connector_twin__prompt_plan["urirun_connector_twin.prompt_plan<br/>18 funcs"]
+    urirun_connector_twin__sandbox["urirun_connector_twin.sandbox<br/>8 funcs"]
+    urirun_connector_twin__session["urirun_connector_twin.session<br/>9 funcs"]
+    urirun_connector_twin__core ==>|7| urirun_connector_twin__environment
+    urirun_connector_twin__core ==>|7| urirun_connector_twin__planner
+    urirun_connector_twin__core ==>|5| urirun_connector_twin__browser
+    urirun_connector_twin__core ==>|4| urirun_connector_twin__mock
+    urirun_connector_twin__core ==>|4| urirun_connector_twin__dispatch
+    urirun_connector_twin__environment ==>|4| urirun_connector_twin__dispatch
+    urirun_connector_twin__core -->|2| urirun_connector_twin__session
+    urirun_connector_twin__core -->|2| urirun_connector_twin__sandbox
+    urirun_connector_twin__environment -->|2| urirun_connector_twin__browser
+    urirun_connector_twin__core -->|1| urirun_connector_twin__prompt_plan
+    urirun_connector_twin__environment -->|1| urirun_connector_twin__session

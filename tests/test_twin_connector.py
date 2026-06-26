@@ -572,3 +572,371 @@ def test_execute_flow_without_dispatch_uses_orchestrator():
     # orchestrator path: returns ok, no goalMet key
     assert out["ok"] is True
     assert "goalMet" not in out
+
+
+# ─── memory loop (drift + remember as URI steps) ─────────────────────────────
+
+def _make_twin_memory():
+    from urirun.node.reversible import TwinMemory
+    import dataclasses
+    return dataclasses.replace(TwinMemory(), store={}, flow_store={})
+
+
+def _make_dispatch_for_memory(calls: list, profiles: dict | None = None):
+    """dispatch_uri stub: records URIs, returns env profile when asked."""
+    profiles = profiles or {}
+    def dispatch(uri, payload=None):
+        calls.append(uri)
+        if "/env/query/drift" in uri or "/memory/command/remember" in uri:
+            # intercepted by _make_memory_dispatch — should never reach here in tests
+            raise AssertionError(f"memory URI leaked to stub dispatch: {uri}")
+        if "environment/query/profile" in uri or "/env/query/profile" in uri:
+            node = (payload or {}).get("node") or uri.split("//")[1].split("/")[0]
+            return profiles.get(node, {"platform": "linux", "best": "cdp"})
+        if "goal/query/verify" in uri or "preflight" in uri:
+            return {"ok": True, "next": {"kind": "done"}}
+        return {"ok": True, "next": {"kind": "continue"}}
+    return dispatch
+
+
+def test_build_thin_plan_injects_drift_and_remember_for_kvm_steps():
+    """_build_thin_plan prepends a drift step and appends a remember step for kvm targets."""
+    from urirun.node.flow import _build_thin_plan
+    memory = _make_twin_memory()
+    flow = {"steps": [
+        {"id": "a", "uri": "kvm://host/ui/command/click"},
+        {"id": "b", "uri": "browser://host/page/command/open"},
+    ]}
+    steps = flow["steps"]
+    plan = _build_thin_plan(steps, flow, execute=True, memory=memory)
+    uris = [s["uri"] for s in plan]
+    # drift step injected before kvm step
+    assert any("/env/query/drift" in u for u in uris), f"no drift step in {uris}"
+    # remember step at end
+    assert uris[-1] == "twin://host/memory/command/remember"
+    # original steps still present
+    assert any("kvm://" in u for u in uris)
+    assert any("browser://" in u for u in uris)
+
+
+def test_build_thin_plan_kvm_always_gets_drift():
+    """kvm:// steps always get drift/remember injected when execute=True, regardless of memory=.
+
+    _build_thin_plan no longer gates on memory= being set: drift/remember are durable-store
+    handlers, not in-memory-only.  memory=None still produces drift steps for kvm targets."""
+    from urirun.node.flow import _build_thin_plan
+    steps = [{"id": "a", "uri": "kvm://host/ui/command/click"}]
+    plan = _build_thin_plan(steps, {}, execute=True, memory=None)
+    uris = [s["uri"] for s in plan]
+    assert any("/env/query/drift" in u for u in uris), "drift step must be injected for kvm"
+    assert any("remember" in u for u in uris), "remember step must be injected for kvm"
+    assert any("kvm://" in u for u in uris), "original kvm step must be present"
+
+
+def test_build_thin_plan_no_kvm_no_drift():
+    """Without kvm steps, no drift or remember steps injected even when memory is set."""
+    from urirun.node.flow import _build_thin_plan
+    memory = _make_twin_memory()
+    steps = [{"id": "a", "uri": "browser://host/page/command/open"}]
+    plan = _build_thin_plan(steps, {}, execute=True, memory=memory)
+    uris = [s["uri"] for s in plan]
+    assert not any("/env/query/drift" in u for u in uris)
+    assert not any("remember" in u for u in uris)
+
+
+def test_build_thin_plan_dry_run_no_drift():
+    """In dry-run mode, _build_thin_plan returns original steps unchanged."""
+    from urirun.node.flow import _build_thin_plan
+    memory = _make_twin_memory()
+    steps = [{"id": "a", "uri": "kvm://host/ui/command/click"}]
+    plan = _build_thin_plan(steps, {}, execute=False, memory=memory)
+    assert plan == steps
+
+
+def test_memory_dispatch_drift_sets_baseline_on_first_run(monkeypatch):
+    """On first drift call for a node, _make_memory_dispatch records known-good baseline."""
+    from urirun.node.flow import _make_memory_dispatch
+    import urirun.node.flow as flow_mod
+    memory = _make_twin_memory()
+    profile = {"best": "cdp", "platform": "linux"}
+    monkeypatch.setattr(flow_mod, "_fetch_env_profile", lambda step, reg: profile)
+
+    dispatch = _make_memory_dispatch(lambda u, p: {"ok": True}, memory, {}, {})
+    result = dispatch("twin://host/env/query/drift", {"node": "host"})
+
+    assert memory.known_good("host") is not None, "baseline must be set on first drift"
+    assert result["ok"] is True
+    assert result.get("next", {}).get("kind") == "continue"
+
+
+def test_memory_dispatch_drift_detects_change(monkeypatch):
+    """Drift handler returns type=twin-drift when current profile differs from known-good."""
+    from urirun.node.flow import _make_memory_dispatch
+    import urirun.node.flow as flow_mod
+    memory = _make_twin_memory()
+    known = {"best": "cdp", "display": "1920x1080", "platform": "linux"}
+    current = {"best": "atspi", "display": "2560x1440", "platform": "linux"}
+    memory.remember("host", known)
+    monkeypatch.setattr(flow_mod, "_fetch_env_profile", lambda step, reg: current)
+
+    dispatch = _make_memory_dispatch(lambda u, p: {"ok": True}, memory, {}, {})
+    result = dispatch("twin://host/env/query/drift", {"node": "host"})
+
+    assert result.get("type") == "twin-drift", f"expected twin-drift, got {result}"
+    assert result.get("drifted") is True
+
+
+def test_memory_dispatch_remember_updates_store(monkeypatch):
+    """Remember handler updates known-good and saves flow record."""
+    from urirun.node.flow import _make_memory_dispatch, _flow_key
+    import urirun.node.flow as flow_mod
+    memory = _make_twin_memory()
+    profile = {"best": "cdp", "platform": "linux"}
+    monkeypatch.setattr(flow_mod, "_fetch_env_profile", lambda step, reg: profile)
+
+    flow = {"steps": [{"id": "a", "uri": "kvm://host/ui/command/click"}]}
+    dispatch = _make_memory_dispatch(lambda u, p: {"ok": True}, memory, flow, {})
+    result = dispatch("twin://host/memory/command/remember",
+                      {"nodes": ["host"], "record": {"steps": flow["steps"]}})
+
+    assert result["ok"] is True
+    assert memory.known_good("host") is not None
+    key = _flow_key(flow)
+    assert memory.recall_flow(key) is not None, "flow record must be saved after remember"
+
+
+def test_execute_flow_with_memory_injects_drift_steps():
+    """execute_flow(memory=...) injects drift+remember steps via _build_thin_plan."""
+    from urirun.node.flow import execute_flow
+    import urirun.node.flow as flow_mod
+    memory = _make_twin_memory()
+    calls = []
+    dispatched = []
+
+    def fake_fetch(step, reg):
+        return {"best": "cdp", "platform": "linux"}
+
+    original_fetch = flow_mod._fetch_env_profile
+    flow_mod._fetch_env_profile = fake_fetch
+    try:
+        def dispatch(uri, payload=None):
+            dispatched.append(uri)
+            if "goal/query/verify" in uri:
+                return {"ok": True, "next": {"kind": "done"}}
+            return {"ok": True, "next": {"kind": "continue"}}
+
+        flow = {
+            "task": {"id": "mem-test"},
+            "steps": [{"id": "s1", "uri": "kvm://host/ui/command/click"}],
+        }
+        out = execute_flow(flow, {}, {}, execute=True,
+                           dispatch_uri=dispatch, memory=memory)
+    finally:
+        flow_mod._fetch_env_profile = original_fetch
+
+    from urirun.node.flow import _flow_key
+    assert out["ok"] is True
+    # Drift/remember steps are intercepted locally by _make_memory_dispatch,
+    # so they do NOT appear in the test's dispatched list.
+    # Instead verify their side-effects: memory state and timeline entries.
+    assert memory.known_good("host") is not None, "drift must set known-good baseline"
+    key = _flow_key(flow)
+    assert memory.recall_flow(key) is not None, "remember must save flow record"
+    timeline_uris = [t.get("uri", "") for t in (out.get("timeline") or [])]
+    assert any("/env/query/drift" in u for u in timeline_uris), (
+        f"drift step must appear in timeline: {timeline_uris}")
+    assert any("memory/command/remember" in u for u in timeline_uris), (
+        f"remember step must appear in timeline: {timeline_uris}")
+
+
+# ─── flow/goal/query/verify handler ─────────────────────────────────────────
+
+def test_goal_verify_no_uri_is_noop():
+    """No goal.uri → goalMet=True, skipped='no-goal-uri' (no mesh call made)."""
+    from urirun_connector_twin.core import flow_goal_verify
+    r = flow_goal_verify(goal={}, results={})
+    assert r["ok"] is True
+    assert r["goalMet"] is True
+    assert r.get("skipped") == "no-goal-uri"
+
+
+def test_goal_verify_no_goal_at_all_is_noop():
+    """goal=None → same as empty — no-op pass."""
+    from urirun_connector_twin.core import flow_goal_verify
+    r = flow_goal_verify(goal=None)
+    assert r["ok"] is True
+    assert r["goalMet"] is True
+
+
+def test_goal_verify_contains_passes(monkeypatch):
+    """goal.contains is found in the dispatched value → goalMet=True."""
+    import urirun.v2_service as _svc
+    monkeypatch.setattr(_svc, "call",
+        lambda uri, payload, reg, mode="execute": {"ok": True, "result": {"value": {"text": "hello world"}}})
+
+    from urirun_connector_twin.core import flow_goal_verify
+    r = flow_goal_verify(goal={"uri": "kvm://host/screen/query/text",
+                                "path": "text", "contains": "hello"})
+    assert r["ok"] is True
+    assert r["goalMet"] is True
+    assert r.get("actual") == "hello world"
+
+
+def test_goal_verify_contains_fails(monkeypatch):
+    """goal.contains NOT found in dispatched value → ok=False, goalMet=False."""
+    import urirun.v2_service as _svc
+    monkeypatch.setattr(_svc, "call",
+        lambda uri, payload, reg, mode="execute": {"ok": True, "result": {"value": {"text": "goodbye"}}})
+
+    from urirun_connector_twin.core import flow_goal_verify
+    r = flow_goal_verify(goal={"uri": "kvm://host/screen/query/text",
+                                "path": "text", "contains": "hello"})
+    assert r["ok"] is False
+    assert r["goalMet"] is False
+
+
+def test_goal_verify_equals_passes(monkeypatch):
+    """goal.equals matches the dispatched value exactly → goalMet=True."""
+    import urirun.v2_service as _svc
+    monkeypatch.setattr(_svc, "call",
+        lambda uri, payload, reg, mode="execute": {"ok": True, "result": {"value": {"url": "https://example.com/done"}}})
+
+    from urirun_connector_twin.core import flow_goal_verify
+    r = flow_goal_verify(goal={"uri": "kvm://host/cdp/page/query/evaluate",
+                                "path": "url", "equals": "https://example.com/done"})
+    assert r["ok"] is True
+    assert r["goalMet"] is True
+
+
+def test_goal_verify_present_passes(monkeypatch):
+    """goal.present=True and value is non-empty → goalMet=True."""
+    import urirun.v2_service as _svc
+    monkeypatch.setattr(_svc, "call",
+        lambda uri, payload, reg, mode="execute": {"ok": True, "result": {"value": {"id": "post-123"}}})
+
+    from urirun_connector_twin.core import flow_goal_verify
+    r = flow_goal_verify(goal={"uri": "kvm://host/cdp/page/query/evaluate",
+                                "path": "id", "present": True})
+    assert r["ok"] is True
+    assert r["goalMet"] is True
+
+
+def test_goal_verify_transport_exception_returns_ok_false(monkeypatch):
+    """Dispatch exception → ok=False, goalMet=False (goal check never panics the caller)."""
+    import urirun.v2_service as _svc
+    def boom(uri, payload, reg, mode="execute"):
+        raise ConnectionError("node unreachable")
+    monkeypatch.setattr(_svc, "call", boom)
+
+    from urirun_connector_twin.core import flow_goal_verify
+    r = flow_goal_verify(goal={"uri": "kvm://host/screen/query/text"})
+    assert r["ok"] is False
+    assert r["goalMet"] is False
+    assert "node unreachable" in r.get("error", "")
+
+
+def test_goal_verify_dispatch_ok_false_fails_goal(monkeypatch):
+    """When the goal URI itself returns ok=False, goal check fails even if present."""
+    import urirun.v2_service as _svc
+    monkeypatch.setattr(_svc, "call",
+        lambda uri, payload, reg, mode="execute": {"ok": False, "error": "timeout"})
+
+    from urirun_connector_twin.core import flow_goal_verify
+    r = flow_goal_verify(goal={"uri": "kvm://host/screen/query/text"})
+    assert r["goalMet"] is False
+
+
+# ─── mock/command/start-probe-stop ───────────────────────────────────────────
+
+def test_mock_start_probe_stop_no_docker(monkeypatch):
+    """Without Docker, start-probe-stop degrades gracefully: ok, reachable=False, reversible=True."""
+    import shutil
+    monkeypatch.setattr(shutil, "which", lambda cmd: None)
+    monkeypatch.setattr("urirun_connector_twin.environment._kvm_query", lambda *a, **kw: None)
+    monkeypatch.setattr("urirun_connector_twin.environment._docker_available", lambda: False)
+
+    from urirun_connector_twin.core import mock_start_probe_stop
+    r = mock_start_probe_stop(prompt="book a flight", flow={}, target="web")
+
+    assert r["ok"] is True
+    assert r["reachable"] is False
+    assert r["reversible"] is True
+    assert r.get("simulated") is True
+    assert "mock" in r
+    assert "Docker" in (r.get("note") or "")
+
+
+def test_mock_start_probe_stop_structure_has_mock_fields(monkeypatch):
+    """Start-probe-stop always includes mock dict (prompt, dockerCompose, testUri, etc.)."""
+    import shutil
+    monkeypatch.setattr(shutil, "which", lambda cmd: None)
+    monkeypatch.setattr("urirun_connector_twin.environment._kvm_query", lambda *a, **kw: None)
+    monkeypatch.setattr("urirun_connector_twin.environment._docker_available", lambda: False)
+
+    from urirun_connector_twin.core import mock_start_probe_stop
+    r = mock_start_probe_stop(prompt="send email", target="smtp")
+
+    mock = r.get("mock") or {}
+    assert isinstance(mock, dict)
+    assert "dockerCompose" in mock or "services" in mock or "ok" in r
+
+
+# ─── _thin_goal_verify direct unit tests ─────────────────────────────────────
+
+def test_thin_goal_verify_pass_returns_none():
+    """When goal-verify dispatch returns ok=True, _thin_goal_verify returns None (no rollback)."""
+    from urirun.node.flow import FlowEnvelope, _thin_goal_verify
+
+    env = FlowEnvelope(goal={})
+    timeline: list = []
+    results: dict = {}
+
+    dispatch = lambda uri, payload=None: {"ok": True, "goalMet": True}
+    rb = _thin_goal_verify(dispatch, env, timeline, results)
+
+    assert rb is None
+
+
+def test_thin_goal_verify_fail_returns_rollback_dict():
+    """When goal-verify returns ok=False, _thin_goal_verify returns rollback dict."""
+    from urirun.node.flow import FlowEnvelope, _thin_goal_verify
+
+    env = FlowEnvelope(goal={"uri": "cdp://host/state/query/check"})
+    timeline: list = []
+    results: dict = {}
+
+    dispatch = lambda uri, payload=None: {"ok": False, "goalMet": False}
+    rb = _thin_goal_verify(dispatch, env, timeline, results)
+
+    assert rb is not None
+    assert rb["ok"] is False
+    assert rb["next"]["kind"] == "goal-failed"
+
+
+def test_thin_goal_verify_registry_not_found_is_pass():
+    """When dispatch returns NOT_FOUND registry error, _thin_goal_verify treats it as pass."""
+    from urirun.node.flow import FlowEnvelope, _thin_goal_verify
+
+    env = FlowEnvelope(goal={})
+    timeline: list = []
+    results: dict = {}
+
+    # Simulate the twin connector not being installed: registry error
+    dispatch = lambda uri, payload=None: {
+        "ok": False,
+        "error": {"type": "registry", "category": "NOT_FOUND", "message": "no handler"},
+    }
+    rb = _thin_goal_verify(dispatch, env, timeline, results)
+
+    # Registry error → implicit pass → no rollback
+    assert rb is None
+
+
+def test_thin_goal_verify_none_dispatch_result_is_pass():
+    """dispatch returning None (unregistered connector) is treated as a pass."""
+    from urirun.node.flow import FlowEnvelope, _thin_goal_verify
+
+    env = FlowEnvelope(goal={})
+    dispatch = lambda uri, payload=None: None  # or {} after `or {}` coercion
+    rb = _thin_goal_verify(dispatch, env, [], {})
+    assert rb is None

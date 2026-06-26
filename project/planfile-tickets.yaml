@@ -1,0 +1,551 @@
+source: code2llm
+# generated in 0.02s
+schema: code2llm.planfile_tickets.v1
+project_root: /home/tom/github/if-uri/urirun-connector-twin
+tickets:
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: _cdp_cookies'
+  description: 'code2llm reports `God Function: _cdp_cookies` in `urirun_connector_twin/browser.py:66`.
+
+
+    Function ''_cdp_cookies'' is oversized: CC=13, fan-out=22, mutations=30.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: high
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - urirun_connector_twin/browser.py
+  dedupe_key: 'code2llm:smell:god_function:urirun_connector_twin/browser.py:66:God
+    Function: _cdp_cookies'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: _cdp_ws_call'
+  description: 'code2llm reports `God Function: _cdp_ws_call` in `urirun_connector_twin/session.py:138`.
+
+
+    Function ''_cdp_ws_call'' is oversized: CC=11, fan-out=17, mutations=29.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: high
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - urirun_connector_twin/session.py
+  dedupe_key: 'code2llm:smell:god_function:urirun_connector_twin/session.py:138:God
+    Function: _cdp_ws_call'
+- signal: code2llm_smell_shotgun_surgery
+  title: 'Address code smell: Shotgun Surgery: domain'
+  description: 'code2llm reports `Shotgun Surgery: domain` in `urirun_connector_twin/core.py:129`.
+
+
+    Mutation of variable ''domain'' spans 5 functions. Changing this logic requires
+    work in many places.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: high
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - shotgun-surgery
+  files:
+  - urirun_connector_twin/core.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/core.py:129:Shotgun
+    Surgery: domain'
+- signal: code2llm_smell_shotgun_surgery
+  title: 'Address code smell: Shotgun Surgery: env'
+  description: 'code2llm reports `Shotgun Surgery: env` in `urirun_connector_twin/core.py:152`.
+
+
+    Mutation of variable ''env'' spans 7 functions. Changing this logic requires work
+    in many places.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: high
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - shotgun-surgery
+  files:
+  - urirun_connector_twin/core.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/core.py:152:Shotgun
+    Surgery: env'
+- signal: code2llm_smell_shotgun_surgery
+  title: 'Address code smell: Shotgun Surgery: m'
+  description: 'code2llm reports `Shotgun Surgery: m` in `urirun_connector_twin/prompt_plan.py:37`.
+
+
+    Mutation of variable ''m'' spans 6 functions. Changing this logic requires work
+    in many places.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: high
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - shotgun-surgery
+  files:
+  - urirun_connector_twin/prompt_plan.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/prompt_plan.py:37:Shotgun
+    Surgery: m'
+- signal: code2llm_smell_shotgun_surgery
+  title: 'Address code smell: Shotgun Surgery: plan'
+  description: 'code2llm reports `Shotgun Surgery: plan` in `urirun_connector_twin/core.py:152`.
+
+
+    Mutation of variable ''plan'' spans 6 functions. Changing this logic requires
+    work in many places.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: high
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - shotgun-surgery
+  files:
+  - urirun_connector_twin/core.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/core.py:152:Shotgun
+    Surgery: plan'
+- signal: code2llm_smell_shotgun_surgery
+  title: 'Address code smell: Shotgun Surgery: r'
+  description: 'code2llm reports `Shotgun Surgery: r` in `urirun_connector_twin/core.py:152`.
+
+
+    Mutation of variable ''r'' spans 6 functions. Changing this logic requires work
+    in many places.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: high
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - shotgun-surgery
+  files:
+  - urirun_connector_twin/core.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/core.py:152:Shotgun
+    Surgery: r'
+- signal: code2llm_smell_shotgun_surgery
+  title: 'Address code smell: Shotgun Surgery: raw'
+  description: 'code2llm reports `Shotgun Surgery: raw` in `urirun_connector_twin/session.py:138`.
+
+
+    Mutation of variable ''raw'' spans 6 functions. Changing this logic requires work
+    in many places.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: high
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - shotgun-surgery
+  files:
+  - urirun_connector_twin/session.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/session.py:138:Shotgun
+    Surgery: raw'
+- signal: code2llm_smell_shotgun_surgery
+  title: 'Address code smell: Shotgun Surgery: result'
+  description: 'code2llm reports `Shotgun Surgery: result` in `urirun_connector_twin/session.py:138`.
+
+
+    Mutation of variable ''result'' spans 6 functions. Changing this logic requires
+    work in many places.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: high
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - shotgun-surgery
+  files:
+  - urirun_connector_twin/session.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/session.py:138:Shotgun
+    Surgery: result'
+- signal: code2llm_smell_shotgun_surgery
+  title: 'Address code smell: Shotgun Surgery: s'
+  description: 'code2llm reports `Shotgun Surgery: s` in `urirun_connector_twin/session.py:138`.
+
+
+    Mutation of variable ''s'' spans 6 functions. Changing this logic requires work
+    in many places.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: high
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - shotgun-surgery
+  files:
+  - urirun_connector_twin/session.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/session.py:138:Shotgun
+    Surgery: s'
+- signal: code2llm_smell_shotgun_surgery
+  title: 'Address code smell: Shotgun Surgery: sessions'
+  description: 'code2llm reports `Shotgun Surgery: sessions` in `urirun_connector_twin/core.py:115`.
+
+
+    Mutation of variable ''sessions'' spans 6 functions. Changing this logic requires
+    work in many places.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: high
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - shotgun-surgery
+  files:
+  - urirun_connector_twin/core.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/core.py:115:Shotgun
+    Surgery: sessions'
+- signal: code2llm_smell_shotgun_surgery
+  title: 'Address code smell: Shotgun Surgery: steps'
+  description: 'code2llm reports `Shotgun Surgery: steps` in `urirun_connector_twin/planner.py:106`.
+
+
+    Mutation of variable ''steps'' spans 5 functions. Changing this logic requires
+    work in many places.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: high
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - shotgun-surgery
+  files:
+  - urirun_connector_twin/planner.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/planner.py:106:Shotgun
+    Surgery: steps'
+- signal: code2llm_smell_shotgun_surgery
+  title: 'Address code smell: Shotgun Surgery: url'
+  description: 'code2llm reports `Shotgun Surgery: url` in `urirun_connector_twin/session.py:138`.
+
+
+    Mutation of variable ''url'' spans 7 functions. Changing this logic requires work
+    in many places.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: high
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - shotgun-surgery
+  files:
+  - urirun_connector_twin/session.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:urirun_connector_twin/session.py:138:Shotgun
+    Surgery: url'
+- signal: code2llm_cc
+  title: 'Reduce cyclomatic complexity: urirun_connector_twin.browser.discover_browser_sessions
+    (CC=15)'
+  description: 'code2llm reports `urirun_connector_twin.browser.discover_browser_sessions`
+    at `urirun_connector_twin/browser.py:150` with cyclomatic complexity 15 (limit
+    15).
+
+
+    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
+    code2llm after the change and keep tests green.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - complexity
+  - refactor
+  files:
+  - urirun_connector_twin/browser.py
+  dedupe_key: code2llm:cc:urirun_connector_twin/browser.py:urirun_connector_twin.browser.discover_browser_sessions
+- signal: code2llm_cc
+  title: 'Reduce cyclomatic complexity: urirun_connector_twin.browser.select_session
+    (CC=15)'
+  description: 'code2llm reports `urirun_connector_twin.browser.select_session` at
+    `urirun_connector_twin/browser.py:202` with cyclomatic complexity 15 (limit 15).
+
+
+    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
+    code2llm after the change and keep tests green.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - complexity
+  - refactor
+  files:
+  - urirun_connector_twin/browser.py
+  dedupe_key: code2llm:cc:urirun_connector_twin/browser.py:urirun_connector_twin.browser.select_session
+- signal: code2llm_cc
+  title: 'Reduce cyclomatic complexity: urirun_connector_twin.prompt_plan.derive_task_target
+    (CC=22)'
+  description: 'code2llm reports `urirun_connector_twin.prompt_plan.derive_task_target`
+    at `urirun_connector_twin/prompt_plan.py:158` with cyclomatic complexity 22 (limit
+    15).
+
+
+    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
+    code2llm after the change and keep tests green.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - complexity
+  - refactor
+  files:
+  - urirun_connector_twin/prompt_plan.py
+  dedupe_key: code2llm:cc:urirun_connector_twin/prompt_plan.py:urirun_connector_twin.prompt_plan.derive_task_target
+- signal: code2llm_cc
+  title: 'Reduce cyclomatic complexity: urirun_connector_twin.prompt_plan.steps_from_prompt
+    (CC=16)'
+  description: 'code2llm reports `urirun_connector_twin.prompt_plan.steps_from_prompt`
+    at `urirun_connector_twin/prompt_plan.py:195` with cyclomatic complexity 16 (limit
+    15).
+
+
+    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
+    code2llm after the change and keep tests green.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - complexity
+  - refactor
+  files:
+  - urirun_connector_twin/prompt_plan.py
+  dedupe_key: code2llm:cc:urirun_connector_twin/prompt_plan.py:urirun_connector_twin.prompt_plan.steps_from_prompt
+- signal: code2llm_smell_data_clump
+  title: 'Address code smell: Data Clump: prompt, env, flow'
+  description: 'code2llm reports `Data Clump: prompt, env, flow` in `urirun_connector_twin/planner.py:106`.
+
+
+    Arguments (prompt, env, flow) are used together in multiple functions: urirun_connector_twin.planner.build_imperative_plan,
+    urirun_connector_twin.core.plan_annotate.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - data-clump
+  files:
+  - urirun_connector_twin/planner.py
+  dedupe_key: 'code2llm:smell:data_clump:urirun_connector_twin/planner.py:106:Data
+    Clump: prompt, env, flow'
+- signal: code2llm_smell_data_clump
+  title: 'Address code smell: Data Clump: prompt, env, flow'
+  description: 'code2llm reports `Data Clump: prompt, env, flow` in `urirun_connector_twin/core.py:199`.
+
+
+    Arguments (prompt, env, flow) are used together in multiple functions: urirun_connector_twin.planner.build_imperative_plan,
+    urirun_connector_twin.core.plan_annotate.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - data-clump
+  files:
+  - urirun_connector_twin/core.py
+  dedupe_key: 'code2llm:smell:data_clump:urirun_connector_twin/core.py:199:Data Clump:
+    prompt, env, flow'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: _docker_probe'
+  description: 'code2llm reports `God Function: _docker_probe` in `urirun_connector_twin/sandbox.py:117`.
+
+
+    Function ''_docker_probe'' is oversized: CC=1, fan-out=5, mutations=12.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - urirun_connector_twin/sandbox.py
+  dedupe_key: 'code2llm:smell:god_function:urirun_connector_twin/sandbox.py:117:God
+    Function: _docker_probe'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: _extract_chrome_info'
+  description: 'code2llm reports `God Function: _extract_chrome_info` in `urirun_connector_twin/session.py:84`.
+
+
+    Function ''_extract_chrome_info'' is oversized: CC=9, fan-out=6, mutations=7.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - urirun_connector_twin/session.py
+  dedupe_key: 'code2llm:smell:god_function:urirun_connector_twin/session.py:84:God
+    Function: _extract_chrome_info'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: annotate_steps'
+  description: 'code2llm reports `God Function: annotate_steps` in `urirun_connector_twin/planner.py:76`.
+
+
+    Function ''annotate_steps'' is oversized: CC=8, fan-out=9, mutations=10.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - urirun_connector_twin/planner.py
+  dedupe_key: 'code2llm:smell:god_function:urirun_connector_twin/planner.py:76:God
+    Function: annotate_steps'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: flow_preflight'
+  description: 'code2llm reports `God Function: flow_preflight` in `urirun_connector_twin/core.py:361`.
+
+
+    Function ''flow_preflight'' is oversized: CC=9, fan-out=12, mutations=7.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - urirun_connector_twin/core.py
+  dedupe_key: 'code2llm:smell:god_function:urirun_connector_twin/core.py:361:God Function:
+    flow_preflight'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: mock_start_probe_stop'
+  description: 'code2llm reports `God Function: mock_start_probe_stop` in `urirun_connector_twin/core.py:240`.
+
+
+    Function ''mock_start_probe_stop'' is oversized: CC=7, fan-out=13, mutations=7.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - urirun_connector_twin/core.py
+  dedupe_key: 'code2llm:smell:god_function:urirun_connector_twin/core.py:240:God Function:
+    mock_start_probe_stop'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: plan_from_prompt_route'
+  description: 'code2llm reports `God Function: plan_from_prompt_route` in `urirun_connector_twin/core.py:152`.
+
+
+    Function ''plan_from_prompt_route'' is oversized: CC=13, fan-out=12, mutations=9.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - urirun_connector_twin/core.py
+  dedupe_key: 'code2llm:smell:god_function:urirun_connector_twin/core.py:152:God Function:
+    plan_from_prompt_route'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: probe'
+  description: 'code2llm reports `God Function: probe` in `urirun_connector_twin/environment.py:107`.
+
+
+    Function ''probe'' is oversized: CC=11, fan-out=11, mutations=13.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - urirun_connector_twin/environment.py
+  dedupe_key: 'code2llm:smell:god_function:urirun_connector_twin/environment.py:107:God
+    Function: probe'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: probe_session'
+  description: 'code2llm reports `God Function: probe_session` in `urirun_connector_twin/session.py:209`.
+
+
+    Function ''probe_session'' is oversized: CC=12, fan-out=5, mutations=14.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - urirun_connector_twin/session.py
+  dedupe_key: 'code2llm:smell:god_function:urirun_connector_twin/session.py:209:God
+    Function: probe_session'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: select_best_session'
+  description: 'code2llm reports `God Function: select_best_session` in `urirun_connector_twin/session.py:238`.
+
+
+    Function ''select_best_session'' is oversized: CC=12, fan-out=2, mutations=8.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - urirun_connector_twin/session.py
+  dedupe_key: 'code2llm:smell:god_function:urirun_connector_twin/session.py:238:God
+    Function: select_best_session'
+applied: []
+skipped: []

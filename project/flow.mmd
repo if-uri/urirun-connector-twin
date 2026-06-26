@@ -1,0 +1,26 @@
+flowchart TD
+%% generated in 0.00s
+
+    %% Entry points (blue)
+    classDef entry fill:#4dabf7,stroke:#1971c2,color:#fff
+
+    subgraph Core
+        urirun_connector_twin__browser___cdp_pages["_cdp_pages"]
+        urirun_connector_twin__browser___cdp_cookies("_cdp_cookies CC=13")
+        urirun_connector_twin__browser__discover_browser_sessions{{discover_browser_sessions CC=15}}
+        urirun_connector_twin__browser__select_session{{select_session CC=15}}
+        urirun_connector_twin__dispatch__set_transport["set_transport"]
+        urirun_connector_twin__session__discover_browser_sessions["discover_browser_sessions"]
+        urirun_connector_twin__session__probe_session["probe_session"]
+        urirun_connector_twin__session__select_best_session["select_best_session"]
+        urirun_connector_twin__prompt_plan___file_write_steps["_file_write_steps"]
+        urirun_connector_twin__prompt_plan__derive_task_target{{derive_task_target CC=22}}
+        urirun_connector_twin__prompt_plan__steps_from_prompt{{steps_from_prompt CC=16}}
+        urirun_connector_twin__core__environment_profile["environment_profile"]
+        urirun_connector_twin__core__constraints_from_profile["constraints_from_profile"]
+        urirun_connector_twin__core__browser_sessions["browser_sessions"]
+        urirun_connector_twin__core__browser_profile["browser_profile"]
+        ...["+17 more"]
+    end
+
+    class urirun_connector_twin__dispatch__set_transport,urirun_connector_twin__session__discover_browser_sessions,urirun_connector_twin__session__probe_session,urirun_connector_twin__session__select_best_session,urirun_connector_twin__prompt_plan___file_write_steps,urirun_connector_twin__core__environment_profile,urirun_connector_twin__core__constraints_from_profile,urirun_connector_twin__core__browser_sessions,urirun_connector_twin__core__browser_profile,urirun_connector_twin__core__plan_from_prompt_route entry

@@ -1,0 +1,500 @@
+name: Code Quality Improvement
+project_name: ''
+project_type: prefactoring
+domain: dev-tools
+goal: Improve code quality using prefact
+goals:
+- Fix all prefact-detected issues
+- Improve code maintainability
+- Ensure consistent code style
+quality_gates:
+- metric: Prefact Issues
+  threshold: '0'
+sprints:
+- id: sprint-1
+  name: Code Quality Improvements
+  duration: 2 weeks
+  objectives:
+  - Fix code quality issues
+  task_patterns:
+  - id: ticket-31f44714
+    name: Fix smart-return-type issues
+    description: Resolve 18 smart-return-type issues in tests/test_rollback_parity.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - tests/test_rollback_parity.py
+    rule_id: smart-return-type
+    count: 18
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-32dd4cb7
+    name: Fix unused-imports issues
+    description: Resolve 6 unused-imports issues in tests/test_rollback_parity.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - tests/test_rollback_parity.py
+    rule_id: unused-imports
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-9a390528
+    name: Fix smart-return-type issues
+    description: Resolve 31 smart-return-type issues in tests/test_session.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - tests/test_session.py
+    rule_id: smart-return-type
+    count: 31
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-590ecc1e
+    name: Fix unused-imports issues
+    description: Resolve 8 unused-imports issues in tests/test_session.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - tests/test_session.py
+    rule_id: unused-imports
+    count: 8
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-2d16655a
+    name: Fix smart-return-type issues
+    description: Resolve 32 smart-return-type issues in tests/test_browser_session.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - tests/test_browser_session.py
+    rule_id: smart-return-type
+    count: 32
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-57d5ac00
+    name: Fix unused-imports issues
+    description: Resolve 8 unused-imports issues in tests/test_browser_session.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - tests/test_browser_session.py
+    rule_id: unused-imports
+    count: 8
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-296b3125
+    name: Fix string-concat issues
+    description: Resolve 2 string-concat issues in urirun_connector_twin/browser.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - urirun_connector_twin/browser.py
+    rule_id: string-concat
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-60e40929
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in urirun_connector_twin/browser.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - urirun_connector_twin/browser.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-9f4667e3
+    name: Fix magic-numbers issues
+    description: Resolve 6 magic-numbers issues in urirun_connector_twin/browser.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - urirun_connector_twin/browser.py
+    rule_id: magic-numbers
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-00920965
+    name: Fix relative-imports issues
+    description: Resolve 2 relative-imports issues in urirun_connector_twin/__init__.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - urirun_connector_twin/__init__.py
+    rule_id: relative-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-22d66b2c
+    name: Fix smart-return-type issues
+    description: Resolve 22 smart-return-type issues in tests/test_dispatch.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - tests/test_dispatch.py
+    rule_id: smart-return-type
+    count: 22
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-595e6671
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in tests/test_dispatch.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - tests/test_dispatch.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-1c2fbf2f
+    name: Fix smart-return-type issues
+    description: Resolve 50 smart-return-type issues in tests/test_twin_connector.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - tests/test_twin_connector.py
+    rule_id: smart-return-type
+    count: 50
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-7416e32c
+    name: Fix unused-imports issues
+    description: Resolve 0 unused-imports issues in tests/test_twin_connector.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - tests/test_twin_connector.py
+    rule_id: unused-imports
+    count: 0
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-b57ba373
+    name: Fix llm-hallucinations issues
+    description: Resolve 0 llm-hallucinations issues in tests/test_twin_connector.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - tests/test_twin_connector.py
+    rule_id: llm-hallucinations
+    count: 0
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-70c03ae3
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in urirun_connector_twin/dispatch.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - urirun_connector_twin/dispatch.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-91d0d5bd
+    name: Fix relative-imports issues
+    description: Resolve 14 relative-imports issues in urirun_connector_twin/core.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - urirun_connector_twin/core.py
+    rule_id: relative-imports
+    count: 14
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-9069f2b8
+    name: Fix string-concat issues
+    description: Resolve 2 string-concat issues in urirun_connector_twin/core.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - urirun_connector_twin/core.py
+    rule_id: string-concat
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-f1db3967
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in urirun_connector_twin/core.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - urirun_connector_twin/core.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-0395164b
+    name: Fix magic-numbers issues
+    description: Resolve 3 magic-numbers issues in urirun_connector_twin/core.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - urirun_connector_twin/core.py
+    rule_id: magic-numbers
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-983d6f09
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in urirun_connector_twin/core.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - urirun_connector_twin/core.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-8f0c8579
+    name: Fix relative-imports issues
+    description: Resolve 6 relative-imports issues in urirun_connector_twin/environment.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - urirun_connector_twin/environment.py
+    rule_id: relative-imports
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-1da6ebdb
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in urirun_connector_twin/environment.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - urirun_connector_twin/environment.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-a3328279
+    name: Fix string-concat issues
+    description: Resolve 2 string-concat issues in urirun_connector_twin/mock.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - urirun_connector_twin/mock.py
+    rule_id: string-concat
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-06934646
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in urirun_connector_twin/mock.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - urirun_connector_twin/mock.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-43f31800
+    name: Fix magic-numbers issues
+    description: Resolve 4 magic-numbers issues in urirun_connector_twin/mock.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - urirun_connector_twin/mock.py
+    rule_id: magic-numbers
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-48bbe1d4
+    name: Fix string-concat issues
+    description: Resolve 1 string-concat issues in urirun_connector_twin/planner.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - urirun_connector_twin/planner.py
+    rule_id: string-concat
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-8ed0154b
+    name: Fix unused-imports issues
+    description: Resolve 6 unused-imports issues in urirun_connector_twin/planner.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - urirun_connector_twin/planner.py
+    rule_id: unused-imports
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-d6d48725
+    name: Fix string-concat issues
+    description: Resolve 2 string-concat issues in urirun_connector_twin/session.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - urirun_connector_twin/session.py
+    rule_id: string-concat
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-ddf72135
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in urirun_connector_twin/session.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - urirun_connector_twin/session.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-ad722606
+    name: Fix magic-numbers issues
+    description: Resolve 2 magic-numbers issues in urirun_connector_twin/session.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - urirun_connector_twin/session.py
+    rule_id: magic-numbers
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-d8be57b8
+    name: Fix string-concat issues
+    description: Resolve 1 string-concat issues in urirun_connector_twin/sandbox.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - urirun_connector_twin/sandbox.py
+    rule_id: string-concat
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-9576f14b
+    name: Fix unused-imports issues
+    description: Resolve 10 unused-imports issues in urirun_connector_twin/sandbox.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - urirun_connector_twin/sandbox.py
+    rule_id: unused-imports
+    count: 10
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-20440265
+    name: Fix string-concat issues
+    description: Resolve 2 string-concat issues in urirun_connector_twin/prompt_plan.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - urirun_connector_twin/prompt_plan.py
+    rule_id: string-concat
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-26275cdc
+    name: Fix unused-imports issues
+    description: Resolve 6 unused-imports issues in urirun_connector_twin/prompt_plan.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - urirun_connector_twin/prompt_plan.py
+    rule_id: unused-imports
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-2dbec027
+    name: Fix magic-numbers issues
+    description: Resolve 2 magic-numbers issues in urirun_connector_twin/prompt_plan.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - urirun_connector_twin/prompt_plan.py
+    rule_id: magic-numbers
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-2b752b46
+    name: Fix llm-generated-code issues
+    description: Resolve 1 llm-generated-code issues in urirun_connector_twin/prompt_plan.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - urirun_connector_twin/prompt_plan.py
+    rule_id: llm-generated-code
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced

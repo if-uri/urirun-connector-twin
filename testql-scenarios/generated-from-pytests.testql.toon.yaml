@@ -1,0 +1,28 @@
+# SCENARIO: Auto-generated from Python Tests
+# TYPE: integration
+# GENERATED: true
+
+CONFIG[2]{key, value}:
+  base_url, ${api_url:-http://localhost:8101}
+  timeout_ms, 10000
+
+# Converted 18 assertions from pytest
+ASSERT[18]{field, operator, expected}:
+  len(env.ledger), ==, 2
+  inverse_calls, ==, ["inverse-b"
+  _extract_url("open https://linkedin.com/feed now"), ==, "https://linkedin.com/feed"
+  _extract_domain("go to https://github.com/if-uri"), ==, "github.com"
+  t.taskType, ==, "browser-open"
+  t.url, ==, "https://github.com"
+  sel.mode, ==, "attach"
+  sel.port, ==, 9333
+  sel.profileType, ==, "real"
+  len(env.ledger), ==, 2
+  inverse_calls, ==, ["inverse-b"
+  _extract_url("open https://linkedin.com/feed now"), ==, "https://linkedin.com/feed"
+  _extract_domain("go to https://github.com/if-uri"), ==, "github.com"
+  t.taskType, ==, "browser-open"
+  t.url, ==, "https://github.com"
+  sel.mode, ==, "attach"
+  sel.port, ==, 9333
+  sel.profileType, ==, "real"

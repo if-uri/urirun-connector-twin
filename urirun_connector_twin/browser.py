@@ -250,6 +250,55 @@ def select_session(sessions: list[dict], domain: str, needs_auth: bool = False) 
     }
 
 
+def _extract_chrome_info(argv: list[bytes]) -> "dict | None":
+    """Compat shim: combine _is_browser + _extract_flag into the shape session.py exported.
+
+    session.py is now a re-export shim; this function is the canonical implementation."""
+    if not _is_browser(argv):
+        return None
+    port_str = _extract_flag(argv, "remote-debugging-port")
+    if not port_str:
+        return None
+    try:
+        port = int(port_str)
+    except ValueError:
+        return None
+    data_dir = _extract_flag(argv, "user-data-dir") or ""
+    return {"port": port, "userDataDir": data_dir}
+
+
+def select_best_session(sessions: list[dict], task: dict) -> dict:
+    """Compat shim for session.select_best_session(sessions, task_dict).
+
+    Maps the task-dict shape (from session.py) onto select_session's explicit params.
+    session.py is now a re-export shim; core.py uses select_session() directly."""
+    domain = str(task.get("domain") or "")
+    needs_auth = bool(task.get("needsAuth"))
+    reachable = [s for s in sessions if s.get("reachable")]
+    if not reachable:
+        return {"mode": "no-chrome", "port": None, "reason": "no reachable Chrome processes found"}
+
+    # Try session with authConfirmed + authCookie (session.py shape — old probe_session path)
+    if needs_auth:
+        for s in reachable:
+            if s.get("authConfirmed") and s.get("authCookie"):
+                return {"mode": "attach", "port": s["port"],
+                        "userDataDir": s.get("userDataDir"),
+                        "authCookie": s["authCookie"]}
+        # holdsTarget: session holds a tab on the target domain
+        for s in reachable:
+            if s.get("holdsTarget"):
+                return {"mode": "attach", "port": s["port"],
+                        "userDataDir": s.get("userDataDir"),
+                        "authCookie": s.get("authCookie")}
+        return {"mode": "needs-login", "port": None,
+                "reason": f"no authenticated session for {domain or 'requested site'} found"}
+
+    # No auth needed: any reachable session is fine
+    s = reachable[0]
+    return {"mode": "attach", "port": s["port"], "userDataDir": s.get("userDataDir")}
+
+
 def _domain_key(domain: str) -> str:
     """Map a domain/URL/service name to the _AUTH_COOKIES key."""
     d = domain.lower()

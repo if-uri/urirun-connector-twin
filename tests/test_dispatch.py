@@ -138,3 +138,71 @@ def test_plan_from_prompt_route_fallback_when_no_transport():
     assert r["ok"] is True
     assert "plan" in r
 
+
+def test_plan_from_prompt_route_calls_annotate_uri():
+    """plan_from_prompt_route calls twin://host/plan/command/annotate via uri_call (step ③)."""
+    transport_calls = []
+
+    def fake(uri, payload):
+        transport_calls.append(uri)
+        if "environment" in uri:
+            return {"ok": True, "node": "laptop", "bestSurface": "cdp",
+                    "controllable": True, "constraints": [], "warnings": [],
+                    "dockerAvailable": True, "sessionSelection": {}}
+        if "plan/command/annotate" in uri:
+            flow = payload.get("flow") or {}
+            env  = payload.get("env") or {}
+            from urirun_connector_twin.planner import build_imperative_plan
+            plan = build_imperative_plan(flow, env, prompt=payload.get("prompt", ""))
+            return {"ok": True, "plan": plan}
+        return {"ok": True}
+
+    _d.set_transport(fake)
+    from urirun_connector_twin.core import plan_from_prompt_route
+    r = plan_from_prompt_route("take a screenshot", node="laptop", probe_browser=False)
+    assert r["ok"] is True
+    annotate_calls = [u for u in transport_calls if "plan/command/annotate" in u]
+    assert len(annotate_calls) == 1, f"annotate URI not called; got: {transport_calls}"
+
+
+def test_plan_annotate_handler_returns_plan():
+    """plan_annotate handler wraps build_imperative_plan and returns {ok, plan}."""
+    from urirun_connector_twin.core import plan_annotate
+    env = {"node": "laptop", "bestSurface": "cdp", "controllable": True,
+           "dockerAvailable": True, "constraints": [], "warnings": []}
+    flow = {"steps": [
+        {"id": "nav", "uri": "kvm://laptop/cdp/page/command/navigate", "payload": {}},
+    ]}
+    r = plan_annotate(flow=flow, env=env, prompt="test")
+    assert r["ok"] is True
+    assert "plan" in r
+    plan = r["plan"]
+    assert plan["totalSteps"] == 1
+    assert plan["feasibleSteps"] == 1
+
+
+def test_all_three_from_prompt_steps_use_uri():
+    """Prove ①②③ are all switchable: replace all three transport responses.
+
+    When a transport provides all three URIs, plan_from_prompt_route must return
+    whatever the transport put in 'plan' — no in-process fallback is taken."""
+    injected_plan = {"steps": [{"id": "stub", "uri": "test://host/x", "feasible": True}],
+                     "totalSteps": 1, "feasibleSteps": 1, "infeasibleSteps": 0,
+                     "irreversibleSteps": 0, "needsMock": False, "node": "remote",
+                     "environment": {}, "prompt": "via-transport"}
+
+    def fake(uri, payload):
+        if "environment" in uri:
+            return {"ok": True, "node": "remote", "bestSurface": "cdp",
+                    "controllable": True, "constraints": [], "warnings": [],
+                    "dockerAvailable": True, "sessionSelection": {}}
+        if "plan/command/annotate" in uri:
+            return {"ok": True, "plan": injected_plan}
+        return {"ok": True}
+
+    _d.set_transport(fake)
+    from urirun_connector_twin.core import plan_from_prompt_route
+    r = plan_from_prompt_route("test task", node="remote", probe_browser=False)
+    assert r["ok"] is True
+    assert r["plan"] is injected_plan, "plan must come from transport, not in-process fallback"
+

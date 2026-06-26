@@ -65,6 +65,19 @@ def _detect_service(prompt: str, uris: list[str]) -> str:
     return "web"
 
 
+def _resolve_service(target: str | None, prompt: str, uris: list[str]) -> str:
+    """Resolve a service key from an optional target domain or prompt/URIs."""
+    if target:
+        # exact key match (e.g. "linkedin")
+        if target in _SERVICE_MOCKS:
+            return target
+        # domain match (e.g. "linkedin.com" → "linkedin")
+        for svc in _SERVICE_MOCKS:
+            if svc in target.lower():
+                return svc
+    return _detect_service(prompt, uris)
+
+
 def _compose_yaml(service: str, spec: dict) -> str:
     env_lines = "\n".join(f"      - {k}={v}" for k, v in spec["env"].items())
     env_block = f"\n    environment:\n{env_lines}" if env_lines else ""
@@ -83,7 +96,7 @@ def generate_mock(prompt: str, plan: dict, target: str | None = None) -> dict:
     """Return a Docker mock spec for the given plan's infeasible/unreachable steps."""
     infeasible_uris = [s["uri"] for s in plan.get("steps", []) if not s.get("feasible")]
     all_uris = [s["uri"] for s in plan.get("steps", [])]
-    svc = target or _detect_service(prompt, infeasible_uris or all_uris)
+    svc = _resolve_service(target, prompt, infeasible_uris or all_uris)
     spec = _SERVICE_MOCKS.get(svc, _DEFAULT_MOCK)
     compose = _compose_yaml(svc, spec)
     return {
