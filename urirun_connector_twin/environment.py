@@ -104,6 +104,18 @@ def _probe_browser(task: dict) -> dict:
     return {"sessions": sessions, "selection": selection, "task": task}
 
 
+def _host_has_kvm_binding() -> bool:
+    """Return True when the kvm connector is installed in this Python environment."""
+    try:
+        import importlib.metadata as _meta
+        return any(
+            "kvm" in str(ep).lower()
+            for ep in _meta.entry_points(group="urirun.bindings")
+        )
+    except Exception:
+        return False
+
+
 def probe(node: str | None = None, prompt: str = "") -> dict:
     """Return a unified environment snapshot for the given node (or localhost).
 
@@ -129,6 +141,9 @@ def probe(node: str | None = None, prompt: str = "") -> dict:
         else:
             warnings.append(f"kvm://{node}/surface/query/current unreachable")
 
+    # When no remote node is selected, check if the host itself can capture the screen.
+    host_kvm_missing = not node and not _host_has_kvm_binding()
+
     action_matrix = profile.get("actionMatrix") or {}
     constraints = _constraints_via_uri(action_matrix)
 
@@ -144,6 +159,17 @@ def probe(node: str | None = None, prompt: str = "") -> dict:
             "reason": (f"Node '{node}' environment unreachable — kvm connector not installed "
                        "or node offline"),
             "fix": f"urirun host ensure {node} kvm",
+        })
+
+    if host_kvm_missing:
+        # No remote node selected AND host doesn't have kvm installed locally.
+        # Screen capture cannot run — tell the user how to fix it.
+        constraints.append({
+            "kind": "infeasible",
+            "what": "/screen/query/capture",
+            "surface": "unknown",
+            "reason": "kvm connector not installed on this host — cannot capture local screen",
+            "fix": "pip install urirun-connector-kvm  # or: select a node that has kvm",
         })
 
     task = derive_task_target(prompt) if prompt else {"domain": None, "needsAuth": False}
