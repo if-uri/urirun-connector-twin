@@ -133,11 +133,13 @@ def probe(node: str | None = None, prompt: str = "") -> dict:
     constraints = _constraints_via_uri(action_matrix)
 
     if node_kvm_unreachable:
-        # kvm://{node}/... steps are infeasible when the node is unreachable.
-        # _is_infeasible matches any URI containing the "what" string as a substring.
+        # kvm screen-capture steps are infeasible when the selected node's env is unreachable.
+        # kvm routes use "kvm://host/..." as authority regardless of which node runs them
+        # (serviceMap routes transparently), so we match the ROUTE PATH, not the URI prefix.
+        # _is_infeasible checks `what in uri` as a substring match.
         constraints.append({
             "kind": "infeasible",
-            "what": f"kvm://{node}/",
+            "what": "/screen/query/capture",
             "surface": "unknown",
             "reason": (f"Node '{node}' environment unreachable — kvm connector not installed "
                        "or node offline"),

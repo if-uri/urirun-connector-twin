@@ -110,11 +110,12 @@ def _search_steps(query: str) -> list[dict]:
 
 
 def _screenshot_steps() -> list[dict]:
-    # Use {node} so the mesh dispatches to the CORRECT node via serviceMap.
-    # kvm://host/screen/query/capture → captures HOST screen.
-    # kvm://lenovo/screen/query/capture → forwarded to lenovo's node (fails if kvm not installed there).
+    # kvm routes always use "host" as the URI authority — serviceMap dispatch routes them to the
+    # selected node transparently.  `kvm://host/screen/query/capture` sent to lenovo's mesh
+    # endpoint runs lenovo's local kvm handler (which also registers as kvm://host/...).
+    # Do NOT use {node} here: kvm://lenovo/... is not in lenovo's own registry.
     return [
-        {"id": "capture_screen", "uri": "kvm://{node}/screen/query/capture",
+        {"id": "capture_screen", "uri": "kvm://host/screen/query/capture",
          "payload": {}},
     ]
 
