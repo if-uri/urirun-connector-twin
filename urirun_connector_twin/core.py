@@ -595,7 +595,13 @@ def flow_recall(
     mem = durable_memory()
 
     def _drift_ok() -> bool:
-        """True when env matches known-good (no drift), False on drift or probe failure."""
+        """True when the env is known-good (no drift). Fail-OPEN when drift is INDETERMINATE.
+
+        The `twin://<node>/env/query/drift` route is not always registered (it was not carried
+        through the twin extraction). A *missing* drift signal must not permanently disable the
+        env-matched recall path — the env_fp already matched a known-good Episode and the recalled
+        flow is re-validated by preflight, so we allow it. We still fail CLOSED on a genuine probe
+        EXCEPTION (offline node): there we cannot trust the live env and re-plan instead."""
         if skip_drift_check:
             return True
         try:
@@ -605,8 +611,10 @@ def flow_recall(
             val = env.get("result", {})
             if isinstance(val, dict) and "value" in val:
                 val = val["value"]
-            return bool(isinstance(val, dict) and not val.get("drift") and val.get("known"))
-        except Exception:  # noqa: BLE001 — offline node → treat as drifted, fall through to LLM
+            if isinstance(val, dict) and ("drift" in val or "known" in val):
+                return not val.get("drift") and bool(val.get("known"))
+            return True  # route unavailable / indeterminate → allow (preflight re-validates)
+        except Exception:  # noqa: BLE001 — live probe failed (offline node) → re-plan, don't replay
             return False
 
     # 1. Direct episode lookup (content-addressed; drift gate guards replay)
