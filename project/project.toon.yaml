@@ -1,4 +1,4 @@
-# urirun-connector-twin | 104 func | 9f | 3616L | python | 2026-06-26
+# urirun-connector-twin | 104 func | 9f | 3618L | python | 2026-06-27
 # generated in 0.00s
 
 HEALTH:
@@ -21,7 +21,7 @@ MODULES[18] (top by size):
   M[planfile.yaml] 643L C:0 F:0 CC↑0 D:0 (yaml)
   M[connector.manifest.json] 616L C:0 F:0 CC↑0 D:0 (json)
   M[urirun_connector_twin/browser.py] 327L C:0 F:13 CC↑15 D:2 (python)
-  M[urirun_connector_twin/prompt_plan.py] 259L C:0 F:21 CC↑13 D:2 (python)
+  M[urirun_connector_twin/prompt_plan.py] 261L C:0 F:21 CC↑13 D:2 (python)
   M[urirun_connector_twin/sandbox.py] 176L C:1 F:9 CC↑6 D:1 (python)
   M[urirun_connector_twin/environment.py] 161L C:0 F:8 CC↑11 D:1 (python)
   M[urirun_connector_twin/proof_cache.py] 141L C:1 F:5 CC↑10 D:1 (python)
@@ -55,4 +55,4 @@ REFACTOR[8]:
   [5] M/L Split select_session (CC=15)
 
 EVOLUTION:
-  2026-06-26 CC̄=4.2 crit=11 3616L // Automated analysis
+  2026-06-27 CC̄=4.2 crit=11 3618L // Automated analysis

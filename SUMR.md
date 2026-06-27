@@ -117,16 +117,16 @@ HUBS[20]:
     CC=15  in:3  out:11  total:14
   urirun_connector_twin.sandbox._simulated_probe
     CC=1  in:1  out:12  total:13
-  urirun_connector_twin.core._prompt_result
-    CC=5  in:1  out:11  total:12
-  urirun_connector_twin.prompt_plan._raw_steps_for_target
-    CC=13  in:1  out:11  total:12
   urirun_connector_twin.proof_cache.proof_record
     CC=10  in:2  out:10  total:12
-  urirun_connector_twin.core.step_feasibility
-    CC=4  in:0  out:12  total:12
   urirun_connector_twin.core.browser_profile
     CC=7  in:0  out:12  total:12
+  urirun_connector_twin.prompt_plan._raw_steps_for_target
+    CC=13  in:1  out:11  total:12
+  urirun_connector_twin.core.step_feasibility
+    CC=4  in:0  out:12  total:12
+  urirun_connector_twin.core._prompt_result
+    CC=5  in:1  out:11  total:12
   urirun_connector_twin.prompt_plan.derive_task_target
     CC=2  in:5  out:6  total:11
   urirun_connector_twin.dispatch.uri_call
@@ -238,28 +238,28 @@ EDGES:
   urirun_connector_twin.planner.annotate_steps → urirun_connector_twin.planner._step_surface
   urirun_connector_twin.planner.build_imperative_plan → urirun_connector_twin.planner.extract_steps_from_flow
   urirun_connector_twin.planner.build_imperative_plan → urirun_connector_twin.planner.annotate_steps
-  urirun_connector_twin.prompt_plan._extract_domain → urirun_connector_twin.prompt_plan._extract_url
-  urirun_connector_twin.prompt_plan._browser_fill_and_submit_steps → urirun_connector_twin.prompt_plan._browser_open_steps
-  urirun_connector_twin.prompt_plan._classify_task_type → urirun_connector_twin.prompt_plan._location_ok
-  urirun_connector_twin.prompt_plan.derive_task_target → urirun_connector_twin.prompt_plan._extract_domain
-  urirun_connector_twin.prompt_plan.derive_task_target → urirun_connector_twin.prompt_plan._extract_url
-  urirun_connector_twin.prompt_plan.derive_task_target → urirun_connector_twin.prompt_plan._extract_text_to_type
-  urirun_connector_twin.prompt_plan.derive_task_target → urirun_connector_twin.prompt_plan._classify_task_type
-  urirun_connector_twin.prompt_plan._raw_steps_for_target → urirun_connector_twin.prompt_plan._fallback_describe_steps
-  urirun_connector_twin.prompt_plan._raw_steps_for_target → urirun_connector_twin.prompt_plan._post_on_social_steps
-  urirun_connector_twin.prompt_plan._raw_steps_for_target → urirun_connector_twin.prompt_plan._search_steps
-  urirun_connector_twin.prompt_plan._raw_steps_for_target → urirun_connector_twin.prompt_plan._browser_fill_and_submit_steps
-  urirun_connector_twin.prompt_plan._raw_steps_for_target → urirun_connector_twin.prompt_plan._browser_open_steps
-  urirun_connector_twin.prompt_plan._raw_steps_for_target → urirun_connector_twin.prompt_plan._screenshot_steps
-  urirun_connector_twin.prompt_plan._raw_steps_for_target → urirun_connector_twin.prompt_plan._service_start_steps
-  urirun_connector_twin.prompt_plan._raw_steps_for_target → urirun_connector_twin.prompt_plan._service_stop_steps
-  urirun_connector_twin.prompt_plan._raw_steps_for_target → urirun_connector_twin.prompt_plan._extract_query
-  urirun_connector_twin.prompt_plan._raw_steps_for_target → urirun_connector_twin.prompt_plan._guess_service_name
-  urirun_connector_twin.prompt_plan.steps_from_prompt → urirun_connector_twin.prompt_plan._bind_node
-  urirun_connector_twin.prompt_plan.steps_from_prompt → urirun_connector_twin.prompt_plan._raw_steps_for_target
-  urirun_connector_twin.prompt_plan.steps_from_prompt → urirun_connector_twin.prompt_plan.derive_task_target
-  urirun_connector_twin.prompt_plan.plan_from_prompt → urirun_connector_twin.prompt_plan.derive_task_target
-  urirun_connector_twin.prompt_plan.plan_from_prompt → urirun_connector_twin.prompt_plan.steps_from_prompt
+  urirun_connector_twin.core._local_browser_profile → urirun_connector_twin.browser.discover_browser_sessions
+  urirun_connector_twin.core._local_browser_profile → urirun_connector_twin.browser.select_session
+  urirun_connector_twin.core._prompt_result → urirun_connector_twin.mock.generate_mock
+  urirun_connector_twin.core.environment_profile → urirun_connector_twin.environment.probe
+  urirun_connector_twin.core.constraints_from_profile → urirun_connector_twin.core._safe_import
+  urirun_connector_twin.core.browser_sessions → urirun_connector_twin.browser.discover_browser_sessions
+  urirun_connector_twin.core.browser_profile → urirun_connector_twin.browser.discover_browser_sessions
+  urirun_connector_twin.core.browser_profile → urirun_connector_twin.browser.select_session
+  urirun_connector_twin.core.browser_profile → urirun_connector_twin.prompt_plan.derive_task_target
+  urirun_connector_twin.core.plan_from_prompt_route → urirun_connector_twin.prompt_plan.derive_task_target
+  urirun_connector_twin.core.plan_from_prompt_route → urirun_connector_twin.prompt_plan.plan_from_prompt
+  urirun_connector_twin.core.plan_from_prompt_route → urirun_connector_twin.dispatch.uri_call
+  urirun_connector_twin.core.plan_from_prompt_route → urirun_connector_twin.core._prompt_result
+  urirun_connector_twin.core.plan_from_prompt_route → urirun_connector_twin.dispatch.value_of
+  urirun_connector_twin.core.plan_from_prompt_route → urirun_connector_twin.environment.probe
+  urirun_connector_twin.core.plan_annotate → urirun_connector_twin.planner.build_imperative_plan
+  urirun_connector_twin.core.plan_generate → urirun_connector_twin.environment.probe
+  urirun_connector_twin.core.plan_generate → urirun_connector_twin.planner.build_imperative_plan
+  urirun_connector_twin.core.plan_generate → urirun_connector_twin.mock.generate_mock
+  urirun_connector_twin.core.mock_create → urirun_connector_twin.environment.probe
+  urirun_connector_twin.core.mock_create → urirun_connector_twin.planner.build_imperative_plan
+  urirun_connector_twin.core.mock_create → urirun_connector_twin.mock.generate_mock
 ```
 
 ## Test Contracts
@@ -311,16 +311,16 @@ HUBS[20]:
     CC=15  in:3  out:11  total:14
   urirun_connector_twin.sandbox._simulated_probe
     CC=1  in:1  out:12  total:13
-  urirun_connector_twin.core._prompt_result
-    CC=5  in:1  out:11  total:12
-  urirun_connector_twin.prompt_plan._raw_steps_for_target
-    CC=13  in:1  out:11  total:12
   urirun_connector_twin.proof_cache.proof_record
     CC=10  in:2  out:10  total:12
-  urirun_connector_twin.core.step_feasibility
-    CC=4  in:0  out:12  total:12
   urirun_connector_twin.core.browser_profile
     CC=7  in:0  out:12  total:12
+  urirun_connector_twin.prompt_plan._raw_steps_for_target
+    CC=13  in:1  out:11  total:12
+  urirun_connector_twin.core.step_feasibility
+    CC=4  in:0  out:12  total:12
+  urirun_connector_twin.core._prompt_result
+    CC=5  in:1  out:11  total:12
   urirun_connector_twin.prompt_plan.derive_task_target
     CC=2  in:5  out:6  total:11
   urirun_connector_twin.dispatch.uri_call
@@ -432,34 +432,34 @@ EDGES:
   urirun_connector_twin.planner.annotate_steps → urirun_connector_twin.planner._step_surface
   urirun_connector_twin.planner.build_imperative_plan → urirun_connector_twin.planner.extract_steps_from_flow
   urirun_connector_twin.planner.build_imperative_plan → urirun_connector_twin.planner.annotate_steps
-  urirun_connector_twin.prompt_plan._extract_domain → urirun_connector_twin.prompt_plan._extract_url
-  urirun_connector_twin.prompt_plan._browser_fill_and_submit_steps → urirun_connector_twin.prompt_plan._browser_open_steps
-  urirun_connector_twin.prompt_plan._classify_task_type → urirun_connector_twin.prompt_plan._location_ok
-  urirun_connector_twin.prompt_plan.derive_task_target → urirun_connector_twin.prompt_plan._extract_domain
-  urirun_connector_twin.prompt_plan.derive_task_target → urirun_connector_twin.prompt_plan._extract_url
-  urirun_connector_twin.prompt_plan.derive_task_target → urirun_connector_twin.prompt_plan._extract_text_to_type
-  urirun_connector_twin.prompt_plan.derive_task_target → urirun_connector_twin.prompt_plan._classify_task_type
-  urirun_connector_twin.prompt_plan._raw_steps_for_target → urirun_connector_twin.prompt_plan._fallback_describe_steps
-  urirun_connector_twin.prompt_plan._raw_steps_for_target → urirun_connector_twin.prompt_plan._post_on_social_steps
-  urirun_connector_twin.prompt_plan._raw_steps_for_target → urirun_connector_twin.prompt_plan._search_steps
-  urirun_connector_twin.prompt_plan._raw_steps_for_target → urirun_connector_twin.prompt_plan._browser_fill_and_submit_steps
-  urirun_connector_twin.prompt_plan._raw_steps_for_target → urirun_connector_twin.prompt_plan._browser_open_steps
-  urirun_connector_twin.prompt_plan._raw_steps_for_target → urirun_connector_twin.prompt_plan._screenshot_steps
-  urirun_connector_twin.prompt_plan._raw_steps_for_target → urirun_connector_twin.prompt_plan._service_start_steps
-  urirun_connector_twin.prompt_plan._raw_steps_for_target → urirun_connector_twin.prompt_plan._service_stop_steps
-  urirun_connector_twin.prompt_plan._raw_steps_for_target → urirun_connector_twin.prompt_plan._extract_query
-  urirun_connector_twin.prompt_plan._raw_steps_for_target → urirun_connector_twin.prompt_plan._guess_service_name
-  urirun_connector_twin.prompt_plan.steps_from_prompt → urirun_connector_twin.prompt_plan._bind_node
-  urirun_connector_twin.prompt_plan.steps_from_prompt → urirun_connector_twin.prompt_plan._raw_steps_for_target
-  urirun_connector_twin.prompt_plan.steps_from_prompt → urirun_connector_twin.prompt_plan.derive_task_target
-  urirun_connector_twin.prompt_plan.plan_from_prompt → urirun_connector_twin.prompt_plan.derive_task_target
-  urirun_connector_twin.prompt_plan.plan_from_prompt → urirun_connector_twin.prompt_plan.steps_from_prompt
+  urirun_connector_twin.core._local_browser_profile → urirun_connector_twin.browser.discover_browser_sessions
+  urirun_connector_twin.core._local_browser_profile → urirun_connector_twin.browser.select_session
+  urirun_connector_twin.core._prompt_result → urirun_connector_twin.mock.generate_mock
+  urirun_connector_twin.core.environment_profile → urirun_connector_twin.environment.probe
+  urirun_connector_twin.core.constraints_from_profile → urirun_connector_twin.core._safe_import
+  urirun_connector_twin.core.browser_sessions → urirun_connector_twin.browser.discover_browser_sessions
+  urirun_connector_twin.core.browser_profile → urirun_connector_twin.browser.discover_browser_sessions
+  urirun_connector_twin.core.browser_profile → urirun_connector_twin.browser.select_session
+  urirun_connector_twin.core.browser_profile → urirun_connector_twin.prompt_plan.derive_task_target
+  urirun_connector_twin.core.plan_from_prompt_route → urirun_connector_twin.prompt_plan.derive_task_target
+  urirun_connector_twin.core.plan_from_prompt_route → urirun_connector_twin.prompt_plan.plan_from_prompt
+  urirun_connector_twin.core.plan_from_prompt_route → urirun_connector_twin.dispatch.uri_call
+  urirun_connector_twin.core.plan_from_prompt_route → urirun_connector_twin.core._prompt_result
+  urirun_connector_twin.core.plan_from_prompt_route → urirun_connector_twin.dispatch.value_of
+  urirun_connector_twin.core.plan_from_prompt_route → urirun_connector_twin.environment.probe
+  urirun_connector_twin.core.plan_annotate → urirun_connector_twin.planner.build_imperative_plan
+  urirun_connector_twin.core.plan_generate → urirun_connector_twin.environment.probe
+  urirun_connector_twin.core.plan_generate → urirun_connector_twin.planner.build_imperative_plan
+  urirun_connector_twin.core.plan_generate → urirun_connector_twin.mock.generate_mock
+  urirun_connector_twin.core.mock_create → urirun_connector_twin.environment.probe
+  urirun_connector_twin.core.mock_create → urirun_connector_twin.planner.build_imperative_plan
+  urirun_connector_twin.core.mock_create → urirun_connector_twin.mock.generate_mock
 ```
 
 ### Code Analysis (`project/analysis.toon.yaml`)
 
 ```toon markpact:analysis path=project/analysis.toon.yaml
-# code2llm | 18f 3616L | python:10,yaml:4,shell:2,json:1,toml:1 | 2026-06-26
+# code2llm | 18f 3618L | python:10,yaml:4,shell:2,json:1,toml:1 | 2026-06-27
 # generated in 0.00s
 # CC̅=4.2 | critical:3/104 | dups:0 | cycles:0
 
@@ -537,7 +537,7 @@ LAYERS:
   urirun_connector_twin/          CC̄=4.2    ←in:0  →out:0
   │ !! core                       733L  0C   34m  CC=20     ←0
   │ !! browser                    327L  0C   13m  CC=15     ←2
-  │ prompt_plan                259L  0C   21m  CC=13     ←2
+  │ prompt_plan                261L  0C   21m  CC=13     ←2
   │ sandbox                    176L  1C    9m  CC=6      ←1
   │ environment                161L  0C    8m  CC=11     ←1
   │ proof_cache                141L  1C    5m  CC=10     ←1
@@ -569,7 +569,7 @@ EXTERNAL:
 ### Duplication (`project/duplication.toon.yaml`)
 
 ```toon markpact:analysis path=project/duplication.toon.yaml
-# redup/duplication | 0 groups | 0f 0L | 2026-06-26
+# redup/duplication | 0 groups | 0f 0L | 2026-06-27
 
 SUMMARY:
   files_scanned: 0
@@ -577,13 +577,13 @@ SUMMARY:
   dup_groups:    0
   dup_fragments: 0
   saved_lines:   0
-  scan_ms:       3
+  scan_ms:       5
 ```
 
 ### Evolution / Churn (`project/evolution.toon.yaml`)
 
 ```toon markpact:analysis path=project/evolution.toon.yaml
-# code2llm/evolution | 104 func | 9f | 2026-06-26
+# code2llm/evolution | 104 func | 9f | 2026-06-27
 # generated in 0.00s
 
 NEXT[6] (ranked by impact):

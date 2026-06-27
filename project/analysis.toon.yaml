@@ -1,4 +1,4 @@
-# code2llm | 18f 3616L | python:10,yaml:4,shell:2,json:1,toml:1 | 2026-06-26
+# code2llm | 18f 3618L | python:10,yaml:4,shell:2,json:1,toml:1 | 2026-06-27
 # generated in 0.00s
 # CC̅=4.2 | critical:3/104 | dups:0 | cycles:0
 
@@ -76,7 +76,7 @@ LAYERS:
   urirun_connector_twin/          CC̄=4.2    ←in:0  →out:0
   │ !! core                       733L  0C   34m  CC=20     ←0
   │ !! browser                    327L  0C   13m  CC=15     ←2
-  │ prompt_plan                259L  0C   21m  CC=13     ←2
+  │ prompt_plan                261L  0C   21m  CC=13     ←2
   │ sandbox                    176L  1C    9m  CC=6      ←1
   │ environment                161L  0C    8m  CC=11     ←1
   │ proof_cache                141L  1C    5m  CC=10     ←1

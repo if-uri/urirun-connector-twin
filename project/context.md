@@ -364,9 +364,9 @@ Functions exposed as public API (no underscore prefix):
 - `urirun_connector_twin.core.mock_create` - 7 calls
 - `urirun_connector_twin.core.flow_goal_verify` - 7 calls
 - `urirun_connector_twin.mock.generate_mock` - 6 calls
-- `urirun_connector_twin.prompt_plan.derive_task_target` - 6 calls
 - `urirun_connector_twin.core.browser_sessions` - 6 calls
 - `urirun_connector_twin.core.proof_record_route` - 6 calls
+- `urirun_connector_twin.prompt_plan.derive_task_target` - 6 calls
 - `urirun_connector_twin.dispatch.uri_call` - 5 calls
 - `urirun_connector_twin.core.constraints_from_profile` - 5 calls
 - `urirun_connector_twin.core.plan_generate` - 5 calls
@@ -380,10 +380,10 @@ Functions exposed as public API (no underscore prefix):
 - `urirun_connector_twin.core.flow_diagnose` - 4 calls
 - `urirun_connector_twin.proof_cache.proof_check` - 4 calls
 - `urirun_connector_twin.sandbox.scenario_for_uri` - 3 calls
-- `urirun_connector_twin.prompt_plan.steps_from_prompt` - 3 calls
-- `urirun_connector_twin.prompt_plan.plan_from_prompt` - 3 calls
 - `urirun_connector_twin.core.environment_profile` - 3 calls
 - `urirun_connector_twin.core.plan_annotate` - 3 calls
+- `urirun_connector_twin.core.flow_execute` - 3 calls
+- `urirun_connector_twin.prompt_plan.steps_from_prompt` - 3 calls
 
 ## System Interactions
 

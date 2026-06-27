@@ -1,4 +1,4 @@
-# urirun-connector-twin | 22f 5195L | python:19,shell:2,less:1 | 2026-06-26
+# urirun-connector-twin | 22f 5197L | python:19,shell:2,less:1 | 2026-06-27
 # stats: 292 func | 11 cls | 22 mod | CC̄=3.7 | critical:14 | cycles:0
 # alerts[5]: CC test_append_twin_widget_emits_events_with_inverse=20; CC flow_recall=20; CC discover_browser_sessions=15; CC select_session=15; CC _cdp_cookies=13
 # hotspots[5]: _cdp_cookies fan=19; discover_browser_sessions fan=13; mock_start_probe_stop fan=13; plan_from_prompt_route fan=11; flow_recall fan=11
@@ -24,7 +24,7 @@ M[22]:
   urirun_connector_twin/environment.py,162
   urirun_connector_twin/mock.py,115
   urirun_connector_twin/planner.py,128
-  urirun_connector_twin/prompt_plan.py,260
+  urirun_connector_twin/prompt_plan.py,262
   urirun_connector_twin/proof_cache.py,142
   urirun_connector_twin/sandbox.py,177
 D:
