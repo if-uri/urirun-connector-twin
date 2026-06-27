@@ -595,25 +595,30 @@ def flow_recall(
     mem = durable_memory()
 
     def _drift_ok() -> bool:
-        """True when the env is known-good (no drift). Fail-OPEN when drift is INDETERMINATE.
+        """True when the node's live env matches its known-good fingerprint (no drift).
 
-        The `twin://<node>/env/query/drift` route is not always registered (it was not carried
-        through the twin extraction). A *missing* drift signal must not permanently disable the
-        env-matched recall path — the env_fp already matched a known-good Episode and the recalled
-        flow is re-validated by preflight, so we allow it. We still fail CLOSED on a genuine probe
-        EXCEPTION (offline node): there we cannot trust the live env and re-plan instead."""
+        Computes drift IN-PROCESS from the kvm env profile + the durable known-good baseline. We do
+        NOT round-trip through `twin://<node>/env/query/drift`: the twin scheme is contended (the flow
+        connector and this connector both claim it) so that route does not dispatch reliably, and the
+        baseline lives right here in `mem`. Fails OPEN when the live profile is unavailable/empty —
+        indeterminate drift must not permanently disable the env-matched recall path, and the recalled
+        flow is re-validated by preflight; fails CLOSED only on a genuine probe EXCEPTION (offline
+        node), where we cannot trust the live env and should re-plan."""
         if skip_drift_check:
             return True
         try:
             import urirun.v2_service as _svc  # noqa: PLC0415
-            drift_uri = f"twin://{node}/env/query/drift"
-            env = _svc.call(drift_uri, {}, {}, mode="execute")
-            val = env.get("result", {})
+            prof_r = _svc.call(f"kvm://{node}/environment/query/profile", {}, {}, mode="execute")
+            val = prof_r.get("result") or {}
             if isinstance(val, dict) and "value" in val:
                 val = val["value"]
-            if isinstance(val, dict) and ("drift" in val or "known" in val):
-                return not val.get("drift") and bool(val.get("known"))
-            return True  # route unavailable / indeterminate → allow (preflight re-validates)
+            profile = val if isinstance(val, dict) else {}
+            if not profile:
+                return True  # no live profile → indeterminate → allow (preflight re-validates)
+            verdict = mem.drift(node, profile)
+            if not verdict.get("known"):
+                return True  # no baseline yet → allow
+            return not verdict.get("drifted")
         except Exception:  # noqa: BLE001 — live probe failed (offline node) → re-plan, don't replay
             return False
 
