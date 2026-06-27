@@ -608,7 +608,7 @@ def flow_recall(
             return True
         try:
             import urirun.v2_service as _svc  # noqa: PLC0415
-            prof_r = _svc.call(f"kvm://{node}/environment/query/profile", {}, {}, mode="execute")
+            prof_r = _svc.call(f"kvm://{node}/env/query/profile", {}, {}, mode="execute")
             val = prof_r.get("result") or {}
             if isinstance(val, dict) and "value" in val:
                 val = val["value"]
