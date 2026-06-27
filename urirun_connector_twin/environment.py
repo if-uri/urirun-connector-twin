@@ -115,11 +115,13 @@ def probe(node: str | None = None, prompt: str = "") -> dict:
     profile: dict = {}
     surface: dict = {}
 
+    node_kvm_unreachable = False
     if node:
         p = _kvm_query(node, "env/query/profile")
         if p:
             profile = p
         else:
+            node_kvm_unreachable = True
             warnings.append(f"kvm://{node}/env/query/profile unreachable — host-only snapshot")
         s = _kvm_query(node, "surface/query/current")
         if s:
@@ -129,6 +131,18 @@ def probe(node: str | None = None, prompt: str = "") -> dict:
 
     action_matrix = profile.get("actionMatrix") or {}
     constraints = _constraints_via_uri(action_matrix)
+
+    if node_kvm_unreachable:
+        # kvm://{node}/... steps are infeasible when the node is unreachable.
+        # _is_infeasible matches any URI containing the "what" string as a substring.
+        constraints.append({
+            "kind": "infeasible",
+            "what": f"kvm://{node}/",
+            "surface": "unknown",
+            "reason": (f"Node '{node}' environment unreachable — kvm connector not installed "
+                       "or node offline"),
+            "fix": f"urirun host ensure {node} kvm",
+        })
 
     task = derive_task_target(prompt) if prompt else {"domain": None, "needsAuth": False}
     session_probe = _probe_browser(task)
