@@ -196,7 +196,7 @@ def test_steps_from_prompt_social_post():
 def test_steps_from_prompt_screenshot():
     steps = steps_from_prompt("zrób zrzut ekranu")
     assert len(steps) >= 1
-    assert "screenshot" in steps[0]["uri"] or "display" in steps[0]["uri"]
+    assert "screen" in steps[0]["uri"] or "capture" in steps[0]["uri"]  # kvm://host/screen/query/capture
 
 
 def test_steps_from_prompt_search():

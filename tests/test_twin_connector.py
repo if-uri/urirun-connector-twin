@@ -398,33 +398,9 @@ def test_abort_envelope_dispatches_rollback_ledger(monkeypatch):
     assert "kvm://host/db/command/delete" in out["rollback"]["undone"]
 
 
-# ─── _thin_driver + _evaluate_step_next seam ─────────────────────────────────
-
-def test_evaluate_step_next_routes_through_dispatch_uri():
-    """When dispatch_uri is set, _evaluate_step_next calls twin://*/step/command/evaluate."""
-    from urirun.node.flow import _evaluate_step_next
-    calls = []
-
-    def fake_dispatch(uri, payload):
-        calls.append(uri)
-        return {"ok": True, "next": "retry"}
-
-    step = {"id": "s1", "uri": "kvm://laptop/cdp/page/query/info"}
-    entry = {"error": {"category": "NETWORK"}, "recovery": {}}
-    result = _evaluate_step_next(step, entry, [], True, 0, 1, False, fake_dispatch)
-    assert result == "retry"
-    assert any("step/command/evaluate" in c for c in calls)
-    assert any("laptop" in c for c in calls)
-
-
-def test_evaluate_step_next_in_process_fallback(monkeypatch):
-    """When dispatch_uri is None, decision is in-process (identical behaviour)."""
-    import urirun.node.flow as flow_mod
-    monkeypatch.setattr(flow_mod, "can_retry_step", lambda *a, **kw: True)
-    step = {"id": "s1", "uri": "kvm://host/cdp/page/query/info"}
-    entry = {"error": {"category": "NETWORK"}, "recovery": {}}
-    result = flow_mod._evaluate_step_next(step, entry, [], True, 0, 1, False, None)
-    assert result == "retry"
+# NOTE: the _evaluate_step_next flow-engine helper was removed in the Phase-5 flow extraction; its
+# decision logic now lives in the step/command/evaluate route handler (step_evaluate), covered above
+# by test_step_evaluate_retry_on_transient / _heal_when_auto_applicable / _rollback_when_healed.
 
 
 # ─── flow/command/preflight ───────────────────────────────────────────────────
