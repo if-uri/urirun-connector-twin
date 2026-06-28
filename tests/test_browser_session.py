@@ -201,6 +201,24 @@ def test_steps_from_prompt_screenshot():
     assert "screen" in steps[0]["uri"] or "capture" in steps[0]["uri"]  # kvm://host/screen/query/capture
 
 
+def test_steps_from_prompt_screenshot_specific_monitor():
+    steps = steps_from_prompt("zrob zrzut ekranu 3 monitora", node="host")
+    assert steps[0]["uri"] == "kvm://host/screen/query/capture"
+    assert steps[0]["payload"] == {"monitor": 3}
+
+
+def test_steps_from_prompt_screenshot_monitor_number_phrase():
+    steps = steps_from_prompt("zrzut ekranu monitora numer 3", node="host")
+    assert steps[0]["uri"] == "kvm://host/screen/query/capture"
+    assert steps[0]["payload"] == {"monitor": 3}
+
+
+def test_steps_from_prompt_screenshot_all_monitors():
+    steps = steps_from_prompt("zrob zrzut ekranu wszystkich monitorw", node="host")
+    assert steps[0]["uri"] == "kvm://host/screen/query/capture"
+    assert steps[0]["payload"] == {"scope": "all", "monitor": -1}
+
+
 def test_steps_from_prompt_search():
     steps = steps_from_prompt("search for urirun")
     uris = [s["uri"] for s in steps]

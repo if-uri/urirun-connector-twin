@@ -109,14 +109,50 @@ def _search_steps(query: str) -> list[dict]:
     ]
 
 
-def _screenshot_steps() -> list[dict]:
+def _screenshot_capture_payload(prompt: str) -> dict:
+    try:
+        from urirun_flow.flow_planner import _screenshot_capture_payload as _flow_payload  # noqa: PLC0415
+        return _flow_payload(prompt)
+    except Exception:  # noqa: BLE001 - twin can run without urirun-flow in minimal installs.
+        low = prompt.lower()
+        if any(kw in low for kw in (
+            "all monitors", "all screens", "whole desktop", "entire desktop",
+            "wszystkie monitory", "wszystkich monitorow", "wszystkich monitorw",
+            "wszystkie ekrany", "caly pulpit", "calego pulpitu",
+        )):
+            return {"scope": "all", "monitor": -1}
+        m = re.search(r"\bmonitor(?:ze|a|ow)?\s*(\d+)\b", low)
+        if m:
+            return {"monitor": max(1, int(m.group(1)))}
+        m = re.search(r"\bmonitor(?:ze|a|ow)?\s+numer\s+(\d+)\b", low)
+        if m:
+            return {"monitor": max(1, int(m.group(1)))}
+        m = re.search(r"\b(\d+)\s+monitor(?:ze|a|ow)?\b", low)
+        if m:
+            return {"monitor": max(1, int(m.group(1)))}
+        m = re.search(r"\bnumer\s+(\d+)\s+monitor(?:ze|a|ow)?\b", low)
+        if m:
+            return {"monitor": max(1, int(m.group(1)))}
+        ordinals = {
+            "pierwszy": 1, "pierwszego": 1, "first": 1,
+            "drugi": 2, "drugiego": 2, "second": 2,
+            "trzeci": 3, "trzeciego": 3, "third": 3,
+            "czwarty": 4, "czwartego": 4, "fourth": 4,
+        }
+        for word, number in ordinals.items():
+            if re.search(rf"\b{re.escape(word)}\s+monitor\b|\bmonitor\s+{re.escape(word)}\b", low):
+                return {"monitor": number}
+        return {}
+
+
+def _screenshot_steps(prompt: str = "") -> list[dict]:
     # kvm routes always use "host" as the URI authority — serviceMap dispatch routes them to the
     # selected node transparently.  `kvm://host/screen/query/capture` sent to lenovo's mesh
     # endpoint runs lenovo's local kvm handler (which also registers as kvm://host/...).
     # Do NOT use {node} here: kvm://lenovo/... is not in lenovo's own registry.
     return [
         {"id": "capture_screen", "uri": "kvm://host/screen/query/capture",
-         "payload": {}},
+         "payload": _screenshot_capture_payload(prompt)},
     ]
 
 
@@ -220,7 +256,7 @@ def _raw_steps_for_target(target: dict, prompt: str) -> list[dict]:
     if task_type == "browser-open" and nav_url:
         return _browser_open_steps(nav_url)
     if task_type == "screenshot":
-        return _screenshot_steps()
+        return _screenshot_steps(prompt)
     if task_type == "service-start":
         return _service_start_steps(_guess_service_name(prompt))
     if task_type == "service-stop":

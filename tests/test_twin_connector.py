@@ -44,6 +44,40 @@ def test_probe_merges_kvm_profile(monkeypatch):
     assert env["bestSurface"] == "cdp"
 
 
+def test_probe_local_host_uses_in_process_kvm_when_mesh_unreachable(monkeypatch):
+    # Preflight: kvm route not served over the mesh yet, but the connector is
+    # installed in-process (same path the execution-time inventory uses). The
+    # plan must NOT report screen capture as infeasible — that was the contradiction
+    # where the twin plan said "unreachable" while routing + execution succeeded.
+    monkeypatch.setattr("urirun_connector_twin.environment._kvm_query", lambda *a, **kw: None)
+    monkeypatch.setattr("urirun_connector_twin.environment._constraints_via_uri", lambda am: [])
+    monkeypatch.setattr(
+        "urirun_connector_twin.environment._kvm_profile_local",
+        lambda: {"controllable": True, "best": "cdp",
+                 "actionMatrix": {"cdp": {"screenshot": "executable"}}},
+    )
+    monkeypatch.setattr("urirun_connector_twin.environment._docker_available", lambda: True)
+    env = probe("host")
+    assert env["controllable"] is True
+    assert env["bestSurface"] == "cdp"
+    assert not any(c.get("what") == "/screen/query/capture" for c in env["constraints"])
+    assert not any("unreachable" in w for w in env["warnings"])
+
+
+def test_probe_local_host_infeasible_when_kvm_truly_absent(monkeypatch):
+    # No mesh route AND no in-process kvm: capture stays infeasible, but with a
+    # LOCAL reason ("not installed on this host"), not the misleading "node offline".
+    monkeypatch.setattr("urirun_connector_twin.environment._kvm_query", lambda *a, **kw: None)
+    monkeypatch.setattr("urirun_connector_twin.environment._constraints_via_uri", lambda am: [])
+    monkeypatch.setattr("urirun_connector_twin.environment._kvm_profile_local", lambda: None)
+    monkeypatch.setattr("urirun_connector_twin.environment._docker_available", lambda: False)
+    env = probe("host")
+    cap = [c for c in env["constraints"] if c.get("what") == "/screen/query/capture"]
+    assert cap, "expected an infeasible capture constraint"
+    assert "this host" in cap[0]["reason"]
+    assert "pip install" in cap[0]["fix"]
+
+
 def test_constraints_from_profile_wayland_type():
     action_matrix = {
         "atspi": {"type": "not_executable"},
@@ -1408,3 +1442,21 @@ def test_annotate_steps_falls_back_to_table_for_contractless_routes():
     # A contracts map that doesn't cover this route -> table fallback (ensure is reversible there).
     out = annotate_steps(steps, env, {"other://x/y/command/z": {"reversible": True}})
     assert out[0]["reversible"] is True and out[0]["inverse"] == "/session/command/close"
+
+
+def test_environment_inventory_returns_selection_ready_surfaces():
+    """The inventory route (keystone of the autonomy thesis) enumerates controllable surfaces in a
+    needs-selection-ready shape: each surface carries id/label/kind. Read-only + best-effort, so the
+    lists may be empty in a headless/permission-poor env — but the shape and contract hold."""
+    import urirun_connector_twin.core as c
+    r = c.environment_inventory()
+    assert r["ok"] is True
+    assert r["node"]
+    for key in ("displays", "audioSinks", "cameras"):
+        assert isinstance(r[key], list)
+        for surface in r[key]:
+            assert {"id", "label", "kind"} <= set(surface), surface
+    # kinds are namespaced per surface family (feeds the needs-selection UI)
+    assert all(s["kind"] == "display" for s in r["displays"])
+    assert all(s["kind"] == "audio-sink" for s in r["audioSinks"])
+    assert all(s["kind"] == "camera" for s in r["cameras"])

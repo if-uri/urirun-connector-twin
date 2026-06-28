@@ -59,6 +59,16 @@ CONTRACTS: dict[str, Contract] = {
                                  "python": "3.13.7", "wayland": True, "display": True},
                         "profile": {}, "surface": {}, "constraints": [], "actionMatrix": {}, "warnings": []}},
         )),
+    "twin://host/environment/query/inventory": Contract(
+        version="v1", effect="query",
+        inp={"node": "?str"},
+        out={"ok": "const:true", "node": "str", "displays": "list", "audioSinks": "list",
+             "cameras": "list"},
+        examples=(
+            {"payload": {},
+             "result": {"ok": True, "node": "localhost",
+                        "displays": [], "audioSinks": [], "cameras": []}},
+        )),
 
     "twin://host/constraints/query/from-profile": Contract(
         version="v1", effect="query",
@@ -277,6 +287,28 @@ CONTRACTS: dict[str, Contract] = {
         examples=(
             {"payload": {"prompt": "not-found-test", "skip_drift_check": True},
              "result": {"ok": True, "found": False, "steps": []}},
+        ),
+    ),
+
+    "twin://host/experience/query/retrieve": Contract(
+        version="v1",
+        effect="query",
+        inp={"intent": "?str", "fingerprint": "?str", "env_fp": "?str", "k": "?int",
+             "node": "?str", "routes": "?list"},
+        out={"ok": "const:true", "kind": "const:experience-retrieval", "intent": "str",
+             "fingerprint": "?str", "node": "str", "k": "int", "episodes": "list",
+             "flows": "list", "routes": "list", "preferences": "list", "index": "obj",
+             "note": "str"},
+        errors=STATEFUL_ERRORS,
+        examples=(
+            {"payload": {"intent": "take screenshot", "fingerprint": "env-test", "k": 3},
+             "result": {"ok": True, "kind": "experience-retrieval",
+                        "intent": "take screenshot", "fingerprint": "env-test",
+                        "node": "host", "k": 3, "episodes": [], "flows": [],
+                        "routes": [], "preferences": [],
+                        "index": {"kind": "derived", "fingerprint": "abc",
+                                  "source": "TwinMemory+routes", "embedding": {}},
+                        "note": "retrieval returns candidates only; router/contract/env gates decide admissibility"}},
         ),
     ),
 

@@ -98,6 +98,63 @@ def environment_profile(node: str = "", prompt: str = "") -> dict:
     return urirun.ok(**env)
 
 
+def _inv_run(cmd: list[str], timeout: float = 4.0) -> str:
+    import subprocess
+    try:
+        r = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+        return r.stdout if r.returncode == 0 else ""
+    except Exception:  # noqa: BLE001 — a missing tool / denied probe is a normal empty inventory
+        return ""
+
+
+def _inventory_displays() -> list[dict]:
+    import os, re, shutil  # noqa: E401
+    if not (shutil.which("xrandr") and os.environ.get("DISPLAY")):
+        return []  # Wayland / headless: no portable read-only enumerator → empty (degrade, not guess)
+    out = []
+    for line in _inv_run(["xrandr", "--query"]).splitlines():
+        if " connected" in line:
+            m = re.search(r"(\d+x\d+)\+\d+\+\d+", line)
+            out.append({"id": line.split()[0], "label": line.split()[0], "kind": "display",
+                        "resolution": m.group(1) if m else None,
+                        "primary": " primary " in f" {line} "})
+    return out
+
+
+def _inventory_audio_sinks() -> list[dict]:
+    import shutil
+    if not shutil.which("pactl"):
+        return []
+    out = []
+    for line in _inv_run(["pactl", "list", "short", "sinks"]).splitlines():
+        parts = line.split("\t")
+        if len(parts) >= 2 and parts[0].strip():
+            out.append({"id": parts[0].strip(), "label": parts[1].strip(), "kind": "audio-sink"})
+    return out
+
+
+def _inventory_cameras() -> list[dict]:
+    import glob
+    return [{"id": dev, "label": dev, "kind": "camera", "device": dev}
+            for dev in sorted(glob.glob("/dev/video*"))]
+
+
+@conn.handler("environment/query/inventory",
+              meta={"label": "Twin environment inventory (displays / audio sinks / cameras)"})
+def environment_inventory(node: str = "") -> dict:
+    """Enumerate the CONTROLLABLE SURFACES of the environment — displays, audio sinks, cameras — so
+    a planner can resolve needs-selection (1 surface → use it; N → pick from preference or ask the
+    human). Read-only and best-effort: each probe degrades to [] when its tool/device/permission is
+    absent. This is the inventory half of the twin — profile/drift answer REACHABILITY, inventory
+    answers WHAT IS THERE (the input the autonomy thesis plans over, alongside action_space)."""
+    return urirun.ok(
+        node=node or "localhost",
+        displays=_inventory_displays(),
+        audioSinks=_inventory_audio_sinks(),
+        cameras=_inventory_cameras(),
+    )
+
+
 @conn.handler("constraints/query/from-profile",
               meta={"label": "Infeasible constraints from actionMatrix"})
 def constraints_from_profile(actionMatrix: dict) -> dict:
@@ -659,6 +716,35 @@ def flow_recall(
                                  driftUnchecked=True)
 
     return urirun.ok(found=False, steps=[])
+
+
+@conn.handler("experience/query/retrieve",
+              meta={"label": "Retrieve candidate episodes, routes and preferences for propose-stage planning"})
+def experience_retrieve(
+    intent: str = "",
+    fingerprint: str = "",
+    env_fp: str = "",
+    k: int = 5,
+    node: str = "host",
+    routes: list | None = None,
+) -> dict:
+    """Retrieve propose-stage candidates from derived Twin memory/index state.
+
+    Similarity/exact recall here is advisory only. The returned candidates are not
+    accepted plans; every proposed flow still goes through router/contract/env gates.
+    """
+    from .experience import retrieve_experience
+    from urirun.node.twin_store import durable_memory  # noqa: PLC0415
+
+    data = retrieve_experience(
+        intent=intent,
+        fingerprint=fingerprint or env_fp,
+        k=k,
+        node=node or "host",
+        routes=routes or [],
+        memory=durable_memory(),
+    )
+    return urirun.ok(**data)
 
 
 @conn.handler("flow/episode/command/run",

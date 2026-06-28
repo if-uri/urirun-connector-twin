@@ -43,6 +43,36 @@ def _kvm_query(node: str, route: str) -> dict | None:
     return None
 
 
+_LOCAL_NODES = {"", "host", "localhost", "local", "127.0.0.1"}
+
+
+def _is_local_node(node: str | None) -> bool:
+    """True when ``node`` denotes the local host rather than a remote mesh node."""
+    return not node or str(node).lower() in _LOCAL_NODES
+
+
+def _kvm_profile_local() -> dict | None:
+    """In-process kvm env profile, used when the connector is installed locally
+    but its ``env/query/profile`` route is not reachable over the mesh yet.
+
+    The preflight planner runs before the node is served, so the mesh call in
+    ``_kvm_query`` returns nothing even though the very same flow will reach the
+    kvm profile in-process at execution time (via ``v2_service``). Without this
+    fallback the plan reports ``/screen/query/capture`` as infeasible ("kvm
+    connector not installed") while routing + execution succeed — contradictory
+    operator evidence. Reusing the connector's own ``profile()`` keeps the plan's
+    feasibility aligned with what the flow actually does. No hard dependency: a
+    missing kvm connector simply leaves the infeasible constraint in place."""
+    kvm = _safe_import("urirun_connector_kvm.environment")
+    if kvm is None or not hasattr(kvm, "profile"):
+        return None
+    try:
+        prof = kvm.profile()
+        return prof if isinstance(prof, dict) else None
+    except Exception:
+        return None
+
+
 def _constraints_from_profile_local(action_matrix: dict) -> list[dict]:
     """In-process fallback: call reversible._infeasible_constraints directly."""
     rev = _safe_import("urirun.node.reversible")
@@ -130,6 +160,10 @@ def probe(node: str | None = None, prompt: str = "") -> dict:
     node_kvm_unreachable = False
     if node:
         p = _kvm_query(node, "env/query/profile")
+        if not p and _is_local_node(node):
+            # Mesh route not served during preflight — reuse the in-process kvm
+            # profile so feasibility matches the execution path (no false negative).
+            p = _kvm_profile_local()
         if p:
             profile = p
         else:
@@ -138,7 +172,7 @@ def probe(node: str | None = None, prompt: str = "") -> dict:
         s = _kvm_query(node, "surface/query/current")
         if s:
             surface = s
-        else:
+        elif not _is_local_node(node):
             warnings.append(f"kvm://{node}/surface/query/current unreachable")
 
     # When no remote node is selected, check if the host itself can capture the screen.
@@ -152,13 +186,21 @@ def probe(node: str | None = None, prompt: str = "") -> dict:
         # kvm routes use "kvm://host/..." as authority regardless of which node runs them
         # (serviceMap routes transparently), so we match the ROUTE PATH, not the URI prefix.
         # _is_infeasible checks `what in uri` as a substring match.
+        if _is_local_node(node):
+            # Reached only when the in-process fallback also found no kvm profile,
+            # i.e. the connector really is absent on this host.
+            reason = "kvm connector not installed on this host — cannot capture local screen"
+            fix = "pip install urirun-connector-kvm  # or select a node that has kvm"
+        else:
+            reason = (f"Node '{node}' environment unreachable — kvm connector not installed "
+                      "or node offline")
+            fix = f"urirun host ensure {node} kvm"
         constraints.append({
             "kind": "infeasible",
             "what": "/screen/query/capture",
             "surface": "unknown",
-            "reason": (f"Node '{node}' environment unreachable — kvm connector not installed "
-                       "or node offline"),
-            "fix": f"urirun host ensure {node} kvm",
+            "reason": reason,
+            "fix": fix,
         })
 
     if host_kvm_missing:
