@@ -122,6 +122,19 @@ def test_annotate_cdp_fill_is_feasible():
     assert annotated[0]["feasible"] is True
 
 
+def test_annotate_screen_and_window_queries_do_not_inherit_best_cdp_surface():
+    steps = [
+        {"id": "list", "uri": "kvm://host/window/query/list", "payload": {"app": "chrome"}},
+        {"id": "capture", "uri": "kvm://host/screen/query/capture",
+         "payload": {"monitor_from": "list.result.value.selected.monitor"}},
+    ]
+
+    annotated = {step["id"]: step for step in annotate_steps(steps, _CDP_ENV)}
+
+    assert annotated["list"]["surface"] == "window"
+    assert annotated["capture"]["surface"] == "screen"
+
+
 def test_annotate_navigate_is_reversible():
     steps = [{"id": "nav", "uri": "kvm://laptop/cdp/page/command/navigate",
               "payload": {"url": "https://example.com"}}]

@@ -27,6 +27,14 @@ _CDP_ROUTES = frozenset({
     "/cdp/session/command/ensure", "/cdp/session/query/ready",
 })
 
+_SCREEN_QUERY_ROUTES = frozenset({
+    "/screen/query/capture",
+})
+
+_WINDOW_QUERY_ROUTES = frozenset({
+    "/window/query/list",
+})
+
 _REVERSIBLE_TABLE: dict[str, str | None] = {
     "/page/command/navigate": "/page/command/navigate",
     "/page/command/fill": None,
@@ -60,6 +68,10 @@ def _step_surface(uri: str, best_surface: str | None) -> str:
     s = _route_suffix(uri)
     if any(cdp in uri for cdp in ("/cdp/", "/browser/")):
         return "cdp"
+    if s in _SCREEN_QUERY_ROUTES:
+        return "screen"
+    if s in _WINDOW_QUERY_ROUTES:
+        return "window"
     if any(p in s for p in _OS_TYPE_PATHS):
         return best_surface or "os"
     return best_surface or "unknown"
