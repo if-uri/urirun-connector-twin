@@ -1,6 +1,8 @@
+README.md
 pyproject.toml
 tests/test_browser_session.py
 tests/test_contract.py
+tests/test_contract_conformance.py
 tests/test_dispatch.py
 tests/test_proof_cache.py
 tests/test_proof_routes.py
@@ -10,6 +12,7 @@ tests/test_session.py
 tests/test_twin_connector.py
 urirun_connector_twin/__init__.py
 urirun_connector_twin/browser.py
+urirun_connector_twin/contracts.py
 urirun_connector_twin/core.py
 urirun_connector_twin/dispatch.py
 urirun_connector_twin/environment.py

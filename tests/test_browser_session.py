@@ -188,7 +188,9 @@ def test_steps_from_prompt_social_post():
     # Must have session ensure + navigate + fill/post steps
     assert any("session" in u for u in uris)
     assert any("navigate" in u for u in uris)
-    assert any("fill" in u or "click" in u for u in uris)
+    assert "kvm://laptop/ui/command/click" in uris
+    assert "kvm://laptop/ui/command/fill" in uris
+    assert next(s for s in steps if s["id"] == "fill_post")["payload"]["value"]
     # {node} must be substituted
     assert all("{node}" not in s["uri"] for s in steps)
 

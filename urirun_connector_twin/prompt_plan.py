@@ -88,11 +88,11 @@ def _post_on_social_steps(domain: str, content: str) -> list[dict]:
          "payload": {"url": url}},
         {"id": "page_ready", "uri": "kvm://{node}/cdp/session/query/ready",
          "payload": {}},
-        {"id": "click_compose", "uri": "kvm://{node}/cdp/page/command/click",
+        {"id": "click_compose", "uri": "kvm://{node}/ui/command/click",
          "payload": {"role": "button", "text": "Start a post"}},
-        {"id": "fill_post", "uri": "kvm://{node}/cdp/page/command/fill",
-         "payload": {"role": "textbox", "text": content or "New post"}},
-        {"id": "click_publish", "uri": "kvm://{node}/cdp/page/command/click",
+        {"id": "fill_post", "uri": "kvm://{node}/ui/command/fill",
+         "payload": {"role": "textbox", "value": content or "New post"}},
+        {"id": "click_publish", "uri": "kvm://{node}/ui/command/click",
          "payload": {"role": "button", "text": "Post"}},
     ]
 
