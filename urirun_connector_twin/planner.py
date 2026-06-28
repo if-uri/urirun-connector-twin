@@ -65,7 +65,18 @@ def _step_surface(uri: str, best_surface: str | None) -> str:
     return best_surface or "unknown"
 
 
-def _step_reversible(uri: str) -> tuple[bool, str | None]:
+def _step_reversible(uri: str, route_contracts: dict | None = None) -> tuple[bool, str | None]:
+    """Reversibility of a route. CONTRACT IS THE SINGLE SOURCE when available: if the live registry
+    carries a contract for this URI (``route_contracts[uri]`` = a ``meta.contract`` dict with
+    ``reversible``/``inverseRoute``), it wins. The static ``_REVERSIBLE_TABLE`` is the FALLBACK for
+    routes whose connector has no contract yet (most of the fleet) — dropping it would regress those
+    to unknown. Pass ``route_contracts`` (e.g. built from a compiled registry) to make the planner
+    contract-driven for covered routes while staying correct for the rest."""
+    if route_contracts:
+        c = route_contracts.get(uri)
+        if isinstance(c, dict) and "reversible" in c:
+            rev = bool(c.get("reversible"))
+            return rev, (c.get("inverseRoute") or None) if rev else None
     suffix = _route_suffix(uri)
     for pattern, inv in _REVERSIBLE_TABLE.items():
         if pattern in suffix:
@@ -73,15 +84,19 @@ def _step_reversible(uri: str) -> tuple[bool, str | None]:
     return False, None
 
 
-def annotate_steps(steps: list[dict], env: dict) -> list[dict]:
-    """Annotate a list of {id, uri, payload} steps with feasibility + reversibility."""
+def annotate_steps(steps: list[dict], env: dict, route_contracts: dict | None = None) -> list[dict]:
+    """Annotate a list of {id, uri, payload} steps with feasibility + reversibility.
+
+    ``route_contracts`` (optional URI→contract map from the live registry's ``meta.contract``) makes
+    reversibility contract-driven for covered routes; absent, the static table is used (unchanged
+    behaviour). Backward-compatible: callers that pass nothing get exactly the old annotation."""
     constraints = env.get("constraints") or []
     best = env.get("bestSurface")
     annotated = []
     for i, step in enumerate(steps, 1):
         uri = str(step.get("uri") or "")
         infeasible = _is_infeasible(uri, constraints)
-        reversible, inverse = _step_reversible(uri)
+        reversible, inverse = _step_reversible(uri, route_contracts)
         annotated.append({
             "step": i,
             "id": step.get("id") or f"step_{i}",
@@ -103,10 +118,13 @@ def extract_steps_from_flow(flow: dict) -> list[dict]:
             for s in (flow.get("steps") or [])]
 
 
-def build_imperative_plan(flow: dict, env: dict, prompt: str = "") -> dict:
-    """Generate an imperative plan from a flow + environment probe."""
+def build_imperative_plan(flow: dict, env: dict, prompt: str = "",
+                          route_contracts: dict | None = None) -> dict:
+    """Generate an imperative plan from a flow + environment probe. ``route_contracts`` (optional
+    URI→contract map from the live registry) makes reversibility contract-driven; absent, the
+    static table is used (unchanged)."""
     raw_steps = extract_steps_from_flow(flow)
-    steps = annotate_steps(raw_steps, env)
+    steps = annotate_steps(raw_steps, env, route_contracts)
     infeasible_steps = [s for s in steps if not s["feasible"]]
     irreversible_steps = [s for s in steps if not s["reversible"]]
     return {

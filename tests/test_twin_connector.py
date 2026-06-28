@@ -1374,3 +1374,37 @@ def test_non_degraded_query_step_shows_applied_status(monkeypatch):
     assert step_events[0]["status"] == "applied"
     assert step_events[0]["degraded"] is False
     assert "degraded" not in step_events[0]["narration"]
+
+
+def test_annotate_steps_contract_overrides_static_table():
+    """Single source of reversibility: when a route's contract is supplied (route_contracts, as
+    built from the live registry's meta.contract), it WINS over the static _REVERSIBLE_TABLE; routes
+    without a contract fall back to the table (so the 29/37 contractless fleet doesn't regress)."""
+    env = {"constraints": [], "bestSurface": None}
+    steps = [
+        {"id": "nav", "uri": "kvm://host/cdp/page/command/navigate", "payload": {}},   # table: reversible
+        {"id": "fill", "uri": "kvm://host/ui/command/fill", "payload": {}},            # table: not in it
+    ]
+    # Contract says navigate is IRREVERSIBLE (overrides table) and fill IS reversible (adds info).
+    route_contracts = {
+        "kvm://host/cdp/page/command/navigate": {"effect": "command", "reversible": False},
+        "kvm://host/ui/command/fill": {"effect": "command", "reversible": True,
+                                       "inverseRoute": "/ui/command/clear"},
+    }
+    by_default = {s["id"]: s for s in annotate_steps(steps, env)}
+    by_contract = {s["id"]: s for s in annotate_steps(steps, env, route_contracts)}
+
+    # default (no contracts) = unchanged static-table behaviour
+    assert by_default["nav"]["reversible"] is True       # table has /page/command/navigate
+    # contract overrides the table
+    assert by_contract["nav"]["reversible"] is False
+    assert by_contract["fill"]["reversible"] is True
+    assert by_contract["fill"]["inverse"] == "/ui/command/clear"
+
+
+def test_annotate_steps_falls_back_to_table_for_contractless_routes():
+    env = {"constraints": [], "bestSurface": None}
+    steps = [{"id": "ensure", "uri": "kvm://host/cdp/session/command/ensure", "payload": {}}]
+    # A contracts map that doesn't cover this route -> table fallback (ensure is reversible there).
+    out = annotate_steps(steps, env, {"other://x/y/command/z": {"reversible": True}})
+    assert out[0]["reversible"] is True and out[0]["inverse"] == "/session/command/close"
