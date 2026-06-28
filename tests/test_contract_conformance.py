@@ -1,14 +1,12 @@
 # Author: Tom Sapletta · https://tom.sapletta.com
 # Part of the ifURI solution.
-"""Conformance gate for the twin connector's route contracts (deterministic subset).
+"""Conformance gate for the twin connector's route contracts.
 
-twin is mostly LLM/stateful; this covers the pure-probe routes with live-output conformance and
-surfaces the still-uncovered routes via a warning (no silent gaps). The dangling guard hard-fails if
-a contract points at a route that no longer exists.
+All live twin routes must have a route-level contract. Live-output conformance is still limited to
+deterministic probe handlers, but coverage and dangling guards are now strict so the autonomous
+planning surface cannot grow undocumented routes.
 """
 from __future__ import annotations
-
-import warnings
 
 import urirun_connector_twin.core as core
 from urirun_connector_twin.contracts import CONTRACTS
@@ -25,10 +23,10 @@ def test_no_dangling_and_report_coverage():
     dangling = contracted - live
     assert not dangling, f"contracts point at routes that no longer exist: {sorted(dangling)}"
     uncovered = sorted(live - contracted)
-    if uncovered:
-        warnings.warn(
-            f"twin contract coverage {len(contracted)}/{len(live)}; {len(uncovered)} uncovered "
-            f"(LLM/stateful routes pending): {uncovered}", stacklevel=2)
+    assert not uncovered, (
+        f"twin contract coverage {len(contracted)}/{len(live)}; "
+        f"{len(uncovered)} uncovered: {uncovered}"
+    )
 
 
 def test_live_output_conforms_to_contract():
