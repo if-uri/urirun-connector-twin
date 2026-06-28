@@ -11,6 +11,7 @@ Routes served:
   twin://host/constraints/query/from-profile — infeasible constraints from actionMatrix
   twin://host/browser/query/sessions      — list live Chrome sessions
   twin://host/browser/query/profile       — select best session for domain/task
+  twin://host/experience/query/retrieve   — propose-stage memory/route candidates
   twin://host/plan/command/from-prompt    — NL prompt → annotated imperative plan
   twin://host/plan/command/annotate       — flow + env → annotated plan (switchable logic)
   twin://host/plan/command/generate       — flow + node → probe env then annotate
@@ -24,6 +25,8 @@ Routes served:
 from __future__ import annotations
 
 import importlib.util
+import json
+from pathlib import Path
 from typing import Any
 
 import urirun
@@ -819,12 +822,28 @@ def bindings() -> dict:
     return conn.bindings()
 
 
+def _manifest_prose() -> dict:
+    """Load optional prose metadata without making bindings/CLI depend on it."""
+    try:
+        prose = urirun.load_manifest(__package__)
+    except FileNotFoundError:
+        prose_path = Path(__file__).resolve().parent.parent / "connector.manifest.json"
+        if not prose_path.exists():
+            return {}
+        prose = json.loads(prose_path.read_text(encoding="utf-8"))
+    # Older twin checkouts keep a bindings document here. It is useful for static
+    # discovery, but not valid prose for conn.manifest(...).
+    if isinstance(prose, dict) and prose.get("version") == "urirun.bindings.v2":
+        return {}
+    return prose if isinstance(prose, dict) else {}
+
+
 def manifest() -> dict:
-    return conn.manifest(urirun.load_manifest(__package__))
+    return conn.manifest(_manifest_prose())
 
 
 def main(argv: list[str] | None = None) -> int:
-    return conn.cli(argv, manifest_prose=urirun.load_manifest(__package__))
+    return conn.cli(argv, manifest_prose=_manifest_prose())
 
 
 if __name__ == "__main__":

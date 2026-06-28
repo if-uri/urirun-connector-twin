@@ -3,10 +3,11 @@
 **Digital Twin** — connector ekosystemu [ifURI / urirun](https://github.com/if-uri/urirun).
 Schemat URI: `twin://`
 
-Probe a node's real environment, turn a natural-language prompt into an annotated
-imperative plan, and check step feasibility — all over `twin://` URI routes. The
-twin treats every external capability (browser sessions, screen, environment) as a
-URI call, so it works the same locally and across the mesh.
+Probe a node's real environment, retrieve propose-stage experience context, turn a
+natural-language prompt into an annotated imperative plan, and check step
+feasibility — all over `twin://` URI routes. The twin treats every external
+capability (browser sessions, screen, environment, memory, routes) as a URI call,
+so it works the same locally and across the mesh.
 
 ## Opis
 
@@ -23,12 +24,18 @@ Routes served:
 | `twin://host/constraints/query/from-profile` | infeasible constraints from the action matrix |
 | `twin://host/browser/query/sessions` | list live Chrome sessions |
 | `twin://host/browser/query/profile` | select the best session for a domain/task |
+| `twin://host/experience/query/retrieve` | retrieve candidate episodes, flows, preferences and optional route-similarity hints for LLM proposal |
 | `twin://host/step/query/feasibility` | is a given step feasible on this node |
 | `twin://host/plan/command/from-prompt` | NL prompt → annotated imperative plan |
 | `twin://{node}/plan/command/annotate` | annotate a plan against a remote node profile |
 
 Capabilities consumed (switchable via the mesh): `kvm://{node}/env/query/profile`,
 `kvm://{node}/screen/query/capture`, `kvm://{node}/cdp/...`, `env://{node}/intent/query/describe`.
+
+`experience/query/retrieve` is intentionally a **proposal input**, not an
+acceptance gate. Exact recall and optional embedding-ranked candidates can help
+the LLM propose a flow, but router, contracts, policy and environment-domain
+validation still decide whether that candidate may run.
 
 ## Wymagania
 

@@ -1,5 +1,25 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+- **Preflight feasibility now matches execution for the local host.** `environment.probe()`
+  treated `node="host"` as a remote node and probed `kvm://host/env/query/profile` over the mesh
+  with no in-process fallback (unlike its siblings `_constraints_via_uri` / `_probe_browser`).
+  During plan preflight that route is not yet served, so the plan reported
+  `/screen/query/capture` as infeasible ("kvm connector not installed or node offline") even
+  though routing and execution both succeeded — the execution-time `env/query/inventory` reaches
+  the kvm profile in-process. This produced contradictory operator evidence (plan said
+  "0 reachable / 1 unreachable" while the screenshot was captured fine). Fix: `_is_local_node()`
+  classifies `host`/`localhost`/`local`/`127.0.0.1`/empty as local, and `_kvm_profile_local()`
+  reuses `urirun_connector_kvm.environment.profile()` (the same source the inventory uses) as a
+  fallback. For a local node the probe now uses the in-process profile, so
+  `feasibleSteps`/`infeasibleSteps` agree with what the flow actually does. Remote/offline nodes
+  are unchanged — still infeasible, no local-capability substitution. The infeasible reason is
+  split accordingly: local → "not installed on this host" (`pip install urirun-connector-kvm`),
+  remote → "node offline" (`urirun host ensure <node> kvm`). New regression tests in
+  `tests/test_twin_connector.py`.
+
 ## [0.1.10] - 2026-06-26
 
 ### Fixed
