@@ -48,4 +48,36 @@ CONTRACTS: dict[str, Contract] = {
                         "blocked_by": None, "fix": None, "constraints": [],
                         "sessionSelection": {"mode": "no-target", "port": None}}},
         )),
+
+    # browser/query/* — czyste reads CDP (enumeracja/selekcja sesji Chrome), bez LLM/stanu twin
+    "twin://host/browser/query/sessions": Contract(
+        version="v1", effect="query",
+        inp={"probe_cookies": "?bool"},
+        out={"ok": "const:true", "sessions": "list", "count": "int", "reachable": "int"},
+        examples=(
+            {"payload": {},
+             "result": {"ok": True, "sessions": [], "count": 0, "reachable": 0}},
+        )),
+
+    "twin://host/browser/query/profile": Contract(
+        version="v1", effect="query",
+        inp={"domain": "?str", "prompt": "?str", "probe_cookies": "?bool"},
+        out={"ok": "const:true", "domain": "str", "selection": "?obj", "sessions": "int", "reachable": "int"},
+        examples=(
+            {"payload": {"domain": "example.com"},
+             "result": {"ok": True, "domain": "example.com", "selection": None, "sessions": 0, "reachable": 0}},
+        )),
+
+    # proof/query/check — deterministyczny lookup w cache dowodów odwracalności (czyta twin store)
+    "twin://host/proof/query/check": Contract(
+        version="v1", effect="query",
+        inp={"uri": "?str", "env_fingerprint": "?str"},
+        out={"ok": "const:true", "hit": "bool", "proof_key": "str", "next": "obj",
+             "verdict": "?str", "proven_at": "?any"},
+        examples=(
+            {"payload": {"uri": "kvm://host/screen/query/capture", "env_fingerprint": "deadbeef"},
+             "result": {"ok": True, "hit": False,
+                        "proof_key": "kvm://host/screen/query/capture::default::deadbeef",
+                        "next": {"kind": "continue"}}},
+        )),
 }
