@@ -80,4 +80,27 @@ CONTRACTS: dict[str, Contract] = {
                         "proof_key": "kvm://host/screen/query/capture::default::deadbeef",
                         "next": {"kind": "continue"}}},
         )),
+
+    # proof/command/record — zapisuje POZYTYWNY dowód odwracalności w trwałym ledgerze (mutuje store)
+    "twin://host/proof/command/record": Contract(
+        version="v1", effect="command", reversible=False,
+        inp={"uri": "?str", "env_fingerprint": "?str", "verdict": "?str", "scanned_after": "?any"},
+        out={"ok": "const:true", "recorded": "bool", "proof_key": "str", "reason": "?str"},
+        examples=(
+            {"payload": {"uri": "fs://host/file/command/write", "env_fingerprint": "abc", "verdict": "reversible"},
+             "result": {"ok": True, "recorded": True, "proof_key": "fs://host/file/command/write::default::abc"}},
+        )),
+
+    # proof/command/gate — brama odwracalności: skip (cache) | proven (probe+record) | block.
+    # Koperta bez `ok` (jak preflight_step) — decision/reason/proof_key/next.
+    "twin://host/proof/command/gate": Contract(
+        version="v1", effect="command", reversible=False,
+        inp={"uri": "?str", "env_fingerprint": "?str"},
+        out={"decision": "enum:skip|proven|block", "reason": "str", "proof_key": "str", "next": "obj"},
+        examples=(
+            {"payload": {"uri": "kvm://host/screen/query/capture", "env_fingerprint": "deadbeef"},
+             "result": {"decision": "skip", "reason": "proven-reversible (cached)",
+                        "proof_key": "kvm://host/screen/query/capture::default::deadbeef",
+                        "next": {"kind": "continue"}}},
+        )),
 }
