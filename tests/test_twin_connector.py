@@ -1473,3 +1473,20 @@ def test_environment_inventory_returns_selection_ready_surfaces():
     assert all(s["kind"] == "display" for s in r["displays"])
     assert all(s["kind"] == "audio-sink" for s in r["audioSinks"])
     assert all(s["kind"] == "camera" for s in r["cameras"])
+
+
+def test_environment_inventory_does_not_label_local_surfaces_as_remote_node():
+    """A remote node name without a remote inventory transport must degrade to empty domains.
+
+    Returning local host displays under node='lenovo' poisons router decisions; an empty,
+    typed local-only result is safer than false inventory.
+    """
+    import urirun_connector_twin.core as c
+    r = c.environment_inventory(node="definitely-remote-test-node")
+    assert r["ok"] is True
+    assert r["requestedNode"] == "definitely-remote-test-node"
+    assert r["inventoryAvailable"] is False
+    assert r["displays"] == []
+    assert r["audioSinks"] == []
+    assert r["cameras"] == []
+    assert r["warnings"]

@@ -142,6 +142,19 @@ def _inventory_cameras() -> list[dict]:
             for dev in sorted(glob.glob("/dev/video*"))]
 
 
+def _local_inventory_node_names() -> set[str]:
+    import socket
+    names = {"", "host", "localhost", "127.0.0.1"}
+    try:
+        hostname = socket.gethostname()
+        if hostname:
+            names.add(hostname)
+            names.add(hostname.split(".", 1)[0])
+    except OSError:
+        pass
+    return names
+
+
 @conn.handler("environment/query/inventory",
               meta={"label": "Twin environment inventory (displays / audio sinks / cameras)"})
 def environment_inventory(node: str = "") -> dict:
@@ -150,11 +163,23 @@ def environment_inventory(node: str = "") -> dict:
     human). Read-only and best-effort: each probe degrades to [] when its tool/device/permission is
     absent. This is the inventory half of the twin — profile/drift answer REACHABILITY, inventory
     answers WHAT IS THERE (the input the autonomy thesis plans over, alongside action_space)."""
+    requested = str(node or "").strip()
+    if requested and requested not in _local_inventory_node_names():
+        return urirun.ok(
+            node="localhost",
+            requestedNode=requested,
+            displays=[],
+            audioSinks=[],
+            cameras=[],
+            inventoryAvailable=False,
+            warnings=[f"inventory is local-only in this connector; remote node {requested!r} was not probed"],
+        )
     return urirun.ok(
-        node=node or "localhost",
+        node=requested or "localhost",
         displays=_inventory_displays(),
         audioSinks=_inventory_audio_sinks(),
         cameras=_inventory_cameras(),
+        inventoryAvailable=True,
     )
 
 
@@ -510,7 +535,7 @@ def flow_goal_verify(goal: dict | None = None, results: dict | None = None) -> d
     Returns {ok:True, goalMet:True} on pass, {ok:False, goalMet:False} on fail so
     _thin_driver can trigger SAGA rollback when the goal state wasn't reached.
     A missing goal.uri is a no-op pass — query-only flows have no goal assertion."""
-    from urirun.node.flow import _run_goal_check
+    from urirun_flow.flow_verify import _run_goal_check
     goal = goal or {}
     if not goal.get("uri"):
         return urirun.ok(goalMet=True, skipped="no-goal-uri")

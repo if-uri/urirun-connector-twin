@@ -1,7 +1,7 @@
 source: code2llm
 # generated in 0.01s
 schema: code2llm.planfile_tickets.v1
-project_root: /home/tom/github/if-uri/urirun-connector-twin
+project_root: ~/github/if-uri/urirun-connector-twin
 tickets:
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: _cdp_cookies'

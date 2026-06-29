@@ -1,4 +1,4 @@
-project: /home/tom/github/if-uri/urirun-connector-twin
+project: ~/github/if-uri/urirun-connector-twin
 generated_from: code2llm call graph analysis
 stats:
   total_nodes: 84

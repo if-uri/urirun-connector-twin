@@ -9,7 +9,7 @@ Three contracts verified:
 from __future__ import annotations
 
 import pytest
-from urirun.node.flow import FlowEnvelope, _thin_driver, _THIN_GOAL_URI
+from urirun_flow.flow_thin import FlowEnvelope, _thin_driver, _THIN_GOAL_URI
 
 
 # ── helpers ──────────────────────────────────────────────────────────────────
@@ -282,7 +282,7 @@ def _stuck_uri(r: dict) -> "str | None":
 
 def test_three_path_rollback_convergence_success():
     """_thin_rollback, flow_rollback, and _uri_rollback all undo the same ledger (by URI set)."""
-    from urirun.node.flow import _thin_rollback, FlowEnvelope
+    from urirun_flow.flow_thin import _thin_rollback, FlowEnvelope
     from urirun_connector_twin.core import flow_rollback
     from urirun.node.reversible import _uri_rollback as uri_rollback_fn
 
@@ -331,7 +331,7 @@ def test_three_path_rollback_convergence_success():
 
 def test_three_path_rollback_convergence_stuck():
     """When an inverse fails, all three paths halt and identify the same stuck URI."""
-    from urirun.node.flow import _thin_rollback, FlowEnvelope
+    from urirun_flow.flow_thin import _thin_rollback, FlowEnvelope
     from urirun_connector_twin.core import flow_rollback
     from urirun.node.reversible import _uri_rollback as uri_rollback_fn
 
